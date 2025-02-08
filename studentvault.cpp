@@ -1,78 +1,104 @@
 #include <iostream>
+#include <vector>
 #include <climits>
 #include <cmath>
 #include <algorithm>
 #include <chrono>
+#include <stdexcept>
 
 using namespace std;
 using namespace chrono;
 
-int partition(int A[], int low, int high) {
-    int pivot = A[high];
-    int i = low - 1;
+class MinDistanceFinder {
+private:
+    static void heapify(vector<int>& arr, int n, int i) {
+        int largest = i;
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
 
-    for (int j = low; j < high; j++) {
-        if (A[j] <= pivot) {
-            i++;
-            swap(A[i], A[j]);
+        if (left < n && arr[left] > arr[largest])
+            largest = left;
+
+        if (right < n && arr[right] > arr[largest])
+            largest = right;
+
+        if (largest != i) {
+            swap(arr[i], arr[largest]);
+            heapify(arr, n, largest);
         }
     }
 
-    swap(A[i + 1], A[high]);
-    return i + 1;
-}
+    static void heapSort(vector<int>& arr) {
+        int n = arr.size();
 
-void quickSort(int A[], int low, int high) {
-    if (low < high) {
-        int pivotIndex = partition(A, low, high);
-        quickSort(A, low, pivotIndex - 1);
-        quickSort(A, pivotIndex + 1, high);
-    }
-}
+        // Build max heap
+        for (int i = n / 2 - 1; i >= 0; i--)
+            heapify(arr, n, i);
 
-int MinDistanceOptimized(int A[], int length) {
-    if (length < 2) {
-        return INT_MAX;
-    }
-
-    quickSort(A, 0, length - 1);
-    int dmin = INT_MAX;
-
-    for (int i = 1; i < length; i++) {
-        int current_distance = abs(A[i] - A[i - 1]);
-        if (current_distance < dmin) {
-            dmin = current_distance;
+        // Extract elements from heap one by one
+        for (int i = n - 1; i > 0; i--) {
+            swap(arr[0], arr[i]);
+            heapify(arr, i, 0);
         }
     }
 
-    return dmin;
-}
+public:
+    static pair<int, pair<int, int>> findMinDistance(const vector<int>& input) {
+        if (input.size() < 2) {
+            throw invalid_argument("Array must contain at least 2 elements");
+        }
+
+        vector<int> A = input; // Create a copy to avoid modifying original
+        heapSort(A);
+        
+        int dmin = INT_MAX;
+        int num1 = 0, num2 = 0;
+
+        for (size_t i = 1; i < A.size(); i++) {
+            int current_distance = abs(A[i] - A[i - 1]);
+            if (current_distance < dmin) {
+                dmin = current_distance;
+                num1 = A[i - 1];
+                num2 = A[i];
+            }
+        }
+
+        return {dmin, {num1, num2}};
+    }
+};
 
 int main() {
-    int size;
-    auto start = high_resolution_clock::now();
-    cout << "Enter the size of the array: ";
-    cin >> size;
+    try {
+        auto start = high_resolution_clock::now();
+        
+        size_t size;
+        cout << "Enter the size of the array: ";
+        cin >> size;
 
-    if (size < 2) {
-        cout << "Array size should be at least 2." << endl;
+        vector<int> numbers;
+        numbers.reserve(size);
+
+        cout << "Enter " << size << " numbers: ";
+        for (size_t i = 0; i < size; i++) {
+            int num;
+            cin >> num;
+            numbers.push_back(num);
+        }
+
+        auto [minDist, pair] = MinDistanceFinder::findMinDistance(numbers);
+        
+        auto end = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(end - start);
+
+        cout << "\nResults:" << endl;
+        cout << "Minimum distance: " << minDist << endl;
+        cout << "Between numbers: " << pair.first << " and " << pair.second << endl;
+        cout << "Execution time: " << duration.count() << " microseconds" << endl;
+
+    } catch (const exception& e) {
+        cerr << "Error: " << e.what() << endl;
         return 1;
     }
 
-    int* array = new int[size];
-
-    cout << "Enter " << size << " numbers: ";
-    for (int i = 0; i < size; i++) {
-        cin >> array[i];
-    }
-
-    
-    int minDist = MinDistanceOptimized(array, size);
-    auto end = high_resolution_clock::now();
-    auto duration = duration_cast<milliseconds>(end - start); 
-    cout << "Minimum distance between two elements: " << minDist << endl;
-    cout << "Execution time: " << duration.count() << " milliseconds" << endl;
-
-    delete[] array;
     return 0;
 }
