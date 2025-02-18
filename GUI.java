@@ -13,22 +13,48 @@ public class GUI extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
 
-        JPanel sidePanel = new JPanel();
-        sidePanel.setBackground(new Color(0x5C2434));
-        gbc.gridx = 0;
-        gbc.weightx = 0.05;
-        background.add(sidePanel, gbc);
+       // SIDE PANEL - NAVIGATION
+       JPanel sidePanel = new JPanel();
+       sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS)); // Use BoxLayout for vertical stacking
+       sidePanel.setBackground(new Color(0x5C2434));
+       sidePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+       gbc.gridx = 0;
+       gbc.weightx = 0.05;
+       background.add(sidePanel, gbc);
 
+       ImageIcon SVLogo = new ImageIcon("Assets/StudentVaultLogo.png");
+       JLabel logo = new JLabel(SVLogo);
+       logo.setPreferredSize(new Dimension(40, 60));
+       logo.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
+       logo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+       ImageIcon addIcon = new ImageIcon("Assets/AddIcon.png");
+       JButton addButton = new JButton(addIcon);
+       addButton.setPreferredSize(new Dimension(40, 40));
+       addButton.setBackground(new Color(0x5C2434));
+       addButton.setBorderPainted(false);
+       addButton.setFocusPainted(false);
+       addButton.setContentAreaFilled(false);
+       addButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+       addButton.setMargin(new Insets(20, 0, 20, 0)); 
+
+
+       sidePanel.add(logo);
+       sidePanel.add(addButton);  // The button will now be below the logo
+
+
+        //COLUMN 2 - MAIN CONTENT
         JPanel column2 = new JPanel(new GridBagLayout());
         column2.setBackground(Color.WHITE);
         gbc.gridx = 1;
-        gbc.weightx = 0.7;
+        gbc.weightx = 0.95;
         background.add(column2, gbc);
 
         GridBagConstraints gbc2 = new GridBagConstraints();
         gbc2.fill = GridBagConstraints.BOTH;
         gbc2.weightx = 1.0;
 
+        //ROW 1 - Search bar
         JPanel row1 = new JPanel(new GridBagLayout());
         row1.setBackground(Color.WHITE);
         gbc2.gridy = 0;
