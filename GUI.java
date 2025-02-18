@@ -13,14 +13,12 @@ public class GUI extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
 
-        // 🔹 First column panel (Sidebar)
         JPanel sidePanel = new JPanel();
         sidePanel.setBackground(new Color(0x5C2434));
         gbc.gridx = 0;
-        gbc.weightx = 0.05; // Narrow sidebar
+        gbc.weightx = 0.05;
         background.add(sidePanel, gbc);
 
-        // 🔹 Second column (Main Content)
         JPanel column2 = new JPanel(new GridBagLayout());
         column2.setBackground(Color.WHITE);
         gbc.gridx = 1;
@@ -31,32 +29,53 @@ public class GUI extends JFrame {
         gbc2.fill = GridBagConstraints.BOTH;
         gbc2.weightx = 1.0;
 
-        // 🔹 First row inside column2 (Search bar area)
-        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        row1.setBackground(new Color(0xFF5733));
+        JPanel row1 = new JPanel(new GridBagLayout());
+        row1.setBackground(Color.WHITE);
         gbc2.gridy = 0;
-        gbc2.weighty = 0.1;
+        gbc2.weighty = 0.02;
+        gbc2.weightx = 1.0;
         column2.add(row1, gbc2);
 
-        // ✅ Improved JTextField with Proper Sizing
-        JTextField searchField = new RoundedTextField(20, 25); // 20 columns, 25px corner radius
-        searchField.setPreferredSize(new Dimension(400, 40)); // Width: 400px, Height: 40px
+        JTextField searchField = new RoundedTextField(200, 10);
+        searchField.setPreferredSize(new Dimension(480, 40));
+        searchField.setMinimumSize(new Dimension(480, 40));
+        searchField.setMaximumSize(new Dimension(1000, 40));
         searchField.setBackground(new Color(0xE7E7E7));
         searchField.setFont(new Font("Helvetica", Font.PLAIN, 18));
-        
-        // 🔹 Search Functionality on Enter Key
+
         searchField.addActionListener(e -> {
             String query = searchField.getText();
             System.out.println("Searching for: " + query);
         });
 
-        row1.add(searchField); // Add text field to row1
+        gbc2.gridx = 0;
+        gbc2.weightx = 1.0;
+        gbc2.insets = new Insets(10, 10, 10, 0);
+        row1.add(searchField, gbc2);
 
-        // 🔹 Second row inside column2 (Main content area)
-        JPanel row2 = new JPanel();
-        row2.setBackground(Color.WHITE);
+        ImageIcon filterIcon = new ImageIcon("Assets/FilterIcon.png");
+        JButton filterButton = new JButton(filterIcon);
+        filterButton.setPreferredSize(new Dimension(40, 40));
+        filterButton.setBackground(new Color(0x5C2434));
+        filterButton.setBorderPainted(false);
+        filterButton.setFocusPainted(false);
+        filterButton.setContentAreaFilled(false);
+
+        filterButton.setMargin(new Insets(0, 10, 0, 10)); 
+
+        gbc2.gridx = 1;
+        gbc2.weightx = 0.0;
+        gbc2.insets = new Insets(10, 0, 10, 0);
+        row1.add(filterButton, gbc2);
+
+        filterButton.addActionListener(e -> {
+            System.out.println("Filtering");
+        });
+
+        JPanel row2 = new JPanel(new GridBagLayout());
+        row2.setBackground(new Color(0xF4F1A3));
         gbc2.gridy = 1;
-        gbc2.weighty = 0.9;
+        gbc2.weighty = 0.98;
         column2.add(row2, gbc2);
 
         this.add(background);
