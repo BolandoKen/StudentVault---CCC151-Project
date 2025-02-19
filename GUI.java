@@ -1,5 +1,8 @@
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import javax.swing.*;
+import javax.swing.table.JTableHeader;
 
 public class GUI extends JFrame {
     public GUI() {
@@ -13,39 +16,36 @@ public class GUI extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
 
-       // SIDE PANEL - NAVIGATION
-       JPanel sidePanel = new JPanel();
-       sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS)); // Use BoxLayout for vertical stacking
-       sidePanel.setBackground(new Color(0x5C2434));
-       sidePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-       gbc.gridx = 0;
-       gbc.weightx = 0.05;
-       background.add(sidePanel, gbc);
+        // SIDE PANEL - NAVIGATION
+        JPanel sidePanel = new JPanel();
+        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS)); 
+        sidePanel.setBackground(new Color(0x5C2434));
+        gbc.gridx = 0;
+        gbc.weightx = 0.05;
+        background.add(sidePanel, gbc);
 
-       ImageIcon SVLogo = new ImageIcon("Assets/StudentVaultLogo.png");
-       JLabel logo = new JLabel(SVLogo);
-       logo.setPreferredSize(new Dimension(40, 60));
-       logo.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
-       logo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        ImageIcon SVLogo = new ImageIcon("Assets/StudentVaultLogo.png");
+        JLabel logo = new JLabel(SVLogo);
+        logo.setPreferredSize(new Dimension(40, 60));
+        logo.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
+        logo.setAlignmentX(Component.CENTER_ALIGNMENT);
+ 
+        ImageIcon addIcon = new ImageIcon("Assets/AddIcon.png");
+        JButton addButton = new JButton(addIcon);
+        addButton.setPreferredSize(new Dimension(40, 40));
+        addButton.setBackground(new Color(0x5C2434));
+        addButton.setBorderPainted(false);
+        addButton.setFocusPainted(false);
+        addButton.setContentAreaFilled(false);
+        addButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        addButton.setMargin(new Insets(20, 0, 20, 0)); 
+ 
+        sidePanel.add(logo);
+        sidePanel.add(addButton);  
 
-       ImageIcon addIcon = new ImageIcon("Assets/AddIcon.png");
-       JButton addButton = new JButton(addIcon);
-       addButton.setPreferredSize(new Dimension(40, 40));
-       addButton.setBackground(new Color(0x5C2434));
-       addButton.setBorderPainted(false);
-       addButton.setFocusPainted(false);
-       addButton.setContentAreaFilled(false);
-       addButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-       addButton.setMargin(new Insets(20, 0, 20, 0)); 
-
-
-       sidePanel.add(logo);
-       sidePanel.add(addButton);  // The button will now be below the logo
-
-
-        //COLUMN 2 - MAIN CONTENT
+        // COLUMN 2 - MAIN CONTENT
         JPanel column2 = new JPanel(new GridBagLayout());
-        column2.setBackground(Color.WHITE);
+        column2.setBackground(Color.green);
         gbc.gridx = 1;
         gbc.weightx = 0.95;
         background.add(column2, gbc);
@@ -54,32 +54,34 @@ public class GUI extends JFrame {
         gbc2.fill = GridBagConstraints.BOTH;
         gbc2.weightx = 1.0;
 
-        //ROW 1 - Search bar
+        // ROW 1 - Search bar
         JPanel row1 = new JPanel(new GridBagLayout());
         row1.setBackground(Color.white);
         gbc2.gridy = 0;
-        gbc2.weighty = 0.02;
-        gbc2.weightx = 1.0;
+        gbc2.weighty = 0.02; // Adjusted for better layout control
         column2.add(row1, gbc2);
 
-        // Create the rounded search panel
+        // ROW 2 - Main content
+        JPanel row2 = new JPanel();
+        row2.setBackground(new Color(0xE7E7E7));
+        gbc2.gridy = 1;
+        gbc2.weighty = 0.98; // Ensuring it takes more space
+        column2.add(row2, gbc2);
+
         RoundedPanel searchPanel = new RoundedPanel(10);
         searchPanel.setBackground(new Color(0xE7E7E7));
-        searchPanel.setLayout(new BorderLayout()); // Use BorderLayout for proper positioning
+        searchPanel.setLayout(new BorderLayout());
 
-        // Create the search field
-        // Use your RoundedTextField instead of JTextField
         RoundedTextField searchField = new RoundedTextField(200, 10);
         searchField.setBackground(new Color(0xE7E7E7));
         searchField.setFont(new Font("Helvetica", Font.PLAIN, 18));
-        searchField.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 10)); // Padding inside the text field
+        searchField.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 10)); 
 
         searchField.addActionListener(e -> {
             String query = searchField.getText();
             System.out.println("Searching for: " + query);
         });
 
-        // Create a clear button
         ImageIcon clearIcon = new ImageIcon("Assets/XIcon.png");
         JButton clearButton = new JButton(clearIcon);
         clearButton.setPreferredSize(new Dimension(40, 40));
@@ -90,18 +92,14 @@ public class GUI extends JFrame {
 
         clearButton.addActionListener(e -> searchField.setText(""));
 
-        // Add components to searchPanel
         searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(clearButton, BorderLayout.EAST); // Button stays on the right
+        searchPanel.add(clearButton, BorderLayout.EAST);
 
-        // Add searchPanel to row1
         gbc2.gridx = 0;
         gbc2.weightx = 1.0;
-        gbc2.fill = GridBagConstraints.HORIZONTAL; // Allows it to stretch horizontally
+        gbc2.fill = GridBagConstraints.HORIZONTAL;
         gbc2.insets = new Insets(10, 10, 10, 0);
         row1.add(searchPanel, gbc2);
-
-        //row1.add(searchField, gbc2);
 
         ImageIcon filterIcon = new ImageIcon("Assets/FilterIcon.png");
         JButton filterButton = new JButton(filterIcon);
@@ -122,12 +120,56 @@ public class GUI extends JFrame {
             System.out.println("Filtering");
         });
 
-        JPanel row2 = new JPanel(new GridBagLayout());
-        row2.setBackground(new Color(0xF4F1A3));
-        gbc2.gridy = 1;
-        gbc2.weighty = 0.98;
-        column2.add(row2, gbc2);
+        RoundedPanel tablePanel = new RoundedPanel(10);
+        tablePanel.setBackground(new Color(0xffffff));
+        tablePanel.setPreferredSize(new Dimension(600, 400));
 
+        row2.add(tablePanel);
+
+        String[] columnNames = {"Name", "Age"};
+        Object[][] data = {
+            {"John Doe", 20},
+            {"Jane Smith", 22},
+            {"Mike Johnson", 21}
+        };
+
+        JTable table = new JTable(data, columnNames);
+        JTableHeader header = table.getTableHeader();
+        
+        table.setRowHeight(30);
+        header.setFont(new Font("Helvetica", Font.BOLD, 18));
+        table.setFont(new Font("Helvetica", Font.PLAIN, 18));
+        
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
+        
+        table.setFillsViewportHeight(true);
+        
+        RoundedScrollPane scrollPane = new RoundedScrollPane(table, 10);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        
+        header.setBorder(BorderFactory.createEmptyBorder());
+        header.setOpaque(false);
+        header.setBackground(table.getBackground());
+        
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        tablePanel.setLayout(new BorderLayout());
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+        tablePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        HoverTableRenderer hoverRenderer = new HoverTableRenderer();
+        table.setDefaultRenderer(Object.class, hoverRenderer);
+
+        table.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                hoverRenderer.setHoveredRow(row);
+                table.repaint();
+            }
+        });
+        
         this.add(background);
         this.setVisible(true);
     }
