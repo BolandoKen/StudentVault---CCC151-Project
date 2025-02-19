@@ -56,28 +56,52 @@ public class GUI extends JFrame {
 
         //ROW 1 - Search bar
         JPanel row1 = new JPanel(new GridBagLayout());
-        row1.setBackground(Color.WHITE);
+        row1.setBackground(Color.white);
         gbc2.gridy = 0;
         gbc2.weighty = 0.02;
         gbc2.weightx = 1.0;
         column2.add(row1, gbc2);
 
-        JTextField searchField = new RoundedTextField(200, 10);
-        searchField.setPreferredSize(new Dimension(480, 40));
-        searchField.setMinimumSize(new Dimension(480, 40));
-        searchField.setMaximumSize(new Dimension(1000, 40));
+        // Create the rounded search panel
+        RoundedPanel searchPanel = new RoundedPanel(10);
+        searchPanel.setBackground(new Color(0xE7E7E7));
+        searchPanel.setLayout(new BorderLayout()); // Use BorderLayout for proper positioning
+
+        // Create the search field
+        // Use your RoundedTextField instead of JTextField
+        RoundedTextField searchField = new RoundedTextField(200, 10);
         searchField.setBackground(new Color(0xE7E7E7));
         searchField.setFont(new Font("Helvetica", Font.PLAIN, 18));
+        searchField.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 10)); // Padding inside the text field
 
         searchField.addActionListener(e -> {
             String query = searchField.getText();
             System.out.println("Searching for: " + query);
         });
 
+        // Create a clear button
+        ImageIcon clearIcon = new ImageIcon("Assets/XIcon.png");
+        JButton clearButton = new JButton(clearIcon);
+        clearButton.setPreferredSize(new Dimension(40, 40));
+        clearButton.setBackground(new Color(0x5C2434));
+        clearButton.setBorderPainted(false);
+        clearButton.setFocusPainted(false);
+        clearButton.setContentAreaFilled(false);
+
+        clearButton.addActionListener(e -> searchField.setText(""));
+
+        // Add components to searchPanel
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(clearButton, BorderLayout.EAST); // Button stays on the right
+
+        // Add searchPanel to row1
         gbc2.gridx = 0;
         gbc2.weightx = 1.0;
+        gbc2.fill = GridBagConstraints.HORIZONTAL; // Allows it to stretch horizontally
         gbc2.insets = new Insets(10, 10, 10, 0);
-        row1.add(searchField, gbc2);
+        row1.add(searchPanel, gbc2);
+
+        //row1.add(searchField, gbc2);
 
         ImageIcon filterIcon = new ImageIcon("Assets/FilterIcon.png");
         JButton filterButton = new JButton(filterIcon);
