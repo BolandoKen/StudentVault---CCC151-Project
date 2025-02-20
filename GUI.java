@@ -45,7 +45,7 @@ public class GUI extends JFrame {
 
         // COLUMN 2 - MAIN CONTENT
         JPanel column2 = new JPanel(new GridBagLayout());
-        column2.setBackground(Color.green);
+        column2.setBackground(new Color(0xE7E7E7));
         gbc.gridx = 1;
         gbc.weightx = 0.95;
         background.add(column2, gbc);
@@ -62,11 +62,41 @@ public class GUI extends JFrame {
         column2.add(row1, gbc2);
 
         // ROW 2 - Main content
+        // ROW 2 - Main content with 2 rows
+        // ROW 2 - Main content
         JPanel row2 = new JPanel();
         row2.setBackground(new Color(0xE7E7E7));
+        row2.setLayout(new GridBagLayout()); // Ensures proper alignment inside the scroll pane
+
+        // Wrap row2 in a JScrollPane
+        JScrollPane scrollPaneRow2 = new JScrollPane(row2);
+        scrollPaneRow2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS); // Always show vertical scrollbar
+        scrollPaneRow2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // Disable horizontal scrolling
+        scrollPaneRow2.getViewport().setBackground(new Color(0xE7E7E7)); // Keep background consistent
+        scrollPaneRow2.setBorder(BorderFactory.createEmptyBorder());
+
+        // Add scrollable row2 to column2
         gbc2.gridy = 1;
-        gbc2.weighty = 0.98; // Ensuring it takes more space
-        column2.add(row2, gbc2);
+        gbc2.weighty = 0.98;
+        column2.add(scrollPaneRow2, gbc2);
+
+        GridBagConstraints gbcRow2 = new GridBagConstraints();
+        gbcRow2.fill = GridBagConstraints.BOTH;
+        gbcRow2.weightx = 1.0;
+
+        // First row of row2 (Red)
+        JPanel topRow = new JPanel();
+        topRow.setBackground(new Color(0xE7E7E7));
+        topRow.setPreferredSize(new Dimension(1, 100)); // Ensures it has height
+        gbcRow2.gridy = 0;
+        gbcRow2.weighty = 0.2; // Takes 20% of row2's height
+        row2.add(topRow, gbcRow2);
+
+        // Second row of row2 (Blue) containing the table panel
+        JPanel bottomRow = new JPanel(new BorderLayout());
+        bottomRow.setBackground(new Color(0xE7E7E7));
+        gbcRow2.gridy = 1;
+        gbcRow2.weighty = 0.8; // Takes 80% of row2's height
 
         RoundedPanel searchPanel = new RoundedPanel(10);
         searchPanel.setBackground(new Color(0xE7E7E7));
@@ -122,15 +152,32 @@ public class GUI extends JFrame {
 
         RoundedPanel tablePanel = new RoundedPanel(10);
         tablePanel.setBackground(new Color(0xffffff));
-        tablePanel.setPreferredSize(new Dimension(600, 400));
+        tablePanel.setPreferredSize(new Dimension(1155, 800));
 
-        row2.add(tablePanel);
+        //row2.add(tablePanel);
 
-        String[] columnNames = {"Name", "Age"};
+        String[] columnNames = {"ID Number", "Name", "Year Level", "Gender", "Course", "Collage"};
         Object[][] data = {
-            {"John Doe", 20},
-            {"Jane Smith", 22},
-            {"Mike Johnson", 21}
+            {"20210001", "Juan Dela Cruz", "1st Year", "Male", "BSIT", "CIT"},
+            {"20210002", "Maria Clara", "2nd Year", "Female", "BSIT", "CIT"},
+            {"20210003", "Pedro Penduko", "3rd Year", "", "BSIT", "CIT"},
+            {"20210004", "Juan Tamad", "4th Year", "", "BSIT", "CIT"},
+            {"20210005", "Maria Makiling", "1st Year", "", "BSIT", "CIT"},
+            {"20210006", "Pedro Calungsod", "2nd Year", "", "BSIT", "CIT"},
+            {"20210007", "Juan Luna", "3rd Year", "", "BSIT", "CIT"},
+            {"20210008", "Maria Ozawa", "4th Year", "", "BSIT", "CIT"},
+            {"20210009", "Pedro Gil", "1st Year", "", "BSIT", "CIT"},
+            {"20210010", "Juan Tamad", "2nd Year", "", "BSIT", "CIT"},
+            {"20210011", "Maria Makiling", "3rd Year", "", "BSIT", "CIT"},
+            {"20210012", "Pedro Calungsod", "4th Year", "", "BSIT", "CIT"},
+            {"20210013", "Juan Luna", "1st Year", "", "BSIT", "CIT"},
+            {"20210014", "Maria Ozawa", "2nd Year", "", "BSIT", "CIT"},
+            {"20210015", "Pedro Gil", "3rd Year", "", "BSIT", "CIT"},
+            {"20210016", "Juan Tamad", "4th Year", "", "BSIT", "CIT"},
+            {"20210017", "Maria Makiling", "1st Year", "", "BSIT", "CIT"},
+            {"20210018", "Pedro Calungsod", "2nd Year", "", "BSIT", "CIT"},
+            {"20210019", "Juan Luna", "3rd Year", "", "BSIT", "CIT"},
+            {"20210020", "Maria Ozawa", "4th Year", "", "BSIT", "CIT"},
         };
 
         JTable table = new JTable(data, columnNames);
@@ -138,8 +185,11 @@ public class GUI extends JFrame {
         
         table.setRowHeight(30);
         header.setFont(new Font("Helvetica", Font.BOLD, 18));
-        table.setFont(new Font("Helvetica", Font.PLAIN, 18));
-        
+        header.setForeground(new Color(0x7E7E7E)); // Change to any color you like
+        table.setFont(new Font("Helvetica", Font.PLAIN, 16));
+        table.setSelectionBackground(Color.black); // Change background when selected
+        table.setSelectionForeground(Color.black);         // Change text color when selected
+                
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
         
@@ -160,6 +210,12 @@ public class GUI extends JFrame {
         
         HoverTableRenderer hoverRenderer = new HoverTableRenderer();
         table.setDefaultRenderer(Object.class, hoverRenderer);
+
+        JPanel tableContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        tableContainer.setOpaque(false); // Make it transparent
+        tableContainer.add(tablePanel);
+        bottomRow.add(tableContainer, BorderLayout.CENTER);
+        row2.add(bottomRow, gbcRow2);
 
         table.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
