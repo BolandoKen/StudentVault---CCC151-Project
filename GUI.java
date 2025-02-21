@@ -34,10 +34,18 @@ public class GUI extends JFrame {
         gbc2.weighty = 0.02;
         column2.add(new SearchPanel(), gbc2);
 
+        // Wrap row2 in a JScrollPane
+        JScrollPane scrollPaneRow2 = new JScrollPane(new TablePanel());
+        scrollPaneRow2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+	    // Always show vertical scrollbar
+        scrollPaneRow2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // Disable horizontal scrolling
+        scrollPaneRow2.getViewport().setBackground(new Color(0xE7E7E7)); // Keep background consistent
+        scrollPaneRow2.setBorder(BorderFactory.createEmptyBorder());
+
         // Table Panel (inside a scroll pane)
         gbc2.gridy = 1;
         gbc2.weighty = 0.98;
-        column2.add(new TablePanel(), gbc2);
+        column2.add(scrollPaneRow2, gbc2);
 
         this.add(background);
         this.setVisible(true);
