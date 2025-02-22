@@ -2,6 +2,9 @@ import java.awt.*;
 import javax.swing.*;
 
 public class GUI extends JFrame {
+    private CardLayout cardLayout;
+    private JPanel contentPanel;
+
     public GUI() {
         this.setSize(1280, 832);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -16,39 +19,59 @@ public class GUI extends JFrame {
         // Side Panel
         gbc.gridx = 0;
         gbc.weightx = 0.05;
-        background.add(new SidePanel(), gbc);
+        SidePanel sidePanel = new SidePanel(this); // Pass reference of GUI
+        background.add(sidePanel, gbc);
 
-        // Main Content
-        JPanel column2 = new JPanel(new GridBagLayout());
-        column2.setBackground(new Color(0xE7E7E7));
-        gbc.gridx = 1;
-        gbc.weightx = 0.95;
-        background.add(column2, gbc);
+        // Main Content (CardLayout Container)
+        contentPanel = new JPanel();
+        cardLayout = new CardLayout();
+        contentPanel.setLayout(cardLayout);
+        contentPanel.setBackground(new Color(0xE7E7E7));
+
+        // === Table View (Search Panel + TablePanel) ===
+        JPanel tableView = new JPanel(new GridBagLayout());
+        tableView.setBackground(new Color(0xE7E7E7));
 
         GridBagConstraints gbc2 = new GridBagConstraints();
         gbc2.fill = GridBagConstraints.BOTH;
         gbc2.weightx = 1.0;
 
-        // Search Panel
+        // Search Panel (Stays on Top)
         gbc2.gridy = 0;
         gbc2.weighty = 0.02;
-        column2.add(new SearchPanel(), gbc2);
+        tableView.add(new SearchPanel(), gbc2);
 
-        // Wrap row2 in a JScrollPane
-        JScrollPane scrollPaneRow2 = new JScrollPane(new TablePanel());
-        scrollPaneRow2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	    // Always show vertical scrollbar
-        scrollPaneRow2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // Disable horizontal scrolling
-        scrollPaneRow2.getViewport().setBackground(new Color(0xE7E7E7)); // Keep background consistent
-        scrollPaneRow2.setBorder(BorderFactory.createEmptyBorder());
-
-        // Table Panel (inside a scroll pane)
+        // Table Panel (Inside a Scroll Pane)
+        JScrollPane tableScrollPane = new JScrollPane(new TablePanel());
+        tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        tableScrollPane.getVerticalScrollBar().setUnitIncrement(20); // Default speed
+        tableScrollPane.getViewport().setBackground(new Color(0xE7E7E7));
+        tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        
         gbc2.gridy = 1;
         gbc2.weighty = 0.98;
-        column2.add(scrollPaneRow2, gbc2);
+        tableView.add(tableScrollPane, gbc2);
+
+        // === Add Student Panel ===
+        JPanel addStudentPanel = new AddStudent();
+
+        // Add both panels to CardLayout
+        contentPanel.add(tableView, "TABLE");
+        contentPanel.add(addStudentPanel, "ADD_STUDENT");
+
+        // Add contentPanel to GUI
+        gbc.gridx = 1;
+        gbc.weightx = 0.95;
+        background.add(contentPanel, gbc);
 
         this.add(background);
         this.setVisible(true);
+    }
+
+    // Function to switch panels
+    public void switchPanel(String panelName) {
+        cardLayout.show(contentPanel, panelName);
     }
 
     public static void main(String[] args) {
