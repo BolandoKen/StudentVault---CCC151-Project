@@ -39,7 +39,7 @@ public class AddStudent extends JPanel {
         RoundedPanel formPanel = new RoundedPanel(10);
         formPanel.setLayout(new GridBagLayout());
         formPanel.setBackground(new Color(0xffffff));
-        formPanel.add(new StudentFormEx());
+        formPanel.add(new StudentForm());
         formPanel.setPreferredSize(new Dimension(400, 300));
         bottomRow.add(formPanel, BorderLayout.CENTER);
 

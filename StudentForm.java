@@ -1,11 +1,13 @@
 import java.awt.*;
 import javax.swing.*;
 
-public class StudentFormEx extends JPanel {
-    public StudentFormEx() {
+public class StudentForm extends JPanel {
+    public StudentForm() {
         setLayout(new GridBagLayout());
+        this.setBackground(Color.white);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 10, 5, 10);
 
         // Row 0: Title
         gbc.gridy = 0;
@@ -186,7 +188,7 @@ public class StudentFormEx extends JPanel {
             JFrame frame = new JFrame("Student Form Example");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setLayout(new BorderLayout());
-            frame.add(new StudentFormEx(), BorderLayout.CENTER);
+            frame.add(new StudentForm(), BorderLayout.CENTER);
             frame.pack();
             frame.setLocationRelativeTo(null); // Center on screen
             frame.setVisible(true);
