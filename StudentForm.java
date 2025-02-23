@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 
 public class StudentForm extends JPanel {
@@ -33,10 +35,12 @@ public class StudentForm extends JPanel {
         nameGbc.insets = new Insets(5, 10, 5, 10);
 
         nameGbc.gridx = 0;
-        row1.add(new RoundedTextField(30, 10, "Firstname", false, "#E7E7E7", "Helvetica", Font.PLAIN, 18), nameGbc);
+        RoundedTextField firstnameField = new RoundedTextField(30, 10, "Firstname", false, "#E7E7E7", "Helvetica", Font.PLAIN, 18);
+        row1.add(firstnameField, nameGbc);
 
         nameGbc.gridx = 1;
-        row1.add(new RoundedTextField(30, 10, "Lastname", false, "#E7E7E7", "Helvetica", Font.PLAIN, 18), nameGbc);
+        RoundedTextField lastnameField = new RoundedTextField(30, 10, "Firstname", false, "#E7E7E7", "Helvetica", Font.PLAIN, 18);
+        row1.add(lastnameField, nameGbc);
         add(row1, gbc);
 
         // Row 2: Gender, ID Number, Year Level
@@ -54,7 +58,7 @@ public class StudentForm extends JPanel {
 
         // Gender Dropdown
         row2Gbc.gridx = 0;
-        RoundedComboBox gender = new RoundedComboBox(
+        RoundedComboBox genderComboBox = new RoundedComboBox(
             new String[]{"Male", "Female", "Other"},
             Color.decode("#E7E7E7"),
             Color.gray,
@@ -63,7 +67,7 @@ public class StudentForm extends JPanel {
             , "Gender",
             Color.decode("#6DBECA")
         );
-        row2.add(gender, row2Gbc);
+        row2.add(genderComboBox, row2Gbc);
 
         // ID Number Field
         row2Gbc.gridx = 1;
@@ -76,7 +80,7 @@ public class StudentForm extends JPanel {
 
         // Year Level Dropdown
         row2Gbc.gridx = 2;
-        RoundedComboBox yearLevel = new RoundedComboBox(
+        RoundedComboBox yearLevelComboBox = new RoundedComboBox(
             new String[]{"1st Year", "2nd Year", "3rd Year", "4th Year"},
             Color.decode("#E7E7E7"),
             Color.GRAY,
@@ -86,7 +90,7 @@ public class StudentForm extends JPanel {
             Color.decode("#6DBECA")
 
         );
-        row2.add(yearLevel, row2Gbc);
+        row2.add(yearLevelComboBox, row2Gbc);
         add(row2, gbc);
 
         // Row 3: College Panel
@@ -109,7 +113,7 @@ public class StudentForm extends JPanel {
         "College of Economics and Business Accountancy", "College of Arts and Social Sciences",
         "College of Education", "College of Health Sciences",
         };
-        RoundedComboBox college = new RoundedComboBox(
+        RoundedComboBox collegeComboBox = new RoundedComboBox(
             colleges,
             Color.decode("#E7E7E7"),
             Color.GRAY,
@@ -118,7 +122,7 @@ public class StudentForm extends JPanel {
             , "College",
             Color.decode("#6DBECA")
         );
-        collegePanel.add(college, BorderLayout.CENTER);
+        collegePanel.add(collegeComboBox, BorderLayout.CENTER);
         row3.add(collegePanel, row3Gbc);
         add(row3, gbc);
 
@@ -142,7 +146,7 @@ public class StudentForm extends JPanel {
         "College of Economics and Business Accountancy", "College of Arts and Social Sciences",
         "College of Education", "College of Health Sciences",
         };
-        RoundedComboBox program = new RoundedComboBox(
+        RoundedComboBox programComboBox = new RoundedComboBox(
             programs,
             Color.decode("#E7E7E7"),
             Color.GRAY,
@@ -151,7 +155,7 @@ public class StudentForm extends JPanel {
             , "Program",
             Color.decode("#6DBECA")
         );
-        programPanel.add(program, BorderLayout.CENTER);
+        programPanel.add(programComboBox, BorderLayout.CENTER);
         row4.add(programPanel, row4Gbc);
         add(row4, gbc);
 
@@ -180,6 +184,26 @@ public class StudentForm extends JPanel {
         addButton.setPreferredSize(new Dimension(150, 40));
         addPanel.add(addButton, BorderLayout.CENTER);
         row5.add(addPanel, row5Gbc);
+
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Get input values
+                String firstName = firstnameField.getText();
+                String lastName = lastnameField.getText();
+                String gender = genderComboBox.getSelectedItem().toString();
+                String idNumber = idField.getText();
+                String yearLevel = yearLevelComboBox.getSelectedItem().toString();
+                String college = collegeComboBox.getSelectedItem().toString();
+                String program = programComboBox.getSelectedItem().toString();
+
+                if(firstName.isEmpty() || lastName.isEmpty()) {
+                   System.err.println("Please fill all fields!");
+                    return;
+                }
+                Student student = new Student(firstName, lastName, gender, idNumber, yearLevel, college, program); // Add other fields as needed
+            }
+        });
         add(row5, gbc);
     }
 
