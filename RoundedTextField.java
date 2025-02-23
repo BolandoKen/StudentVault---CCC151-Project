@@ -7,21 +7,24 @@ class RoundedTextField extends JTextField {
     private int radius;
     private String placeholder;
     private boolean showingPlaceholder;
-    private boolean hasBorder; // New flag to enable/disable border
+    private boolean hasBorder;
+    private Color backgroundColor;
 
-    public RoundedTextField(int columns, int radius, String placeholder, boolean hasBorder) {
+    // Constructor with Font, Hex Color, and Other Customizations
+    public RoundedTextField(int columns, int radius, String placeholder, boolean hasBorder, String hexColor, String fontName, int fontStyle, int fontSize) {
         super(columns);
         this.radius = radius;
         this.placeholder = placeholder;
         this.showingPlaceholder = true;
         this.hasBorder = hasBorder;
+        this.backgroundColor = Color.decode(hexColor); // Convert HEX to Color
 
-        setOpaque(false); // Make background transparent
+        setOpaque(false);
         setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15)); // Padding
         setForeground(Color.GRAY);
         setText(placeholder);
+        setFont(new Font(fontName, fontStyle, fontSize)); // Set custom font
 
-        // Placeholder logic using FocusListener
         addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -48,11 +51,10 @@ class RoundedTextField extends JTextField {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Background color with rounded corners
-        g2.setColor(getBackground());
+        g2.setColor(backgroundColor);
         g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
 
-        super.paintComponent(g); // Draw text
+        super.paintComponent(g);
         g2.dispose();
     }
 
@@ -62,7 +64,7 @@ class RoundedTextField extends JTextField {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            g2.setColor(Color.LIGHT_GRAY); // Border color
+            g2.setColor(Color.LIGHT_GRAY);
             g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
 
             g2.dispose();

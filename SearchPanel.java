@@ -15,11 +15,7 @@ public class SearchPanel extends JPanel {
         searchPanel.setLayout(new BorderLayout());
         searchPanel.setBackground(new Color(0xE7E7E7));
 
-        RoundedTextField searchField = new RoundedTextField(200, 10, "Search", false);
-        searchField.setBackground(new Color(0xE7E7E7));
-        searchField.setFont(new Font("Helvetica", Font.PLAIN, 18));
-        searchField.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 10));
-
+        RoundedTextField searchField = new RoundedTextField(200, 10, "Search", false, "#E7E7E7", "Helvetica", Font.PLAIN, 18);
         JButton clearButton = createButton("Assets/XIcon.png");
 
         searchField.addActionListener(e -> System.out.println("Searching: " + searchField.getText()));
