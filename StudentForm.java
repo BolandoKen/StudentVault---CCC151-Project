@@ -39,7 +39,7 @@ public class StudentForm extends JPanel {
         row1.add(firstnameField, nameGbc);
 
         nameGbc.gridx = 1;
-        RoundedTextField lastnameField = new RoundedTextField(30, 10, "Firstname", false, "#E7E7E7", "Helvetica", Font.PLAIN, 18);
+        RoundedTextField lastnameField = new RoundedTextField(30, 10, "Lastname", false, "#E7E7E7", "Helvetica", Font.PLAIN, 18);
         row1.add(lastnameField, nameGbc);
         add(row1, gbc);
 
@@ -188,20 +188,86 @@ public class StudentForm extends JPanel {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Get input values
-                String firstName = firstnameField.getText();
-                String lastName = lastnameField.getText();
+                // Get input values and trim whitespace
+                String firstName = firstnameField.getText().trim();
+                String lastName = lastnameField.getText().trim();
                 String gender = genderComboBox.getSelectedItem().toString();
-                String idNumber = idField.getText();
+                String idNumber = idField.getText().trim();
                 String yearLevel = yearLevelComboBox.getSelectedItem().toString();
                 String college = collegeComboBox.getSelectedItem().toString();
                 String program = programComboBox.getSelectedItem().toString();
-
-                if(firstName.isEmpty() || lastName.isEmpty()) {
-                   System.err.println("Please fill all fields!");
+        
+                // Validate all required fields
+                StringBuilder errorMessage = new StringBuilder("Please fill in the following fields:\n");
+                boolean hasError = false;
+        
+                if(firstName.isEmpty() || firstName.equals("Firstname")) {
+                    errorMessage.append("- First Name\n");
+                    hasError = true;
+                }
+                if(lastName.isEmpty() || lastName.equals("Lastname")) {
+                    errorMessage.append("- Last Name\n");
+                    hasError = true;
+                }
+                if(idNumber.isEmpty() || idNumber.equals("ID Number")) {
+                    errorMessage.append("- ID Number\n");
+                    hasError = true;
+                }
+                if(gender.equals("Gender")) {
+                    errorMessage.append("- Gender\n");
+                    hasError = true;
+                }
+                if(yearLevel.equals("Year Level")) {
+                    errorMessage.append("- Year Level\n");
+                    hasError = true;
+                }
+                if(college.equals("College")) {
+                    errorMessage.append("- College\n");
+                    hasError = true;
+                }
+                if(program.equals("Program")) {
+                    errorMessage.append("- Program\n");
+                    hasError = true;
+                }
+        
+                if(hasError) {
+                    JOptionPane.showMessageDialog(
+                        StudentForm.this,
+                        errorMessage.toString(),
+                        "Input Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
                     return;
                 }
-                Student student = new Student(firstName, lastName, gender, idNumber, yearLevel, college, program); // Add other fields as needed
+        
+                try {
+                    Student student = new Student(firstName, lastName, gender, idNumber, 
+                                               yearLevel, college, program);
+                    // Add success message
+                    JOptionPane.showMessageDialog(
+                        StudentForm.this,
+                        "Student added successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    
+                    // Clear form fields
+                    firstnameField.setText("Firstname");
+                    lastnameField.setText("Lastname");
+                    idField.setText("ID Number");
+                    genderComboBox.setSelectedIndex(0);
+                    yearLevelComboBox.setSelectedIndex(0);
+                    collegeComboBox.setSelectedIndex(0);
+                    programComboBox.setSelectedIndex(0);
+                    
+                } catch(Exception ex) {
+                    JOptionPane.showMessageDialog(
+                        StudentForm.this,
+                        "Error creating student: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
             }
         });
         add(row5, gbc);
