@@ -1,10 +1,14 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.*;
 
 public class StudentForm extends JPanel {
+    private TablePanel tablePanel;
     public StudentForm() {
+        tablePanel = new TablePanel();
         setLayout(new GridBagLayout());
         this.setBackground(Color.white);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -108,20 +112,28 @@ public class StudentForm extends JPanel {
 
         JPanel collegePanel = new JPanel(new BorderLayout());
         collegePanel.setBackground(Color.white);
-        String[] colleges = {
-        "Collage of Computer Studies", "College of Engineering", "College of Science and Mathemathics", 
-        "College of Economics and Business Accountancy", "College of Arts and Social Sciences",
-        "College of Education", "College of Health Sciences",
-        };
+
+        Map<String, String[]> collegePrograms = new HashMap<>();
+        collegePrograms.put("College of Computer Studies", new String[]{"BS Computer Science", "BS Information Technology"});
+        collegePrograms.put("College of Engineering", new String[]{"BS Civil Engineering", "BS Electrical Engineering"});
+        collegePrograms.put("College of Science and Mathematics", new String[]{"BS Mathematics", "BS Physics"});
+        collegePrograms.put("College of Economics and Business Accountancy", new String[]{"BS Accountancy", "BS Economics"});
+        collegePrograms.put("College of Arts and Social Sciences", new String[]{"BA Communication", "BA Political Science"});
+        collegePrograms.put("College of Education", new String[]{"BS Secondary Education", "BS Elementary Education"});
+        collegePrograms.put("College of Health Sciences", new String[]{"BS Nursing", "BS Pharmacy"});
+
+        // Populate college dropdown
+        String[] colleges = collegePrograms.keySet().toArray(new String[0]);
         RoundedComboBox collegeComboBox = new RoundedComboBox(
             colleges,
             Color.decode("#E7E7E7"),
             Color.GRAY,
             new Font("Helvetica", Font.PLAIN, 18),
-            10, new Dimension(450, 40) 
-            , "College",
+            10, new Dimension(450, 40),
+            "College",
             Color.decode("#6DBECA")
         );
+
         collegePanel.add(collegeComboBox, BorderLayout.CENTER);
         row3.add(collegePanel, row3Gbc);
         add(row3, gbc);
@@ -141,23 +153,31 @@ public class StudentForm extends JPanel {
 
         JPanel programPanel = new JPanel(new BorderLayout());
         programPanel.setBackground(Color.white);
-        String[] programs = {
-        "Collage of Computer Studies", "College of Engineering", "College of Science and Mathemathics", 
-        "College of Economics and Business Accountancy", "College of Arts and Social Sciences",
-        "College of Education", "College of Health Sciences",
-        };
         RoundedComboBox programComboBox = new RoundedComboBox(
-            programs,
+            new String[]{}, // Empty initially
             Color.decode("#E7E7E7"),
             Color.GRAY,
             new Font("Helvetica", Font.PLAIN, 18),
-            10, new Dimension(450, 40) 
-            , "Program",
+            10, new Dimension(450, 40),
+            "Program",
             Color.decode("#6DBECA")
         );
         programPanel.add(programComboBox, BorderLayout.CENTER);
         row4.add(programPanel, row4Gbc);
         add(row4, gbc);
+
+        collegeComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedCollege = (String) collegeComboBox.getSelectedItem();
+                programComboBox.removeAllItems();
+                if (selectedCollege != null && collegePrograms.containsKey(selectedCollege)) {
+                    for (String program : collegePrograms.get(selectedCollege)) {
+                        programComboBox.addItem(program);
+                    }
+                }
+            }
+        });
 
         // Row 5: Add Student Panel
         gbc.gridy = 5;
@@ -243,13 +263,23 @@ public class StudentForm extends JPanel {
                 try {
                     Student student = new Student(firstName, lastName, gender, idNumber, 
                                                yearLevel, college, program);
-                    // Add success message
+                    
+                    // Save to CSV using StudentManager
+                    StudentManager.saveStudent(student);
+                    
                     JOptionPane.showMessageDialog(
                         StudentForm.this,
                         "Student added successfully!",
                         "Success",
                         JOptionPane.INFORMATION_MESSAGE
                     );
+
+                    System.out.println("Refreshing table...");
+                    SwingUtilities.invokeLater(() -> {
+                        tablePanel.refreshTable();
+                        tablePanel.revalidate();
+                        tablePanel.repaint();
+                    });
                     
                     // Clear form fields
                     firstnameField.setText("Firstname");

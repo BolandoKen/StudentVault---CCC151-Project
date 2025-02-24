@@ -1,11 +1,17 @@
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.List;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 public class TablePanel extends JPanel {
+    private JTable table;
+    private DefaultTableModel model;
+
     public TablePanel() {
         this.setLayout(new GridBagLayout());
         this.setBackground(new Color(0xE7E7E7));
@@ -23,6 +29,24 @@ public class TablePanel extends JPanel {
         gbc.weighty = 0.2;
         this.add(topRow, gbc);
 
+        // Create a refresh button
+        JButton refreshButton = new JButton("Refresh Table");
+        refreshButton.setFont(new Font("Helvetica", Font.BOLD, 16));
+        refreshButton.setBackground(Color.BLUE);
+        refreshButton.setForeground(Color.black);
+        refreshButton.setFocusPainted(false);
+        refreshButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+        // Add action listener to refresh table
+        refreshButton.addActionListener(e -> {
+            System.out.println("Refreshing table...");
+            refreshTable();
+        });
+
+        // Add the button to the topRow panel
+        topRow.add(refreshButton);
+
+
         // Bottom row content (JTable)
         JPanel bottomRow = new JPanel(new BorderLayout());
         bottomRow.setBackground(new Color(0xE7E7E7));
@@ -33,53 +57,19 @@ public class TablePanel extends JPanel {
         RoundedPanel tablePanel = new RoundedPanel(10);
         tablePanel.setBackground(new Color(0xffffff));
 
-        String[] columnNames = {"ID Number", "Firstname", "Lastname", "Year Level", "College", "Program"};
-        Object[][] data = {
-            {"2023-1864", "Sheldono Enario", "Bolando", "1st", "CCS", "BSCS"},
-            {"2024-1023", "Alexander", "Hamilton", "3rd", "COE", "BSEE"},
-            {"2021-5678", "Marie", "Curie", "4th", "COS", "BS Chemistry"},
-            {"2020-4321", "Nikola", "Tesla", "4th", "COE", "BSEE"},
-            {"2019-8765", "Isaac", "Newton", "4th", "COS", "BS Physics"},
-            {"2023-1864", "Lebron James", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Kobe Bryant", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Michael Jordan", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Stephen Curry", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Kevin Durant", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Kawhi Leonard", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "James Harden", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Anthony Davis", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Giannis Antetokounmpo", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Luka Doncic", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Damian Lillard", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Joel Embiid", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Nikola Jokic", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Devin Booker", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Jayson Tatum", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Donovan Mitchell", "Bolando", "1st", "CCS", "BSCS"},
-            {"2023-1864", "Jimmy Butler", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Klay Thompson", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Paul George", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Russell Westbrook", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Kyrie Irving", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Zion Williamson", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Carmelo Anthony", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Chris Paul", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Dwyane Wade", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Dirk Nowitzki", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Tim Duncan", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Kevin Garnett", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Ray Allen", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Vince Carter", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Tracy McGrady", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Allen Iverson", "Bolando", "1st", "CCS", "BSIT"},
-            {"2023-1864", "Shaquille O'Neal", "Bolando", "1st", "CCS", "BSIT"},
-            
-
+        String[] columnNames = {"Firstname", "Lastname", "Gender", "Id Number", "Year Level", "College", "Program"};
+        model = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make table read-only
+            }
         };
 
-        JTable table = new JTable(data, columnNames);
+        // Create table with the model
+        table = new JTable(model);
         JTableHeader header = table.getTableHeader();
         
+        // Set table properties
         table.setRowHeight(30);
         header.setFont(new Font("Helvetica", Font.BOLD, 18));
         header.setForeground(new Color(0x7E7E7E));
@@ -90,24 +80,30 @@ public class TablePanel extends JPanel {
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        // Set preferred column widths dynamically
+        // Add sorting capability
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
+
+        // Create scroll pane for table
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(null);
+        scrollPane.setPreferredSize(new Dimension(1155, 400));
+
+        // Set column widths
+        int[] columnWidths = {150, 150, 100, 150, 100, 250, 250};
         for (int i = 0; i < table.getColumnCount(); i++) {
             TableColumn column = table.getColumnModel().getColumn(i);
-            column.setPreferredWidth(getPreferredColumnWidth(table, i));
+            column.setPreferredWidth(columnWidths[i]);
         }
 
-        // Dynamically adjust table height
-        int tableHeight = table.getRowHeight() * table.getRowCount() + header.getPreferredSize().height;
-        table.setPreferredSize(new Dimension(1155, tableHeight));
-        table.setMaximumSize(new Dimension(1155, tableHeight));
+        refreshTable();
 
         header.setBorder(BorderFactory.createEmptyBorder());
         header.setOpaque(false);
         header.setBackground(table.getBackground());
 
         tablePanel.setLayout(new BorderLayout());
-        tablePanel.add(header, BorderLayout.NORTH);
-        tablePanel.add(table, BorderLayout.CENTER);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
         tablePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         HoverTableRenderer hoverRenderer = new HoverTableRenderer();
@@ -127,16 +123,46 @@ public class TablePanel extends JPanel {
             }
         });
     }
+    
 
-    private int getPreferredColumnWidth(JTable table, int columnIndex) {
-        int maxWidth = 50;
-        for (int row = 0; row < table.getRowCount(); row++) {
-            Object value = table.getValueAt(row, columnIndex);
-            if (value != null) {
-                int width = table.getFontMetrics(table.getFont()).stringWidth(value.toString());
-                maxWidth = Math.max(maxWidth, width + 20);
+    public void refreshTable() {
+        SwingUtilities.invokeLater(() -> {
+            model.setRowCount(0); // Clear table
+            List<Student> students = StudentManager.loadStudents();
+    
+            System.out.println("Students loaded: " + students.size()); // Debugging
+    
+            for (Student student : students) {
+                model.addRow(new Object[]{
+                    student.getFirstName(),
+                    student.getLastName(),
+                    student.getGender(),
+                    student.getIdNumber(),
+                    student.getYearLevel(),
+                    student.getCollege(),
+                    student.getProgram()
+                });
             }
-        }
-        return maxWidth;
+    
+            model.fireTableDataChanged(); // Notify JTable model
+    
+            // Refresh UI elements
+            revalidate();
+            repaint();
+    
+            // If inside a JScrollPane, refresh its parent
+            Container parent = getParent();
+            while (parent != null) {
+                parent.revalidate();
+                parent.repaint();
+                parent = parent.getParent();
+            }
+        });
+    }
+    
+
+    // Method to get the table (useful if you need to access it from outside)
+    public JTable getTable() {
+        return table;
     }
 }
