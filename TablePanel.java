@@ -21,7 +21,6 @@ public final class TablePanel extends JPanel {
         gbc.weightx = 1.0;
 
         // Top row content
-       // Create top row panel
 JPanel topRow = new JPanel(new BorderLayout());
 topRow.setBackground(new Color(0xE7E7E7));
 topRow.setPreferredSize(new Dimension(1, 100));
@@ -31,7 +30,7 @@ gbc.weighty = 0.2;
 this.add(topRow, gbc);
 
 // Create a button panel for actions (Refresh, Edit, Delete)
-JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 10));
 buttonPanel.setBackground(Color.blue); // Match background color
 
 // Create Edit button
@@ -56,21 +55,16 @@ RoundedButton deleteButton = new RoundedButton(
 deleteButton.addActionListener(e -> deleteSelectedStudent());
 buttonPanel.add(deleteButton);
 
-// Create sorting panel
-
-// Sorting category dropdown
 String[] sortCategories = {"First Name", "Last Name", "Gender", "ID Number", "Year Level", "College", "Program"};
 JComboBox<String> sortCategoryBox = new JComboBox<>(sortCategories);
 sortCategoryBox.setFont(new Font("Helvetica", Font.PLAIN, 16));
 buttonPanel.add(new JLabel("Sort by:"));
 buttonPanel.add(sortCategoryBox);
 
-// Sorting order dropdown
 JComboBox<String> sortOrderBox = new JComboBox<>();
 sortOrderBox.setFont(new Font("Helvetica", Font.PLAIN, 16));
 buttonPanel.add(sortOrderBox);
 
-// Populate order box based on selected category
 sortCategoryBox.addActionListener(e -> {
     String selectedCategory = (String) sortCategoryBox.getSelectedItem();
     sortOrderBox.removeAllItems();
@@ -101,10 +95,7 @@ sortOrderBox.addActionListener(e -> {
         sortTable(category, order);
     }
 });
-
-// Add buttonPanel to the left and sortPanel to the right
 topRow.add(buttonPanel, BorderLayout.WEST);
-
 
         // Bottom row content (JTable)
         JPanel bottomRow = new JPanel(new BorderLayout());
@@ -370,26 +361,28 @@ topRow.add(buttonPanel, BorderLayout.WEST);
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
     
-        int columnIndex = switch (category) {
-            case "First Name" -> 0;
-            case "Last Name" -> 1;
-            case "Gender" -> 2;
-            case "ID Number" -> 3;
-            case "Year Level" -> 4;
-            case "College" -> 5;
-            case "Program" -> 6;
-            default -> -1;
-        };
+        int columnIndex = -1;
+        switch (category) {
+            case "First Name": columnIndex = 0; break;
+            case "Last Name": columnIndex = 1; break;
+            case "Gender": columnIndex = 2; break;
+            case "ID Number": columnIndex = 3; break;
+            case "Year Level": columnIndex = 4; break;
+            case "College": columnIndex = 5; break;
+            case "Program": columnIndex = 6; break;
+        }
     
         if (columnIndex == -1) return; // Invalid category
     
-        SortOrder sortOrder = (order.equals("A-Z") || order.equals("Male → Female") || order.equals("Ascending"))
-                ? SortOrder.ASCENDING
-                : SortOrder.DESCENDING;
+        SortOrder sortOrder;
+        if (order.equals("A-Z") || order.equals("Male → Female") || order.equals("Ascending")) {
+            sortOrder = SortOrder.ASCENDING;
+        } else {
+            sortOrder = SortOrder.DESCENDING;
+        }
     
         sorter.setSortKeys(List.of(new RowSorter.SortKey(columnIndex, sortOrder)));
         sorter.sort();
     }
-    
     
 }
