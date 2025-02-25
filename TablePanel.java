@@ -21,7 +21,7 @@ public class TablePanel extends JPanel {
         gbc.weightx = 1.0;
 
         // Top row content
-        JPanel topRow = new JPanel();
+        JPanel topRow = new JPanel(new BorderLayout());
         topRow.setBackground(new Color(0xE7E7E7));
         topRow.setPreferredSize(new Dimension(1, 100));
         gbc.gridx = 0;
@@ -30,12 +30,13 @@ public class TablePanel extends JPanel {
         this.add(topRow, gbc);
 
         // Create a refresh button
-        JButton refreshButton = new JButton("Refresh Table");
-        refreshButton.setFont(new Font("Helvetica", Font.BOLD, 16));
-        refreshButton.setBackground(Color.BLUE);
-        refreshButton.setForeground(Color.black);
-        refreshButton.setFocusPainted(false);
-        refreshButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        RoundedButton refreshButton = new RoundedButton(
+            "Refresh",
+            Color.decode("#6DBECA"),  // Background color (blue)
+            Color.WHITE,              // Text color
+            new Font("Helvetica", Font.PLAIN, 18), // Custom font
+            10  
+        );
 
         // Add action listener to refresh table
         refreshButton.addActionListener(e -> {
@@ -44,7 +45,7 @@ public class TablePanel extends JPanel {
         });
 
         // Add the button to the topRow panel
-        topRow.add(refreshButton);
+        topRow.add(refreshButton, BorderLayout.SOUTH);
 
 
         // Bottom row content (JTable)
@@ -96,7 +97,6 @@ public class TablePanel extends JPanel {
             column.setPreferredWidth(columnWidths[i]);
         }
 
-        refreshTable();
 
         header.setBorder(BorderFactory.createEmptyBorder());
         header.setOpaque(false);
@@ -122,47 +122,48 @@ public class TablePanel extends JPanel {
                 table.repaint();
             }
         });
+        refreshTable();
     }
     
 
     public void refreshTable() {
-        SwingUtilities.invokeLater(() -> {
-            model.setRowCount(0); // Clear table
-            List<Student> students = StudentManager.loadStudents();
+        model.setRowCount(0); // Clear table
+        List<Student> students = StudentManager.loadStudents();
     
-            System.out.println("Students loaded: " + students.size()); // Debugging
+        System.out.println("Students loaded: " + students.size()); // Debugging
     
-            for (Student student : students) {
-                model.addRow(new Object[]{
-                    student.getFirstName(),
-                    student.getLastName(),
-                    student.getGender(),
-                    student.getIdNumber(),
-                    student.getYearLevel(),
-                    student.getCollege(),
-                    student.getProgram()
-                });
-            }
+        for (Student student : students) {
+            model.addRow(new Object[]{
+                student.getFirstName(),
+                student.getLastName(),
+                student.getGender(),
+                student.getIdNumber(),
+                student.getYearLevel(),
+                student.getCollege(),
+                student.getProgram()
+            });
+        }
     
-            model.fireTableDataChanged(); // Notify JTable model
+        model.fireTableDataChanged(); // Notify JTable model
     
-            // Refresh UI elements
-            revalidate();
-            repaint();
+        // Refresh UI elements
+        revalidate();
+        repaint();
     
-            // If inside a JScrollPane, refresh its parent
-            Container parent = getParent();
-            while (parent != null) {
-                parent.revalidate();
-                parent.repaint();
-                parent = parent.getParent();
-            }
-        });
-    }
+        // Propagate refresh to parent containers
+        Container parent = getParent();
+        while (parent != null) {
+            parent.revalidate();
+            parent.repaint();
+            parent = parent.getParent();
+        }
+    };
+    
     
 
     // Method to get the table (useful if you need to access it from outside)
     public JTable getTable() {
         return table;
     }
+
 }

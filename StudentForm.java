@@ -274,12 +274,29 @@ public class StudentForm extends JPanel {
                         JOptionPane.INFORMATION_MESSAGE
                     );
 
-                    System.out.println("Refreshing table...");
-                    SwingUtilities.invokeLater(() -> {
+                    System.out.println("Finding parent TablePanel to refresh...");
+            
+            // Find the TablePanel component in the parent hierarchy
+            Container parent = StudentForm.this;
+            while (parent != null && !(parent.getParent() instanceof TablePanel)) {
+                parent = parent.getParent();
+            }
+            
+            if (parent != null && parent.getParent() instanceof TablePanel) {
+                TablePanel tablePanel = (TablePanel) parent.getParent();
+                System.out.println("Found TablePanel, refreshing...");
+                
+                // Use invokeLater to ensure UI updates happen on EDT
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
                         tablePanel.refreshTable();
-                        tablePanel.revalidate();
-                        tablePanel.repaint();
-                    });
+                    }
+                });
+            } else {
+                System.out.println("Could not find parent TablePanel");
+            }
+             
                     
                     // Clear form fields
                     firstnameField.setText("Firstname");
