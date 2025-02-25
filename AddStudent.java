@@ -3,7 +3,7 @@ import javax.swing.*;
 
 public class AddStudent extends JPanel {
     
-    public AddStudent() {
+    public AddStudent(TablePanel tablePanel) {
         this.setLayout(new GridBagLayout());
         this.setBackground(Color.white);
 
@@ -39,7 +39,7 @@ public class AddStudent extends JPanel {
         RoundedPanel formPanel = new RoundedPanel(10);
         formPanel.setLayout(new GridBagLayout());
         formPanel.setBackground(new Color(0xffffff));
-        formPanel.add(new StudentForm());
+        formPanel.add(new StudentForm(tablePanel));
         formPanel.setPreferredSize(new Dimension(400, 300));
         bottomRow.add(formPanel, BorderLayout.CENTER);
 

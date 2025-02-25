@@ -2,8 +2,8 @@ import java.awt.*;
 import javax.swing.*;
 
 public class GUI extends JFrame {
-    private CardLayout cardLayout;
-    private JPanel contentPanel;
+    private final CardLayout cardLayout;
+    private final JPanel contentPanel;
 
     public GUI() {
         this.setSize(1280, 832);
@@ -42,7 +42,8 @@ public class GUI extends JFrame {
         tableView.add(new SearchPanel(), gbc2);
 
         // Table Panel (Inside a Scroll Pane)
-        JScrollPane tableScrollPane = new JScrollPane(new TablePanel());
+        TablePanel tablePanel = new TablePanel();
+        JScrollPane tableScrollPane = new JScrollPane(tablePanel);
         tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         tableScrollPane.getVerticalScrollBar().setUnitIncrement(20); // Default speed
@@ -54,7 +55,7 @@ public class GUI extends JFrame {
         tableView.add(tableScrollPane, gbc2);
 
         // === Add Student Panel ===
-        JPanel addStudentPanel = new AddStudent();
+        JPanel addStudentPanel = new AddStudent(tablePanel);
 
         // Add both panels to CardLayout
         contentPanel.add(tableView, "TABLE");
@@ -75,6 +76,5 @@ public class GUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        new GUI();
     }
 }
