@@ -36,13 +36,19 @@ public class GUI extends JFrame {
         gbc2.fill = GridBagConstraints.BOTH;
         gbc2.weightx = 1.0;
 
+        // Create TablePanel first so we can pass it to the SearchPanel
+        TablePanel tablePanel = new TablePanel();
+        
+        // Create SearchPanel and set the TablePanel reference
+        SearchPanel searchPanel = new SearchPanel();
+        searchPanel.setTablePanel(tablePanel);
+        
         // Search Panel (Stays on Top)
         gbc2.gridy = 0;
         gbc2.weighty = 0.02;
-        tableView.add(new SearchPanel(), gbc2);
+        tableView.add(searchPanel, gbc2);
 
         // Table Panel (Inside a Scroll Pane)
-        TablePanel tablePanel = new TablePanel();
         JScrollPane tableScrollPane = new JScrollPane(tablePanel);
         tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -76,5 +82,14 @@ public class GUI extends JFrame {
     }
 
     public static void main(String[] args) {
+        // Set the look and feel to system default
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        // Use SwingUtilities to ensure GUI is created on Event Dispatch Thread
+        SwingUtilities.invokeLater(() -> new GUI());
     }
 }
