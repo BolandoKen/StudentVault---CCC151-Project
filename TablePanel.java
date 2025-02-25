@@ -132,15 +132,13 @@ sortOrderBox.addActionListener(e -> {
         model = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make table read-only
+                return false; 
             }
         };
 
-        // Create table with the model
         table = new JTable(model);
         JTableHeader header = table.getTableHeader();
         
-        // Set table properties
         table.setRowHeight(30);
         header.setFont(new Font("Helvetica", Font.BOLD, 18));
         header.setForeground(new Color(0x7E7E7E));
@@ -156,13 +154,11 @@ sortOrderBox.addActionListener(e -> {
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
 
-        // Create scroll pane for table
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(null);
         scrollPane.setPreferredSize(new Dimension(1155, 400));
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        // Set column widths
         int[] columnWidths = {150, 150, 100, 150, 100, 250, 250};
         for (int i = 0; i < table.getColumnCount(); i++) {
             TableColumn column = table.getColumnModel().getColumn(i);
@@ -194,7 +190,6 @@ sortOrderBox.addActionListener(e -> {
             }
         });
         
-        // Add double-click listener for editing students
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -204,7 +199,6 @@ sortOrderBox.addActionListener(e -> {
             }
         });
         
-        // Add right-click context menu
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -215,7 +209,6 @@ sortOrderBox.addActionListener(e -> {
                     table.clearSelection();
                 }
 
-                // Right-click context menu
                 if (e.isPopupTrigger() && e.getComponent() instanceof JTable) {
                     JPopupMenu popup = createPopupMenu();
                     popup.show(e.getComponent(), e.getX(), e.getY());
@@ -251,10 +244,8 @@ sortOrderBox.addActionListener(e -> {
     private void editSelectedStudent() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
-            // Convert view row index to model row index
             int modelRow = table.convertRowIndexToModel(selectedRow);
             
-            // Get values from the selected row
             String firstName = model.getValueAt(modelRow, 0).toString();
             String lastName = model.getValueAt(modelRow, 1).toString();
             String gender = model.getValueAt(modelRow, 2).toString();
@@ -262,8 +253,7 @@ sortOrderBox.addActionListener(e -> {
             String yearLevel = model.getValueAt(modelRow, 4).toString();
             String college = model.getValueAt(modelRow, 5).toString();
             String program = model.getValueAt(modelRow, 6).toString();
-            
-            // Create a student object to pass to the form
+
             Student student = new Student(firstName, lastName, gender, idNumber, yearLevel, college, program);
             
             // Find the GUI instance to switch panels

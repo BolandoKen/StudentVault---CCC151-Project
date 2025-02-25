@@ -4,6 +4,14 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.event.DocumentEvent;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class StudentForm extends JPanel {
     private TablePanel tablePanel;
@@ -248,10 +256,10 @@ public class StudentForm extends JPanel {
         cancelPanel.setBackground(Color.white);
         RoundedButton cancelButton = new RoundedButton(
             "Cancel",
-            Color.decode("#E7E7E7"),  // Background color (gray)
-            Color.BLACK,              // Text color
-            new Font("Helvetica", Font.PLAIN, 18), // Custom font
-            10                        // Corner radius
+            Color.decode("#E7E7E7"),  
+            Color.BLACK,            
+            new Font("Helvetica", Font.PLAIN, 18), 
+            10                       
         );
         cancelButton.setPreferredSize(new Dimension(150, 40));
         cancelPanel.add(cancelButton, BorderLayout.CENTER);
@@ -282,7 +290,6 @@ public class StudentForm extends JPanel {
     }
     
     private boolean validateForm() {
-        // Get input values and trim whitespace
         String firstName = firstnameField.getText().trim();
         String lastName = lastnameField.getText().trim();
         String gender = genderComboBox.getSelectedItem().toString();
@@ -291,7 +298,6 @@ public class StudentForm extends JPanel {
         String college = collegeComboBox.getSelectedItem().toString();
         String program = programComboBox.getSelectedItem().toString();
 
-        // Validate all required fields
         StringBuilder errorMessage = new StringBuilder("Please fill in the following fields:\n");
         boolean hasError = false;
 
@@ -306,7 +312,14 @@ public class StudentForm extends JPanel {
         if(idNumber.isEmpty() || idNumber.equals("ID Number")) {
             errorMessage.append("- ID Number\n");
             hasError = true;
-        }
+        } else {
+            // Check ID format (0000-0000)
+            Pattern pattern = Pattern.compile("\\d{4}-\\d{4}");
+            Matcher matcher = pattern.matcher(idNumber);
+            if (!matcher.matches()) {
+                errorMessage.append("- ID Number must be in format 0000-0000\n");
+                hasError = true;
+            }}
         if(gender.equals("Gender")) {
             errorMessage.append("- Gender\n");
             hasError = true;
@@ -352,13 +365,14 @@ public class StudentForm extends JPanel {
     
     private void addStudent() {
         try {
-            String firstName = firstnameField.getText().trim();
-            String lastName = lastnameField.getText().trim();
+            String firstName = capitalizeFirstLetter(firstnameField.getText().trim());
+            String lastName = capitalizeFirstLetter(lastnameField.getText().trim());
             String gender = genderComboBox.getSelectedItem().toString();
             String idNumber = idField.getText().trim();
             String yearLevel = yearLevelComboBox.getSelectedItem().toString();
             String college = collegeComboBox.getSelectedItem().toString();
             String program = programComboBox.getSelectedItem().toString();
+            
             
             Student student = new Student(firstName, lastName, gender, idNumber, 
                                        yearLevel, college, program);
@@ -399,8 +413,8 @@ public class StudentForm extends JPanel {
     
     private void updateStudent() {
         try {
-            String firstName = firstnameField.getText().trim();
-            String lastName = lastnameField.getText().trim();
+            String firstName = capitalizeFirstLetter(firstnameField.getText().trim());
+            String lastName = capitalizeFirstLetter(lastnameField.getText().trim());
             String gender = genderComboBox.getSelectedItem().toString();
             String idNumber = idField.getText().trim();
             String yearLevel = yearLevelComboBox.getSelectedItem().toString();
@@ -460,8 +474,8 @@ public class StudentForm extends JPanel {
         actionButton.setText("Update Student");
         
         // Populate form fields with student data
-        firstnameField.setText(student.getFirstName());
-        lastnameField.setText(student.getLastName());
+        firstnameField.setText(capitalizeFirstLetter(student.getFirstName()));
+        lastnameField.setText(capitalizeFirstLetter(student.getLastName()));
         idField.setText(student.getIdNumber());
         
         // Set combo box selections
@@ -478,7 +492,7 @@ public class StudentForm extends JPanel {
                 break;
             }
         }
-
+    
         for (int i = 0; i < collegeComboBox.getItemCount(); i++) {
             if (collegeComboBox.getItemAt(i).toString().equals(student.getCollege())) {
                 collegeComboBox.setSelectedIndex(i);
@@ -486,7 +500,7 @@ public class StudentForm extends JPanel {
                 break;
             }
         }
-
+    
         for (int i = 0; i < programComboBox.getItemCount(); i++) {
             if (programComboBox.getItemAt(i).toString().equals(student.getProgram())) {
                 programComboBox.setSelectedIndex(i);
@@ -494,7 +508,6 @@ public class StudentForm extends JPanel {
             }
         }
     }
-
     private void resetForm() {
         editMode = false;
         originalId = null;
@@ -510,4 +523,121 @@ public class StudentForm extends JPanel {
         collegeComboBox.setSelectedIndex(0);
         updateProgramComboBox("College");
     }
+    private String capitalizeFirstLetter(String input) {
+        if (input == null || input.isEmpty() || input.equalsIgnoreCase("Firstname") || input.equalsIgnoreCase("Lastname")) {
+            return input;
+        }
+    
+        String[] words = input.split("\\s+"); // Split by spaces
+        StringBuilder capitalizedName = new StringBuilder();
+    
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                capitalizedName.append(Character.toUpperCase(word.charAt(0))) // Capitalize first letter
+                               .append(word.substring(1).toLowerCase()) // Convert rest to lowercase
+                               .append(" "); // Add space
+            }
+        }
+    
+        return capitalizedName.toString().trim(); // Remove extra space at the end
+    }
+    
+    private void setupIdField() {
+    // Add document listener to format ID number as 0000-0000
+    idField.getDocument().addDocumentListener(new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            formatIdNumber();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            // Don't format on remove to avoid complications
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            formatIdNumber();
+        }
+        
+        private void formatIdNumber() {
+            String text = idField.getText();
+            // Skip if it's the default placeholder
+            if (text.equals("ID Number")) {
+                return;
+            }
+            
+            // Remove non-digits
+            String digitsOnly = text.replaceAll("[^0-9]", "");
+            
+            // Format as 0000-0000
+            StringBuilder formatted = new StringBuilder();
+            for (int i = 0; i < digitsOnly.length() && i < 8; i++) {
+                if (i == 4) {
+                    formatted.append('-');
+                }
+                formatted.append(digitsOnly.charAt(i));
+            }
+            
+            // Only update if it's different to avoid infinite loop
+            if (!text.equals(formatted.toString())) {
+                idField.setText(formatted.toString());
+            }
+        }
+    });
+    
+    // Limit total input length to 9 characters (including the hyphen)
+    ((PlainDocument) idField.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            String text = fb.getDocument().getText(0, fb.getDocument().getLength());
+            String newText = text.substring(0, offset) + string + text.substring(offset);
+            
+            // Count characters excluding the hyphen
+            int digitCount = newText.replaceAll("-", "").length();
+            if (digitCount <= 8) {
+                super.insertString(fb, offset, string, attr);
+            }
+        }
+        
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+            String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
+            String newText = currentText.substring(0, offset) + text + currentText.substring(offset + length);
+            
+            // Count characters excluding the hyphen
+            int digitCount = newText.replaceAll("-", "").length();
+            if (digitCount <= 8) {
+                super.replace(fb, offset, length, text, attrs);
+            }
+        }
+    });
+    setupIdField();
+setupNameFields();
+}
+
+// Add auto-capitalization to form fields
+private void setupNameFields() {
+    // First name field focus listener for auto-capitalization
+    firstnameField.addFocusListener(new java.awt.event.FocusAdapter() {
+        @Override
+        public void focusLost(java.awt.event.FocusEvent evt) {
+            String text = firstnameField.getText();
+            if (!text.equals("Firstname")) {
+                firstnameField.setText(capitalizeFirstLetter(text));
+            }
+        }
+    });
+    
+    // Last name field focus listener for auto-capitalization
+    lastnameField.addFocusListener(new java.awt.event.FocusAdapter() {
+        @Override
+        public void focusLost(java.awt.event.FocusEvent evt) {
+            String text = lastnameField.getText();
+            if (!text.equals("Lastname")) {
+                lastnameField.setText(capitalizeFirstLetter(text));
+            }
+        }
+    });
+}
 }
