@@ -410,7 +410,6 @@ public class StudentForm extends JPanel {
             Student updatedStudent = new Student(firstName, lastName, gender, idNumber, 
                                        yearLevel, college, program);
             
-            // Update student in CSV
             if (StudentManager.updateStudent(originalId, updatedStudent)) {
                 JOptionPane.showMessageDialog(
                     StudentForm.this,

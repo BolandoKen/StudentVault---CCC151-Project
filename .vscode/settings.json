@@ -1,4 +1,10 @@
 {
-    "java.project.sourcePaths": [],
-    "java.project.referencedLibraries": []
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": ".*\\.java$",  
+                "cmd": "./clean_compile.sh"
+            }
+        ]
+    }
 }

@@ -10,7 +10,7 @@ import javax.swing.table.TableRowSorter;
 public final class TablePanel extends JPanel {
     private JTable table;
     private DefaultTableModel model;
-    private StudentForm studentForm; // Reference to the form
+    private StudentForm studentForm; 
 
     public TablePanel() {
         this.setLayout(new GridBagLayout());
@@ -21,7 +21,7 @@ public final class TablePanel extends JPanel {
         gbc.weightx = 1.0;
 
         // Top row content
-JPanel topRow = new JPanel(new BorderLayout());
+JPanel topRow = new JPanel(new GridBagLayout());
 topRow.setBackground(new Color(0xE7E7E7));
 topRow.setPreferredSize(new Dimension(1, 100));
 gbc.gridx = 0;
@@ -29,41 +29,62 @@ gbc.gridy = 0;
 gbc.weighty = 0.2;
 this.add(topRow, gbc);
 
-// Create a button panel for actions (Refresh, Edit, Delete)
-JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 10));
-buttonPanel.setBackground(Color.blue); // Match background color
+GridBagConstraints gbcTopRow = new GridBagConstraints();
+gbcTopRow.fill = GridBagConstraints.BOTH;
+gbcTopRow.gridy = 0; // Keep everything in row 0
+gbcTopRow.weightx = 0.5; // Both panels take equal width
+gbcTopRow.weighty = 1.0; // Allow vertical expansion
+gbcTopRow.anchor = GridBagConstraints.SOUTH; // Align to the bottom
 
-// Create Edit button
-RoundedButton editButton = new RoundedButton(
-    "Edit Student",
-    Color.decode("#F4A261"),  // Orange
-    Color.WHITE,
-    new Font("Helvetica", Font.PLAIN, 18),
-    10  
-);
+gbcTopRow.gridx = 0;
+gbcTopRow.weightx = 0.5;
+gbcTopRow.anchor = GridBagConstraints.WEST; 
+JPanel leftPanel = new JPanel(new BorderLayout());
+topRow.add(leftPanel, gbcTopRow);
+
+JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10,0));
+sortPanel.setOpaque(false);
+leftPanel.add(sortPanel, BorderLayout.SOUTH);
+
+gbcTopRow.gridx = 1;
+gbcTopRow.weightx = 0.5; 
+gbcTopRow.anchor = GridBagConstraints.EAST; 
+JPanel rightPanel = new JPanel(new BorderLayout());
+topRow.add(rightPanel, gbcTopRow);
+
+JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0,0));
+buttonsPanel.setOpaque(false);
+rightPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
+JLabel label = new JLabel("StudentVault");
+label.setFont(new Font("Helvetica", Font.BOLD, 32));
+
+JButton editButton = new JButton(new ImageIcon("Assets/EditIcon.png"));
+editButton.setBorderPainted(false);
+editButton.setFocusPainted(false);
+editButton.setContentAreaFilled(false);
 editButton.addActionListener(e -> editSelectedStudent());
-buttonPanel.add(editButton);
 
-// Create Delete button
-RoundedButton deleteButton = new RoundedButton(
-    "Delete Student",
-    Color.decode("#E76F51"),  // Red
-    Color.WHITE,
-    new Font("Helvetica", Font.PLAIN, 18),
-    10  
-);
+JButton deleteButton = new JButton(new ImageIcon("Assets/DeleteIcon.png"));
+deleteButton.setBorderPainted(false);
+deleteButton.setFocusPainted(false);
+deleteButton.setContentAreaFilled(false);
 deleteButton.addActionListener(e -> deleteSelectedStudent());
-buttonPanel.add(deleteButton);
 
 String[] sortCategories = {"First Name", "Last Name", "Gender", "ID Number", "Year Level", "College", "Program"};
 JComboBox<String> sortCategoryBox = new JComboBox<>(sortCategories);
 sortCategoryBox.setFont(new Font("Helvetica", Font.PLAIN, 16));
-buttonPanel.add(new JLabel("Sort by:"));
-buttonPanel.add(sortCategoryBox);
+
 
 JComboBox<String> sortOrderBox = new JComboBox<>();
 sortOrderBox.setFont(new Font("Helvetica", Font.PLAIN, 16));
-buttonPanel.add(sortOrderBox);
+
+sortPanel.add(label);
+sortPanel.add(new JLabel("Sort by:"));
+sortPanel.add(sortCategoryBox);
+sortPanel.add(sortOrderBox);
+buttonsPanel.add(editButton);
+buttonsPanel.add(deleteButton);
 
 sortCategoryBox.addActionListener(e -> {
     String selectedCategory = (String) sortCategoryBox.getSelectedItem();
@@ -88,6 +109,7 @@ sortCategoryBox.addActionListener(e -> {
             break;
     }
 });
+
 sortOrderBox.addActionListener(e -> {
     String category = (String) sortCategoryBox.getSelectedItem();
     String order = (String) sortOrderBox.getSelectedItem();
@@ -95,7 +117,6 @@ sortOrderBox.addActionListener(e -> {
         sortTable(category, order);
     }
 });
-topRow.add(buttonPanel, BorderLayout.WEST);
 
         // Bottom row content (JTable)
         JPanel bottomRow = new JPanel(new BorderLayout());
@@ -129,6 +150,8 @@ topRow.add(buttonPanel, BorderLayout.WEST);
         table.setIntercellSpacing(new Dimension(0, 0));
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setBorder(null);
+        header.setBorder(null);
 
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
@@ -137,6 +160,7 @@ topRow.add(buttonPanel, BorderLayout.WEST);
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(null);
         scrollPane.setPreferredSize(new Dimension(1155, 400));
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
         // Set column widths
         int[] columnWidths = {150, 150, 100, 150, 100, 250, 250};
