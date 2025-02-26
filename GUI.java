@@ -6,7 +6,7 @@ public class GUI extends JFrame {
     private final JPanel contentPanel;
 
     public GUI() {
-        this.setSize(1280, 832);
+        this.setSize(1440, 1024);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel background = new JPanel(new GridBagLayout());

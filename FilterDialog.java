@@ -271,7 +271,6 @@ public class FilterDialog extends JDialog {
             filters.add(RowFilter.regexFilter("^" + selectedCollege + "$", 5));
         }
         
-        // Add program filter if not "All Programs"
         if (selectedProgram != null && !selectedProgram.equals("All Programs")) {
             filters.add(RowFilter.regexFilter("^" + selectedProgram + "$", 6));
         }
