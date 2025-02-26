@@ -21,12 +21,12 @@ public class HoverTableRenderer extends DefaultTableCellRenderer {
 
        
         if (row == hoveredRow) {
-            cell.setBackground(Color.LIGHT_GRAY); 
+            cell.setBackground(new Color(0xE7E7E7)); 
         }
 
        
         if (isSelected) {
-            cell.setBackground(new Color(0x85DCEA));
+            cell.setBackground(new Color(0xC3F1F8));
             cell.setForeground(Color.BLACK); 
         }
 

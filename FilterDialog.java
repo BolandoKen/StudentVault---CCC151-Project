@@ -11,8 +11,6 @@ public class FilterDialog extends JDialog {
     private JComboBox<String> yearLevelComboBox;
     private JComboBox<String> collegeComboBox;
     private JComboBox<String> programComboBox;
-    
-    // Maps to store the college-program relationships
     private Map<String, String[]> collegePrograms;
     
     public FilterDialog(Window parent, TablePanel tablePanel) {
@@ -22,13 +20,13 @@ public class FilterDialog extends JDialog {
         initializeCollegePrograms();
         initComponents();
         
-        setSize(450, 400);
-        setLocationRelativeTo(parent);
+        setSize(600, 500);
         setResizable(true);
+        setLocationRelativeTo(parent);
+        
     }
     
     private void initializeCollegePrograms() {
-        // Initialize the college-program map with the same data as in StudentForm
         collegePrograms = new HashMap<>();
         collegePrograms.put("All Colleges", new String[]{"All Programs"});
         collegePrograms.put("College of Computer Studies", new String[]{
@@ -181,7 +179,6 @@ public class FilterDialog extends JDialog {
         programComboBox.setFont(new Font("Helvetica", Font.PLAIN, 14));
         filterPanel.add(programComboBox, gbc);
         
-        // Add listener to update programs when college changes
         collegeComboBox.addActionListener(e -> {
             String selectedCollege = (String) collegeComboBox.getSelectedItem();
             updateProgramComboBox(selectedCollege);
@@ -189,9 +186,9 @@ public class FilterDialog extends JDialog {
         
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton applyButton = createStyledButton("Apply Filters", new Color(0x6DBECA));
-        JButton resetButton = createStyledButton("Reset Filters", new Color(0xE7E7E7));
-        JButton cancelButton = createStyledButton("Cancel", new Color(0xE7E7E7));
+        JButton applyButton = createStyledButton("Apply Filters", Color.BLACK);
+        JButton resetButton = createStyledButton("Reset Filters", Color.BLACK);
+        JButton cancelButton = createStyledButton("Cancel", Color.BLACK);
         
         applyButton.addActionListener(e -> {
             applyFilters();

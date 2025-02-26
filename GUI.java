@@ -18,7 +18,7 @@ public class GUI extends JFrame {
 
         gbc.gridx = 0;
         gbc.weightx = 0.05;
-        SidePanel sidePanel = new SidePanel(this); 
+        SidePanel sidePanel = new SidePanel(this);
         background.add(sidePanel, gbc);
 
         contentPanel = new JPanel();
@@ -45,7 +45,7 @@ public class GUI extends JFrame {
         JScrollPane tableScrollPane = new JScrollPane(tablePanel);
         tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        tableScrollPane.getVerticalScrollBar().setUnitIncrement(20); // Default speed
+        tableScrollPane.getVerticalScrollBar().setUnitIncrement(20);
         tableScrollPane.getViewport().setBackground(new Color(0xE7E7E7));
         tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
         

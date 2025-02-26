@@ -2,7 +2,16 @@ import java.awt.*;
 import javax.swing.*;
 
 public class SidePanel extends JPanel {
-    public SidePanel(GUI parentFrame) { // Accept reference to GUI
+    private ImageIcon addIconDefault = new ImageIcon("Assets/AddIcon.png");
+    private ImageIcon addIconClicked = new ImageIcon("Assets/SelectedAddIcon.png");
+    private ImageIcon tableIconDefault = new ImageIcon("Assets/TableIcon.png");
+    private ImageIcon tableIconClicked = new ImageIcon("Assets/SelectedTableIcon.png");
+    
+    private JButton addButton;
+    private JButton tableButton;
+    private JButton activeButton = null;
+
+    public SidePanel(GUI parentFrame) { 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBackground(new Color(0x5C2434));
 
@@ -10,18 +19,43 @@ public class SidePanel extends JPanel {
         logo.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
         logo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton addButton = createButton(new ImageIcon("Assets/AddIcon.png"));
-        JButton tableButton = createButton(new ImageIcon("Assets/TableIcon.png"));
+        addButton = createButton(addIconDefault);
+        tableButton = createButton(tableIconDefault);
 
         this.add(logo);
         this.add(addButton);
         this.add(tableButton);
 
-        // Switch to AddStudentPanel when Add button is clicked
-        addButton.addActionListener(e -> parentFrame.switchPanel("ADD_STUDENT"));
+        addButton.addActionListener(e -> {
+            updateButtonState(addButton);
+            parentFrame.switchPanel("ADD_STUDENT");
+        });
+        
+        tableButton.addActionListener(e -> {
+            updateButtonState(tableButton);
+            parentFrame.switchPanel("TABLE");
+        });
+    }
 
-        // Switch back to TablePanel when Table button is clicked
-        tableButton.addActionListener(e -> parentFrame.switchPanel("TABLE"));
+    private void updateButtonState(JButton clickedButton) {
+        // Reset previously active button if exists
+        if (activeButton != null && activeButton != clickedButton) {
+            if (activeButton == addButton) {
+                activeButton.setIcon(addIconDefault);
+            } else if (activeButton == tableButton) {
+                activeButton.setIcon(tableIconDefault);
+            }
+        }
+        
+        // Set the clicked button as active
+        activeButton = clickedButton;
+        
+        // Change icon of clicked button
+        if (clickedButton == addButton) {
+            clickedButton.setIcon(addIconClicked);
+        } else if (clickedButton == tableButton) {
+            clickedButton.setIcon(tableIconClicked);
+        }
     }
 
     private JButton createButton(ImageIcon icon) {
