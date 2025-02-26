@@ -20,7 +20,6 @@ public final class TablePanel extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
 
-        // Top row content
 JPanel topRow = new JPanel(new GridBagLayout());
 topRow.setBackground(new Color(0xE7E7E7));
 topRow.setPreferredSize(new Dimension(1, 100));
@@ -31,10 +30,10 @@ this.add(topRow, gbc);
 
 GridBagConstraints gbcTopRow = new GridBagConstraints();
 gbcTopRow.fill = GridBagConstraints.BOTH;
-gbcTopRow.gridy = 0; // Keep everything in row 0
-gbcTopRow.weightx = 0.5; // Both panels take equal width
-gbcTopRow.weighty = 1.0; // Allow vertical expansion
-gbcTopRow.anchor = GridBagConstraints.SOUTH; // Align to the bottom
+gbcTopRow.gridy = 0; 
+gbcTopRow.weightx = 0.5;
+gbcTopRow.weighty = 1.0; 
+gbcTopRow.anchor = GridBagConstraints.SOUTH; 
 
 gbcTopRow.gridx = 0;
 gbcTopRow.weightx = 0.5;
@@ -118,7 +117,6 @@ sortOrderBox.addActionListener(e -> {
     }
 });
 
-        // Bottom row content (JTable)
         JPanel bottomRow = new JPanel(new BorderLayout());
         bottomRow.setBackground(new Color(0xE7E7E7));
         gbc.gridy = 1;
@@ -256,17 +254,14 @@ sortOrderBox.addActionListener(e -> {
 
             Student student = new Student(firstName, lastName, gender, idNumber, yearLevel, college, program);
             
-            // Find the GUI instance to switch panels
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
             if (frame instanceof GUI) {
                 GUI gui = (GUI) frame;
                 
-                // If studentForm exists in the GUI, set it to edit mode
                 if (studentForm != null) {
                     studentForm.setEditMode(student);
                     gui.switchPanel("ADD_STUDENT");
                 } else {
-                    // Create a new StudentForm in edit mode if it doesn't exist yet
                     Container parent = gui.getContentPane();
                     for (Component comp : parent.getComponents()) {
                         if (comp instanceof JPanel) {
@@ -292,13 +287,10 @@ sortOrderBox.addActionListener(e -> {
     private void deleteSelectedStudent() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
-            // Convert view row index to model row index
             int modelRow = table.convertRowIndexToModel(selectedRow);
             
-            // Get student ID
             String idNumber = model.getValueAt(modelRow, 3).toString();
             
-            // Confirm before deletion
             int confirm = JOptionPane.showConfirmDialog(
                 this,
                 "Are you sure you want to delete student with ID: " + idNumber + "?",
@@ -328,10 +320,10 @@ sortOrderBox.addActionListener(e -> {
     }
 
     public void refreshTable() {
-        model.setRowCount(0); // Clear table
+        model.setRowCount(0); 
         List<Student> students = StudentManager.loadStudents();
     
-        System.out.println("Students loaded: " + students.size()); // Debugging
+        System.out.println("Students loaded: " + students.size());
     
         for (Student student : students) {
             model.addRow(new Object[]{
@@ -345,13 +337,12 @@ sortOrderBox.addActionListener(e -> {
             });
         }
     
-        model.fireTableDataChanged(); // Notify JTable model
+        model.fireTableDataChanged(); 
     
-        // Refresh UI elements
+      
         revalidate();
         repaint();
     
-        // Propagate refresh to parent containers
         Container parent = getParent();
         while (parent != null) {
             parent.revalidate();
@@ -360,12 +351,11 @@ sortOrderBox.addActionListener(e -> {
         }
     }
     
-    // Method to get the table (useful if you need to access it from outside)
+   
     public JTable getTable() {
         return table;
     }
     
-    // Set the StudentForm to enable communication between components
     public void setStudentForm(StudentForm form) {
         this.studentForm = form;
     }
@@ -386,7 +376,7 @@ sortOrderBox.addActionListener(e -> {
             case "Program": columnIndex = 6; break;
         }
     
-        if (columnIndex == -1) return; // Invalid category
+        if (columnIndex == -1) return; 
     
         SortOrder sortOrder;
         if (order.equals("A-Z") || order.equals("Male → Female") || order.equals("Ascending")) {

@@ -41,7 +41,6 @@ public class SearchPanel extends JPanel {
 
         this.add(searchPanel, gbc);
 
-        // Filter Button
         gbc.gridx = 1;
         gbc.weightx = 0.0;
         gbc.insets = new Insets(10, 0, 10, 10);
