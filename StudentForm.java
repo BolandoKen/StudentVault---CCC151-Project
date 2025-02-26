@@ -3,15 +3,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.event.DocumentEvent;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import javax.swing.text.PlainDocument;
 
 public class StudentForm extends JPanel {
     private TablePanel tablePanel;
@@ -140,13 +139,69 @@ public class StudentForm extends JPanel {
 
         collegePrograms = new HashMap<>();
         collegePrograms.put("College", new String[]{"Program"});
-        collegePrograms.put("College of Computer Studies", new String[]{"BS Computer Science", "BS Information Technology"});
-        collegePrograms.put("College of Engineering", new String[]{"BS Civil Engineering", "BS Electrical Engineering"});
-        collegePrograms.put("College of Science and Mathematics", new String[]{"BS Mathematics", "BS Physics"});
-        collegePrograms.put("College of Economics and Business Accountancy", new String[]{"BS Accountancy", "BS Economics"});
-        collegePrograms.put("College of Arts and Social Sciences", new String[]{"BA Communication", "BA Political Science"});
-        collegePrograms.put("College of Education", new String[]{"BS Secondary Education", "BS Elementary Education"});
-        collegePrograms.put("College of Health Sciences", new String[]{"BS Nursing", "BS Pharmacy"});
+        collegePrograms.put("College of Computer Studies", new String[]{
+            "Bachelor of Science in Computer Science",
+            "Bachelor of Science in Information Technology",
+            "Bachelor of Science in Information Systems",
+            "Bachelor of Science in Computer Application"
+        });
+        collegePrograms.put("College of Engineering", new String[]{
+            "Diploma in Chemical Engineering Technology",
+            "Bachelor of Science in Ceramic Engineering",
+            "Bachelor of Science in Civil Engineering",
+            "Bachelor of Science in Electrical Engineering",
+            "Bachelor of Science in Mechanical Engineering",
+            "Bachelor of Science in Chemical Engineering",
+            "Bachelor of Science in Metallurgical Engineering",
+            "Bachelor of Science in Computer Engineering",
+            "Bachelor of Science in Mining Engineering",
+            "Bachelor of Science in Electronics & Communications Engineering",
+            "Bachelor of Science in Environmental Engineering"
+        });
+        collegePrograms.put("College of Science and Mathematics", new String[]{
+            "Bachelor of Science in Biology (Botany)",
+            "Bachelor of Science in Chemistry",
+            "Bachelor of Science in Mathematics",
+            "Bachelor of Science in Physics",
+            "Bachelor of Science in Biology (Zoology)",
+            "Bachelor of Science in Biology (Marine)",
+            "Bachelor of Science in Biology (General)",
+            "Bachelor of Science in Statistics"
+        });
+        collegePrograms.put("College of Economics and Business Accountancy", new String[]{
+            "Bachelor of Science in Accountancy",
+            "Bachelor of Science in Business Administration (Business Economics)",
+            "Bachelor of Science in Business Administration (Marketing Management)",
+            "Bachelor of Science in Entrepreneurship",
+            "Bachelor of Science in Hospitality Management"
+        });
+        collegePrograms.put("College of Arts and Social Sciences", new String[]{
+            "Bachelor of Arts in English Language Studies",
+            "Bachelor of Arts in Literary and Cultural Studies",
+            "Bachelor of Arts in Filipino",
+            "Bachelor of Arts in Panitikan",
+            "Bachelor of Arts in Political Science",
+            "Bachelor of Arts in Psychology",
+            "Bachelor of Arts in Sociology",
+            "Bachelor of Arts in History (International History Track)",
+            "Bachelor of Science in Philosophy",
+            "Bachelor of Science in Psychology"
+        });
+        collegePrograms.put("College of Education", new String[]{
+            "Bachelor of Elementary Education (Science and Mathematics)",
+            "Bachelor of Elementary Education (Language Education)",
+            "Bachelor of Secondary Education (Biology)",
+            "Bachelor of Secondary Education (Chemistry)",
+            "Bachelor of Secondary Education (Physics)",
+            "Bachelor of Secondary Education (Mathematics)",
+            "Bachelor of Physical Education",
+            "Bachelor of Technology and Livelihood Education (Home Economics)",
+            "Bachelor of Technology and Livelihood Education (Industrial Arts)",
+            "Bachelor of Technical-Vocational Teacher Education (Drafting Technology)"
+        });
+        collegePrograms.put("College of Health Sciences", new String[]{
+            "Bachelor of Science in Nursing"
+        });
 
         // Populate college dropdown
         String[] colleges = collegePrograms.keySet().toArray(new String[0]);

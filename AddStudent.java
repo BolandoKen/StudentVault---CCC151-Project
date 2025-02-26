@@ -32,8 +32,6 @@ public class AddStudent extends JPanel {
         labelPanel.setBackground(new Color(0xE7E7E7));
         labelPanel.add(label);
 
-
-        // Add to the bottom-left of topRow
         topRow.add(labelPanel, BorderLayout.SOUTH);
         
         RoundedPanel formPanel = new RoundedPanel(10);

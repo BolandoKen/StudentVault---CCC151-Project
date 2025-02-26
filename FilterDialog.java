@@ -1,77 +1,197 @@
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 public class FilterDialog extends JDialog {
     private final TablePanel tablePanel;
-    private Map<String, JCheckBox> genderCheckboxes = new HashMap<>();
-    private Map<String, JCheckBox> yearCheckboxes = new HashMap<>();
-    private Map<String, JCheckBox> collegeCheckboxes = new HashMap<>();
-    private Map<String, JCheckBox> programCheckboxes = new HashMap<>();
+    private JComboBox<String> genderComboBox;
+    private JComboBox<String> yearLevelComboBox;
+    private JComboBox<String> collegeComboBox;
+    private JComboBox<String> programComboBox;
+    
+    // Maps to store the college-program relationships
+    private Map<String, String[]> collegePrograms;
     
     public FilterDialog(Window parent, TablePanel tablePanel) {
         super(parent, "Filter Students");
         this.tablePanel = tablePanel;
         
+        initializeCollegePrograms();
         initComponents();
-        loadFilterOptions();
         
-        // Set dialog properties
-        setSize(400, 500);
+        setSize(450, 400);
         setLocationRelativeTo(parent);
         setResizable(true);
+    }
+    
+    private void initializeCollegePrograms() {
+        // Initialize the college-program map with the same data as in StudentForm
+        collegePrograms = new HashMap<>();
+        collegePrograms.put("All Colleges", new String[]{"All Programs"});
+        collegePrograms.put("College of Computer Studies", new String[]{
+            "All Programs",
+            "Bachelor of Science in Computer Science",
+            "Bachelor of Science in Information Technology",
+            "Bachelor of Science in Information Systems",
+            "Bachelor of Science in Computer Application"
+        });
+        collegePrograms.put("College of Engineering", new String[]{
+            "All Programs",
+            "Diploma in Chemical Engineering Technology",
+            "Bachelor of Science in Ceramic Engineering",
+            "Bachelor of Science in Civil Engineering",
+            "Bachelor of Science in Electrical Engineering",
+            "Bachelor of Science in Mechanical Engineering",
+            "Bachelor of Science in Chemical Engineering",
+            "Bachelor of Science in Metallurgical Engineering",
+            "Bachelor of Science in Computer Engineering",
+            "Bachelor of Science in Mining Engineering",
+            "Bachelor of Science in Electronics & Communications Engineering",
+            "Bachelor of Science in Environmental Engineering"
+        });
+        collegePrograms.put("College of Science and Mathematics", new String[]{
+            "All Programs",
+            "Bachelor of Science in Biology (Botany)",
+            "Bachelor of Science in Chemistry",
+            "Bachelor of Science in Mathematics",
+            "Bachelor of Science in Physics",
+            "Bachelor of Science in Biology (Zoology)",
+            "Bachelor of Science in Biology (Marine)",
+            "Bachelor of Science in Biology (General)",
+            "Bachelor of Science in Statistics"
+        });
+        collegePrograms.put("College of Economics and Business Accountancy", new String[]{
+            "All Programs",
+            "Bachelor of Science in Accountancy",
+            "Bachelor of Science in Business Administration (Business Economics)",
+            "Bachelor of Science in Business Administration (Marketing Management)",
+            "Bachelor of Science in Entrepreneurship",
+            "Bachelor of Science in Hospitality Management"
+        });
+        collegePrograms.put("College of Arts and Social Sciences", new String[]{
+            "All Programs",
+            "Bachelor of Arts in English Language Studies",
+            "Bachelor of Arts in Literary and Cultural Studies",
+            "Bachelor of Arts in Filipino",
+            "Bachelor of Arts in Panitikan",
+            "Bachelor of Arts in Political Science",
+            "Bachelor of Arts in Psychology",
+            "Bachelor of Arts in Sociology",
+            "Bachelor of Arts in History (International History Track)",
+            "Bachelor of Science in Philosophy",
+            "Bachelor of Science in Psychology"
+        });
+        collegePrograms.put("College of Education", new String[]{
+            "All Programs",
+            "Bachelor of Elementary Education (Science and Mathematics)",
+            "Bachelor of Elementary Education (Language Education)",
+            "Bachelor of Secondary Education (Biology)",
+            "Bachelor of Secondary Education (Chemistry)",
+            "Bachelor of Secondary Education (Physics)",
+            "Bachelor of Secondary Education (Mathematics)",
+            "Bachelor of Physical Education",
+            "Bachelor of Technology and Livelihood Education (Home Economics)",
+            "Bachelor of Technology and Livelihood Education (Industrial Arts)",
+            "Bachelor of Technical-Vocational Teacher Education (Drafting Technology)"
+        });
+        collegePrograms.put("College of Health Sciences", new String[]{
+            "All Programs",
+            "Bachelor of Science in Nursing"
+        });
     }
     
     private void initComponents() {
         setLayout(new BorderLayout());
         
         JPanel filterPanel = new JPanel();
-        filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
+        filterPanel.setLayout(new GridBagLayout());
         filterPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
-        // Gender filter
-        JPanel genderPanel = createFilterSection("Filter by Gender");
-        genderCheckboxes.put("Male", new JCheckBox("Male"));
-        genderCheckboxes.put("Female", new JCheckBox("Female"));
-        genderCheckboxes.put("Other", new JCheckBox("Other"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 1.0;
         
-        for (JCheckBox checkbox : genderCheckboxes.values()) {
-            checkbox.setSelected(true);
-            genderPanel.add(checkbox);
-        }
+        // Gender filter
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        JLabel genderLabel = new JLabel("Gender:");
+        genderLabel.setFont(new Font("Helvetica", Font.BOLD, 14));
+        filterPanel.add(genderLabel, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        genderComboBox = new JComboBox<>(new String[]{"All Genders", "Male", "Female", "Other"});
+        genderComboBox.setFont(new Font("Helvetica", Font.PLAIN, 14));
+        filterPanel.add(genderComboBox, gbc);
         
         // Year Level filter
-        JPanel yearPanel = createFilterSection("Filter by Year Level");
-        for (int i = 1; i <= 4; i++) {
-            String yearText = i + getOrdinalSuffix(i) + " Year";
-            JCheckBox yearBox = new JCheckBox(yearText);
-            yearBox.setSelected(true);
-            yearPanel.add(yearBox);
-            yearCheckboxes.put(String.valueOf(i), yearBox);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        JLabel yearLabel = new JLabel("Year Level:");
+        yearLabel.setFont(new Font("Helvetica", Font.BOLD, 14));
+        filterPanel.add(yearLabel, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        yearLevelComboBox = new JComboBox<>(new String[]{
+            "All Year Levels", "1st Year", "2nd Year", "3rd Year", "4th Year"
+        });
+        yearLevelComboBox.setFont(new Font("Helvetica", Font.PLAIN, 14));
+        filterPanel.add(yearLevelComboBox, gbc);
+        
+        // College filter
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        JLabel collegeLabel = new JLabel("College:");
+        collegeLabel.setFont(new Font("Helvetica", Font.BOLD, 14));
+        filterPanel.add(collegeLabel, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        String[] colleges = collegePrograms.keySet().toArray(new String[0]);
+        Arrays.sort(colleges);
+        // Put "All Colleges" at the beginning
+        String[] finalColleges = new String[colleges.length];
+        finalColleges[0] = "All Colleges";
+        int index = 1;
+        for (String college : colleges) {
+            if (!college.equals("All Colleges")) {
+                finalColleges[index++] = college;
+            }
         }
+        collegeComboBox = new JComboBox<>(finalColleges);
+        collegeComboBox.setFont(new Font("Helvetica", Font.PLAIN, 14));
+        filterPanel.add(collegeComboBox, gbc);
         
-        // College and Program filters will be populated dynamically
-        JPanel collegePanel = createFilterSection("Filter by College");
-        JPanel programPanel = createFilterSection("Filter by Program");
+        // Program filter
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        JLabel programLabel = new JLabel("Program:");
+        programLabel.setFont(new Font("Helvetica", Font.BOLD, 14));
+        filterPanel.add(programLabel, gbc);
         
-        // Add all filter sections
-        filterPanel.add(genderPanel);
-        filterPanel.add(Box.createVerticalStrut(10));
-        filterPanel.add(yearPanel);
-        filterPanel.add(Box.createVerticalStrut(10));
-        filterPanel.add(collegePanel);
-        filterPanel.add(Box.createVerticalStrut(10));
-        filterPanel.add(programPanel);
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        programComboBox = new JComboBox<>(new String[]{"All Programs"});
+        programComboBox.setFont(new Font("Helvetica", Font.PLAIN, 14));
+        filterPanel.add(programComboBox, gbc);
+        
+        // Add listener to update programs when college changes
+        collegeComboBox.addActionListener(e -> {
+            String selectedCollege = (String) collegeComboBox.getSelectedItem();
+            updateProgramComboBox(selectedCollege);
+        });
         
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton applyButton = new JButton("Apply Filters");
-        JButton resetButton = new JButton("Reset Filters");
-        JButton cancelButton = new JButton("Cancel");
+        JButton applyButton = createStyledButton("Apply Filters", new Color(0x6DBECA));
+        JButton resetButton = createStyledButton("Reset Filters", new Color(0xE7E7E7));
+        JButton cancelButton = createStyledButton("Cancel", new Color(0xE7E7E7));
         
         applyButton.addActionListener(e -> {
             applyFilters();
@@ -86,7 +206,6 @@ public class FilterDialog extends JDialog {
         buttonPanel.add(applyButton);
         buttonPanel.add(cancelButton);
         
-        // Add components to dialog
         JScrollPane scrollPane = new JScrollPane(filterPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
@@ -95,220 +214,75 @@ public class FilterDialog extends JDialog {
         add(buttonPanel, BorderLayout.SOUTH);
     }
     
-    private void loadFilterOptions() {
-        // Get the components directly from the content pane
-        Container contentPane = getContentPane();
-        
-        // The content pane has a BorderLayout with a JScrollPane in the CENTER
-        JScrollPane scrollPane = (JScrollPane) contentPane.getComponent(0);
-        // Get the view component from the scroll pane (which is the filter panel)
-        JPanel filterPanel = (JPanel) scrollPane.getViewport().getView();
-        
-        // Now get the college panel (index 4 in the filter panel)
-        JPanel collegePanel = (JPanel) filterPanel.getComponent(4);
-        
-        Set<String> colleges = getAvailableColleges();
-        collegeCheckboxes.clear();
-        collegePanel.removeAll();
-        
-        JLabel collegeLabel = new JLabel("Filter by College");
-        collegeLabel.setFont(new Font("Helvetica", Font.BOLD, 14));
-        collegeLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        collegePanel.add(collegeLabel);
-        
-        for (String college : colleges) {
-            JCheckBox box = new JCheckBox(college);
-            box.setSelected(true);
-            collegePanel.add(box);
-            collegeCheckboxes.put(college, box);
+    private JButton createStyledButton(String text, Color backgroundColor) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Helvetica", Font.PLAIN, 14));
+        button.setBackground(backgroundColor);
+        if (backgroundColor.equals(new Color(0x6DBECA))) {
+            button.setForeground(Color.WHITE);
+        } else {
+            button.setForeground(Color.BLACK);
         }
-        
-        // Get the program panel (index 6 in the filter panel)
-        JPanel programPanel = (JPanel) filterPanel.getComponent(6);
-        
-        Set<String> programs = getAvailablePrograms();
-        programCheckboxes.clear();
-        programPanel.removeAll();
-        
-        JLabel programLabel = new JLabel("Filter by Program");
-        programLabel.setFont(new Font("Helvetica", Font.BOLD, 14));
-        programLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        programPanel.add(programLabel);
-        
-        for (String program : programs) {
-            JCheckBox box = new JCheckBox(program);
-            box.setSelected(true);
-            programPanel.add(box);
-            programCheckboxes.put(program, box);
-        }
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        return button;
     }
     
-    private JPanel createFilterSection(String title) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    private void updateProgramComboBox(String selectedCollege) {
+        programComboBox.removeAllItems();
         
-        JLabel label = new JLabel(title);
-        label.setFont(new Font("Helvetica", Font.BOLD, 14));
-        label.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        
-        panel.add(label);
-        
-        return panel;
-    }
-    
-    private String getOrdinalSuffix(int number) {
-        if (number >= 11 && number <= 13) {
-            return "th";
-        }
-        
-        switch (number % 10) {
-            case 1: return "st";
-            case 2: return "nd";
-            case 3: return "rd";
-            default: return "th";
+        if (selectedCollege != null && collegePrograms.containsKey(selectedCollege)) {
+            for (String program : collegePrograms.get(selectedCollege)) {
+                programComboBox.addItem(program);
+            }
+        } else {
+            programComboBox.addItem("All Programs");
         }
     }
     
     private void resetFilters() {
-        // Reset all checkboxes to selected
-        for (JCheckBox box : genderCheckboxes.values()) {
-            box.setSelected(true);
-        }
-        
-        for (JCheckBox box : yearCheckboxes.values()) {
-            box.setSelected(true);
-        }
-        
-        for (JCheckBox box : collegeCheckboxes.values()) {
-            box.setSelected(true);
-        }
-        
-        for (JCheckBox box : programCheckboxes.values()) {
-            box.setSelected(true);
-        }
+        genderComboBox.setSelectedIndex(0);
+        yearLevelComboBox.setSelectedIndex(0);
+        collegeComboBox.setSelectedIndex(0);
+        updateProgramComboBox("All Colleges");
     }
     
     private void applyFilters() {
-        // Collect selected filter values
-        Set<String> selectedGenders = new HashSet<>();
-        for (Map.Entry<String, JCheckBox> entry : genderCheckboxes.entrySet()) {
-            if (entry.getValue().isSelected()) {
-                selectedGenders.add(entry.getKey());
-            }
-        }
+        String selectedGender = (String) genderComboBox.getSelectedItem();
+        String selectedYearLevel = (String) yearLevelComboBox.getSelectedItem();
+        String selectedCollege = (String) collegeComboBox.getSelectedItem();
+        String selectedProgram = (String) programComboBox.getSelectedItem();
         
-        Set<String> selectedYears = new HashSet<>();
-        for (Map.Entry<String, JCheckBox> entry : yearCheckboxes.entrySet()) {
-            if (entry.getValue().isSelected()) {
-                selectedYears.add(entry.getKey());
-            }
-        }
-        
-        Set<String> selectedColleges = new HashSet<>();
-        for (Map.Entry<String, JCheckBox> entry : collegeCheckboxes.entrySet()) {
-            if (entry.getValue().isSelected()) {
-                selectedColleges.add(entry.getKey());
-            }
-        }
-        
-        Set<String> selectedPrograms = new HashSet<>();
-        for (Map.Entry<String, JCheckBox> entry : programCheckboxes.entrySet()) {
-            if (entry.getValue().isSelected()) {
-                selectedPrograms.add(entry.getKey());
-            }
-        }
-        
-        // Apply filters to the table
         JTable table = tablePanel.getTable();
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
         table.setRowSorter(sorter);
         
-        // Create a composite row filter that combines all our filter criteria
         List<RowFilter<DefaultTableModel, Integer>> filters = new ArrayList<>();
         
-        // Gender filter (column 2)
-        if (!selectedGenders.isEmpty() && selectedGenders.size() < genderCheckboxes.size()) {
-            filters.add(RowFilter.orFilter(selectedGenders.stream()
-                .map(gender -> RowFilter.regexFilter("^" + gender + "$", 2))
-                .toList()));
+        // Add gender filter if not "All Genders"
+        if (selectedGender != null && !selectedGender.equals("All Genders")) {
+            filters.add(RowFilter.regexFilter("^" + selectedGender + "$", 2));
         }
         
-        // Year Level filter (column 4)
-        if (!selectedYears.isEmpty() && selectedYears.size() < yearCheckboxes.size()) {
-            filters.add(RowFilter.orFilter(selectedYears.stream()
-                .map(year -> RowFilter.regexFilter("^" + year + ".*", 4))
-                .toList()));
+        // Add year level filter if not "All Year Levels"
+        if (selectedYearLevel != null && !selectedYearLevel.equals("All Year Levels")) {
+            filters.add(RowFilter.regexFilter("^" + selectedYearLevel + "$", 4));
         }
         
-        // College filter (column 5)
-        if (!selectedColleges.isEmpty() && selectedColleges.size() < collegeCheckboxes.size()) {
-            filters.add(RowFilter.orFilter(selectedColleges.stream()
-                .map(college -> RowFilter.regexFilter("^" + Pattern.quote(college) + "$", 5))
-                .toList()));
+        // Add college filter if not "All Colleges"
+        if (selectedCollege != null && !selectedCollege.equals("All Colleges")) {
+            filters.add(RowFilter.regexFilter("^" + selectedCollege + "$", 5));
         }
         
-        // Program filter (column 6)
-        if (!selectedPrograms.isEmpty() && selectedPrograms.size() < programCheckboxes.size()) {
-            filters.add(RowFilter.orFilter(selectedPrograms.stream()
-                .map(program -> RowFilter.regexFilter("^" + Pattern.quote(program) + "$", 6))
-                .toList()));
+        // Add program filter if not "All Programs"
+        if (selectedProgram != null && !selectedProgram.equals("All Programs")) {
+            filters.add(RowFilter.regexFilter("^" + selectedProgram + "$", 6));
         }
         
-        // Combine all filters with AND logic
         if (!filters.isEmpty()) {
             sorter.setRowFilter(RowFilter.andFilter(filters));
         } else {
-            sorter.setRowFilter(null); // No filters, show all rows
+            sorter.setRowFilter(null);
         }
-    }
-    
-    private Set<String> getAvailableColleges() {
-        // Get unique colleges from the table data
-        Set<String> colleges = new HashSet<>();
-        
-        JTable table = tablePanel.getTable();
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        
-        for (int row = 0; row < model.getRowCount(); row++) {
-            String college = (String) model.getValueAt(row, 5); // College is at index 5
-            if (college != null && !college.isEmpty()) {
-                colleges.add(college);
-            }
-        }
-        
-        // If no colleges found, add some default values
-        if (colleges.isEmpty()) {
-            colleges.add("College of Engineering");
-            colleges.add("College of Science");
-            colleges.add("College of Arts and Letters");
-            colleges.add("College of Business Administration");
-        }
-        
-        return colleges;
-    }
-    
-    private Set<String> getAvailablePrograms() {
-        // Get unique programs from the table data
-        Set<String> programs = new HashSet<>();
-        
-        JTable table = tablePanel.getTable();
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        
-        for (int row = 0; row < model.getRowCount(); row++) {
-            String program = (String) model.getValueAt(row, 6); // Program is at index 6
-            if (program != null && !program.isEmpty()) {
-                programs.add(program);
-            }
-        }
-        
-        // If no programs found, add some default values
-        if (programs.isEmpty()) {
-            programs.add("Computer Science");
-            programs.add("Civil Engineering");
-            programs.add("Business Administration");
-            programs.add("Psychology");
-        }
-        
-        return programs;
     }
 }
