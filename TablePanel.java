@@ -10,7 +10,7 @@ import javax.swing.table.TableRowSorter;
 
 public final class TablePanel extends JPanel {
     private JTable table;
-    private DefaultTableModel model;
+    private final DefaultTableModel model;
     private StudentForm studentForm;
     private RoundedComboBox sortOrderBox;
     private boolean selectionMode = false;
@@ -156,23 +156,18 @@ public final class TablePanel extends JPanel {
 
         RoundedPanel tablePanel = new RoundedPanel(10);
         tablePanel.setBackground(new Color(0xffffff));
-        // Use BorderLayout for the table panel to allow full expansion
         tablePanel.setLayout(new BorderLayout());
-        // Set minimum size but not preferred size to allow expansion
         tablePanel.setMinimumSize(new Dimension(800, 400));
 
-        // Modified model with checkbox column
         String[] columnNames = {"", "Firstname", "Lastname", "Gender", "Id Number", "Year Level", "College", "Program"};
         model = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // Only checkbox column is editable
                 return column == 0 && selectionMode; 
             }
             
             @Override
             public Class<?> getColumnClass(int column) {
-                // Make the first column appear as checkboxes
                 return column == 0 ? Boolean.class : Object.class;
             }
         };
@@ -192,7 +187,6 @@ public final class TablePanel extends JPanel {
         table.setBorder(null);
         header.setBorder(null);
 
-        // Set the checkbox column width
         TableColumn checkboxColumn = table.getColumnModel().getColumn(0);
         checkboxColumn.setMaxWidth(30);
         checkboxColumn.setMinWidth(30);
@@ -201,13 +195,11 @@ public final class TablePanel extends JPanel {
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
 
-        // Add table directly without scroll pane
         tablePanel.add(table.getTableHeader(), BorderLayout.NORTH);
         tablePanel.add(table, BorderLayout.CENTER);
         tablePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Set relative column widths (adjusted for checkbox column)
-        int[] columnWidthPercentages = {3, 14, 14, 10, 14, 10, 17, 18}; // Percentages should add up to 100
+        int[] columnWidthPercentages = {3, 14, 14, 10, 14, 10, 17, 18}; 
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         
         table.addComponentListener(new ComponentAdapter() {
@@ -228,11 +220,10 @@ public final class TablePanel extends JPanel {
         header.setOpaque(false);
         header.setBackground(table.getBackground());
 
-        // Custom renderer for hover effects (with checkbox support)
-        HoverTableRenderer hoverRenderer = new HoverTableRenderer();
-        table.setDefaultRenderer(Object.class, hoverRenderer);
+        HoverTooltipTableRenderer hoverTooltipRenderer = new HoverTooltipTableRenderer();
+        table.setDefaultRenderer(Object.class, hoverTooltipRenderer);
 
-        // Use GridBagLayout for the tableContainer to allow for expansion
+
         JPanel tableContainer = new JPanel(new GridBagLayout());
         tableContainer.setOpaque(false);
         
@@ -251,7 +242,7 @@ public final class TablePanel extends JPanel {
             @Override
             public void mouseMoved(MouseEvent e) {
                 int row = table.rowAtPoint(e.getPoint());
-                hoverRenderer.setHoveredRow(row);
+                hoverTooltipRenderer.setHoveredRow(row);
                 table.repaint();
             }
         });
@@ -295,26 +286,22 @@ public final class TablePanel extends JPanel {
     
     private void toggleSelectionMode() {
         selectionMode = !selectionMode;
-        
-        // Toggle visibility of buttons
+    
         deleteButton.setVisible(!selectionMode);
         cancelButton.setVisible(selectionMode);
         confirmDeleteButton.setVisible(selectionMode);
         
-        // Refresh table to update checkbox state
+
         if (!selectionMode) {
-            // Reset all checkboxes when exiting selection mode
             for (int i = 0; i < model.getRowCount(); i++) {
                 model.setValueAt(false, i, 0);
             }
         }
         
-        // Enable or disable the checkbox column
         table.getColumnModel().getColumn(0).setMinWidth(selectionMode ? 30 : 0);
         table.getColumnModel().getColumn(0).setMaxWidth(selectionMode ? 30 : 0);
         table.getColumnModel().getColumn(0).setPreferredWidth(selectionMode ? 30 : 0);
         
-        // Repaint components
         buttonsPanel.revalidate();
         buttonsPanel.repaint();
         table.revalidate();
@@ -324,11 +311,10 @@ public final class TablePanel extends JPanel {
     private void deleteSelectedStudents() {
         List<String> selectedIds = new ArrayList<>();
         
-        // Collect all selected student IDs
         for (int i = 0; i < model.getRowCount(); i++) {
             Boolean isSelected = (Boolean) model.getValueAt(i, 0);
             if (isSelected != null && isSelected) {
-                String idNumber = model.getValueAt(i, 4).toString(); // Adjust index to ID column
+                String idNumber = model.getValueAt(i, 4).toString();
                 selectedIds.add(idNumber);
             }
         }
@@ -343,7 +329,6 @@ public final class TablePanel extends JPanel {
             return;
         }
         
-        // Confirm deletion
         int confirm = JOptionPane.showConfirmDialog(
             this,
             "Are you sure you want to delete " + selectedIds.size() + " selected student(s)?",
@@ -354,14 +339,12 @@ public final class TablePanel extends JPanel {
         if (confirm == JOptionPane.YES_OPTION) {
             int successCount = 0;
             
-            // Delete each student
             for (String id : selectedIds) {
                 if (StudentManager.deleteStudent(id)) {
                     successCount++;
                 }
             }
             
-            // Show results
             if (successCount > 0) {
                 JOptionPane.showMessageDialog(
                     this,
@@ -370,7 +353,6 @@ public final class TablePanel extends JPanel {
                     JOptionPane.INFORMATION_MESSAGE
                 );
                 
-                // Exit selection mode and refresh table
                 toggleSelectionMode();
                 refreshTable();
             } else {
@@ -455,15 +437,18 @@ public final class TablePanel extends JPanel {
         if (selectedRow >= 0) {
             int modelRow = table.convertRowIndexToModel(selectedRow);
             
-            // Adjust column indices for checkbox column
             String firstName = model.getValueAt(modelRow, 1).toString();
             String lastName = model.getValueAt(modelRow, 2).toString();
             String gender = model.getValueAt(modelRow, 3).toString();
             String idNumber = model.getValueAt(modelRow, 4).toString();
             String yearLevel = model.getValueAt(modelRow, 5).toString();
-            String college = model.getValueAt(modelRow, 6).toString();
-            String program = model.getValueAt(modelRow, 7).toString();
-
+            String collegeAbbr = model.getValueAt(modelRow, 6).toString();
+            String programAbbr = model.getValueAt(modelRow, 7).toString();
+            
+            // Convert abbreviations back to full names for editing
+            String college = CollegeAbbreviationConverter.getFullCollegeName(collegeAbbr);
+            String program = CollegeAbbreviationConverter.getFullProgramName(programAbbr);
+    
             Student student = new Student(firstName, lastName, gender, idNumber, yearLevel, college, program);
             
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -477,31 +462,18 @@ public final class TablePanel extends JPanel {
                     Container parent = gui.getContentPane();
                     for (Component comp : parent.getComponents()) {
                         if (comp instanceof JPanel) {
-                            findAndSetStudentForm((JPanel) comp, student);
+                            findAndSetStudentForm((Container) comp, student);
                         }
                     }
                 }
             }
         }
     }
-    
-    private void findAndSetStudentForm(Container container, Student student) {
-        for (Component comp : container.getComponents()) {
-            if (comp instanceof StudentForm) {
-                ((StudentForm) comp).setEditMode(student);
-                break;
-            } else if (comp instanceof Container) {
-                findAndSetStudentForm((Container) comp, student);
-            }
-        }
-    }
-    
     private void deleteSelectedStudent() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
             int modelRow = table.convertRowIndexToModel(selectedRow);
             
-            // Adjust index for checkbox column
             String idNumber = model.getValueAt(modelRow, 4).toString();
             
             int confirm = JOptionPane.showConfirmDialog(
@@ -540,20 +512,19 @@ public final class TablePanel extends JPanel {
     
         for (Student student : students) {
             model.addRow(new Object[]{
-                false, // Checkbox column (initially unchecked)
+                false, 
                 student.getFirstName(),
                 student.getLastName(),
                 student.getGender(),
                 student.getIdNumber(),
                 student.getYearLevel(),
-                student.getCollege(),
-                student.getProgram()
+                CollegeAbbreviationConverter.getCollegeAbbreviation(student.getCollege()),
+                CollegeAbbreviationConverter.getProgramAbbreviation(student.getProgram())
             });
         }
     
         model.fireTableDataChanged(); 
     
-        // Hide checkbox column when not in selection mode
         if (!selectionMode) {
             table.getColumnModel().getColumn(0).setMinWidth(0);
             table.getColumnModel().getColumn(0).setMaxWidth(0);
@@ -585,7 +556,6 @@ public final class TablePanel extends JPanel {
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
     
-        // Adjust column indices for checkbox column
         int columnIndex = -1;
         switch (category) {
             case "First Name": columnIndex = 1; break;
@@ -608,5 +578,15 @@ public final class TablePanel extends JPanel {
     
         sorter.setSortKeys(List.of(new RowSorter.SortKey(columnIndex, sortOrder)));
         sorter.sort();
+    }
+    private void findAndSetStudentForm(Container container, Student student) {
+        for (Component comp : container.getComponents()) {
+            if (comp instanceof StudentForm) {
+                ((StudentForm) comp).setEditMode(student);
+                break;
+            } else if (comp instanceof Container) {
+                findAndSetStudentForm((Container) comp, student);
+            }
+        }
     }
 }

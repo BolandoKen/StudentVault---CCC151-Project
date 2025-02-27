@@ -3,7 +3,7 @@ import java.awt.geom.RoundRectangle2D;
 import javax.swing.*;
 
 public class RoundedButton extends JButton {
-    private int cornerRadius;
+    private final int cornerRadius;
     private Color backgroundColor;
     private Color hoverColor;
     private Color originalColor;

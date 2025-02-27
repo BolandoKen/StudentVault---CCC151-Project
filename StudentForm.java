@@ -13,19 +13,19 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 public class StudentForm extends JPanel {
-    private TablePanel tablePanel;
-    private RoundedTextField firstnameField;
-    private RoundedTextField lastnameField;
-    private RoundedTextField idField;
-    private RoundedComboBox genderComboBox;
-    private RoundedComboBox yearLevelComboBox;
-    private RoundedComboBox collegeComboBox;
-    private RoundedComboBox programComboBox;
-    private RoundedButton actionButton;
-    private JLabel titleLabel;
+    private final TablePanel tablePanel;
+    private final RoundedTextField firstnameField;
+    private final RoundedTextField lastnameField;
+    private final RoundedTextField idField;
+    private final RoundedComboBox genderComboBox;
+    private final RoundedComboBox yearLevelComboBox;
+    private final RoundedComboBox collegeComboBox;
+    private final RoundedComboBox programComboBox;
+    private final RoundedButton actionButton;
+    private final JLabel titleLabel;
     
     private boolean editMode = false;
-    private String originalId = null; // To keep track of the ID before editing
+    private String originalId = null;
     private Map<String, String[]> collegePrograms;
     
     public StudentForm(TablePanel tablePanel) {
@@ -40,7 +40,6 @@ public class StudentForm extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 10, 5, 10);
 
-        // Row 0: Title
         gbc.gridy = 0;
         JPanel additionalInfoPanel = new JPanel(new GridBagLayout());
         additionalInfoPanel.setPreferredSize(new Dimension(450, 54));
@@ -51,7 +50,6 @@ public class StudentForm extends JPanel {
         additionalInfoPanel.add(titleLabel);
         add(additionalInfoPanel, gbc);
 
-        // Row 1: Firstname and Lastname
         gbc.gridy = 1;
         JPanel row1 = new JPanel(new GridBagLayout());
         row1.setPreferredSize(new Dimension(450, 54));
@@ -88,7 +86,7 @@ public class StudentForm extends JPanel {
         // Gender Dropdown
         row2Gbc.gridx = 0;
         genderComboBox = new RoundedComboBox(
-            new String[]{"Gender", "Male", "Female", "Other"},
+            new String[]{"Male", "Female", "Other"},
             Color.decode("#E7E7E7"),
             Color.gray,
             new Font("Helvetica", Font.PLAIN, 18),
@@ -110,7 +108,7 @@ public class StudentForm extends JPanel {
         // Year Level Dropdown
         row2Gbc.gridx = 2;
         yearLevelComboBox = new RoundedComboBox(
-            new String[]{"Year Level", "1st Year", "2nd Year", "3rd Year", "4th Year"},
+            new String[]{"1st Year", "2nd Year", "3rd Year", "4th Year", "5+"},
             Color.decode("#E7E7E7"),
             Color.GRAY,
             new Font("Helvetica", Font.PLAIN, 18),
@@ -138,7 +136,6 @@ public class StudentForm extends JPanel {
         collegePanel.setBackground(Color.white);
 
         collegePrograms = new HashMap<>();
-        collegePrograms.put("College", new String[]{"Program"});
         collegePrograms.put("College of Computer Studies", new String[]{
             "Bachelor of Science in Computer Science",
             "Bachelor of Science in Information Technology",
@@ -168,7 +165,7 @@ public class StudentForm extends JPanel {
             "Bachelor of Science in Biology (General)",
             "Bachelor of Science in Statistics"
         });
-        collegePrograms.put("College of Economics and Business Accountancy", new String[]{
+        collegePrograms.put("College of Economics, Business & Accountancy", new String[]{
             "Bachelor of Science in Accountancy",
             "Bachelor of Science in Business Administration (Business Economics)",
             "Bachelor of Science in Business Administration (Marketing Management)",
@@ -203,7 +200,6 @@ public class StudentForm extends JPanel {
             "Bachelor of Science in Nursing"
         });
 
-        // Populate college dropdown
         String[] colleges = collegePrograms.keySet().toArray(new String[0]);
         collegeComboBox = new RoundedComboBox(
             colleges,
@@ -255,7 +251,6 @@ public class StudentForm extends JPanel {
             }
         });
 
-        // Row 5: Action Button (Add/Update)
         gbc.gridy = 5;
         gbc.gridwidth = 3;
         JPanel row5 = new JPanel(new GridBagLayout());
@@ -272,7 +267,7 @@ public class StudentForm extends JPanel {
         actionPanel.setBackground(Color.white);
         actionButton = new RoundedButton(
             "Add Student",
-            Color.decode("#6DBECA"),  // Background color (blue)
+            Color.decode("#5C2434"),  // Background color (blue)
             Color.WHITE,              // Text color
             new Font("Helvetica", Font.PLAIN, 18), // Custom font
             10                        // Corner radius
@@ -325,7 +320,6 @@ public class StudentForm extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 resetForm();
                 
-                // Switch back to table view
                 JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(StudentForm.this);
                 if (frame instanceof GUI) {
                     ((GUI) frame).switchPanel("TABLE");
@@ -368,7 +362,6 @@ public class StudentForm extends JPanel {
             errorMessage.append("- ID Number\n");
             hasError = true;
         } else {
-            // Check ID format (0000-0000)
             Pattern pattern = Pattern.compile("\\d{4}-\\d{4}");
             Matcher matcher = pattern.matcher(idNumber);
             if (!matcher.matches()) {
@@ -402,7 +395,6 @@ public class StudentForm extends JPanel {
             return false;
         }
         
-        // Check if ID exists (only in add mode, or if ID has changed in edit mode)
         if (!editMode || !idNumber.equals(originalId)) {
             if (StudentManager.isIdExists(idNumber)) {
                 JOptionPane.showMessageDialog(
@@ -583,22 +575,22 @@ public class StudentForm extends JPanel {
             return input;
         }
     
-        String[] words = input.split("\\s+"); // Split by spaces
+        String[] words = input.split("\\s+"); 
         StringBuilder capitalizedName = new StringBuilder();
     
         for (String word : words) {
             if (!word.isEmpty()) {
-                capitalizedName.append(Character.toUpperCase(word.charAt(0))) // Capitalize first letter
-                               .append(word.substring(1).toLowerCase()) // Convert rest to lowercase
-                               .append(" "); // Add space
+                capitalizedName.append(Character.toUpperCase(word.charAt(0))) 
+                               .append(word.substring(1).toLowerCase()) 
+                               .append(" "); 
             }
         }
     
-        return capitalizedName.toString().trim(); // Remove extra space at the end
+        return capitalizedName.toString().trim(); 
     }
     
     private void setupIdField() {
-    // Add document listener to format ID number as 0000-0000
+
     idField.getDocument().addDocumentListener(new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
@@ -607,7 +599,6 @@ public class StudentForm extends JPanel {
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            // Don't format on remove to avoid complications
         }
 
         @Override
@@ -617,12 +608,10 @@ public class StudentForm extends JPanel {
         
         private void formatIdNumber() {
             String text = idField.getText();
-            // Skip if it's the default placeholder
             if (text.equals("ID Number")) {
                 return;
             }
             
-            // Remove non-digits
             String digitsOnly = text.replaceAll("[^0-9]", "");
             
             // Format as 0000-0000
@@ -634,21 +623,18 @@ public class StudentForm extends JPanel {
                 formatted.append(digitsOnly.charAt(i));
             }
             
-            // Only update if it's different to avoid infinite loop
             if (!text.equals(formatted.toString())) {
                 idField.setText(formatted.toString());
             }
         }
     });
     
-    // Limit total input length to 9 characters (including the hyphen)
     ((PlainDocument) idField.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
         @Override
         public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
             String text = fb.getDocument().getText(0, fb.getDocument().getLength());
             String newText = text.substring(0, offset) + string + text.substring(offset);
             
-            // Count characters excluding the hyphen
             int digitCount = newText.replaceAll("-", "").length();
             if (digitCount <= 8) {
                 super.insertString(fb, offset, string, attr);
@@ -660,7 +646,6 @@ public class StudentForm extends JPanel {
             String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
             String newText = currentText.substring(0, offset) + text + currentText.substring(offset + length);
             
-            // Count characters excluding the hyphen
             int digitCount = newText.replaceAll("-", "").length();
             if (digitCount <= 8) {
                 super.replace(fb, offset, length, text, attrs);
@@ -671,9 +656,7 @@ public class StudentForm extends JPanel {
 setupNameFields();
 }
 
-// Add auto-capitalization to form fields
 private void setupNameFields() {
-    // First name field focus listener for auto-capitalization
     firstnameField.addFocusListener(new java.awt.event.FocusAdapter() {
         @Override
         public void focusLost(java.awt.event.FocusEvent evt) {
@@ -684,7 +667,6 @@ private void setupNameFields() {
         }
     });
     
-    // Last name field focus listener for auto-capitalization
     lastnameField.addFocusListener(new java.awt.event.FocusAdapter() {
         @Override
         public void focusLost(java.awt.event.FocusEvent evt) {

@@ -7,7 +7,11 @@ public class GUI extends JFrame {
 
     public GUI() {
         this.setSize(1440, 1024);
+        this.setTitle("StudentVault");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        ImageIcon studentVaultLogo = new ImageIcon("Assets/StudentVaultLogo.png");
+        this.setIconImage(studentVaultLogo.getImage());
 
         JPanel background = new JPanel(new GridBagLayout());
         background.setBackground(new Color(0x5C2434));

@@ -114,7 +114,6 @@ public class FilterDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.weightx = 1.0;
         
-        // Gender filter
         gbc.gridx = 0;
         gbc.gridy = 0;
         JLabel genderLabel = new JLabel("Gender:");
@@ -127,7 +126,6 @@ public class FilterDialog extends JDialog {
         genderComboBox.setFont(new Font("Helvetica", Font.PLAIN, 14));
         filterPanel.add(genderComboBox, gbc);
         
-        // Year Level filter
         gbc.gridx = 0;
         gbc.gridy = 2;
         JLabel yearLabel = new JLabel("Year Level:");
@@ -183,13 +181,29 @@ public class FilterDialog extends JDialog {
             String selectedCollege = (String) collegeComboBox.getSelectedItem();
             updateProgramComboBox(selectedCollege);
         });
-        
-        // Button panel
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton applyButton = createStyledButton("Apply Filters", Color.BLACK);
-        JButton resetButton = createStyledButton("Reset Filters", Color.BLACK);
-        JButton cancelButton = createStyledButton("Cancel", Color.BLACK);
-        
+        RoundedButton applyButton = new RoundedButton(
+            "Apply Filters",
+            Color.decode("#6DBECA"),  
+            Color.WHITE,             
+            new Font("Helvetica", Font.PLAIN, 18),
+            10  
+        );
+        RoundedButton resetButton = new RoundedButton(
+            "Reset",
+            Color.white, 
+            Color.black,             
+            new Font("Helvetica", Font.PLAIN, 18), 
+            10  
+        );
+        RoundedButton cancelButton = new RoundedButton(
+            "Cancel",
+            Color.decode("#5C2434"), 
+            Color.WHITE,             
+            new Font("Helvetica", Font.PLAIN, 18), 
+            10
+        );
         applyButton.addActionListener(e -> {
             applyFilters();
             dispose();
@@ -255,24 +269,25 @@ public class FilterDialog extends JDialog {
         table.setRowSorter(sorter);
         
         List<RowFilter<DefaultTableModel, Integer>> filters = new ArrayList<>();
-        
-        // Add gender filter if not "All Genders"
+    
         if (selectedGender != null && !selectedGender.equals("All Genders")) {
-            filters.add(RowFilter.regexFilter("^" + selectedGender + "$", 2));
+            filters.add(RowFilter.regexFilter("^" + selectedGender + "$", 3)); // Column index for Gender
         }
         
-        // Add year level filter if not "All Year Levels"
         if (selectedYearLevel != null && !selectedYearLevel.equals("All Year Levels")) {
-            filters.add(RowFilter.regexFilter("^" + selectedYearLevel + "$", 4));
+            filters.add(RowFilter.regexFilter("^" + selectedYearLevel + "$", 5)); // Column index for Year Level
         }
         
-        // Add college filter if not "All Colleges"
         if (selectedCollege != null && !selectedCollege.equals("All Colleges")) {
-            filters.add(RowFilter.regexFilter("^" + selectedCollege + "$", 5));
+            // Convert full college name to abbreviation for filtering
+            String collegeAbbreviation = CollegeAbbreviationConverter.getCollegeAbbreviation(selectedCollege);
+            filters.add(RowFilter.regexFilter("^" + collegeAbbreviation + "$", 6)); // Column index for College
         }
         
         if (selectedProgram != null && !selectedProgram.equals("All Programs")) {
-            filters.add(RowFilter.regexFilter("^" + selectedProgram + "$", 6));
+            // Convert full program name to abbreviation for filtering
+            String programAbbreviation = CollegeAbbreviationConverter.getProgramAbbreviation(selectedProgram);
+            filters.add(RowFilter.regexFilter("^" + programAbbreviation + "$", 7)); // Column index for Program
         }
         
         if (!filters.isEmpty()) {

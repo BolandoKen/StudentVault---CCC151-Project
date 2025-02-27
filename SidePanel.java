@@ -2,10 +2,10 @@ import java.awt.*;
 import javax.swing.*;
 
 public class SidePanel extends JPanel {
-    private ImageIcon addIconDefault = new ImageIcon("Assets/AddIcon.png");
-    private ImageIcon addIconClicked = new ImageIcon("Assets/SelectedAddIcon.png");
-    private ImageIcon tableIconDefault = new ImageIcon("Assets/TableIcon.png");
-    private ImageIcon tableIconClicked = new ImageIcon("Assets/SelectedTableIcon.png");
+    private final ImageIcon addIconDefault = new ImageIcon("Assets/AddIcon.png");
+    private final ImageIcon addIconClicked = new ImageIcon("Assets/SelectedAddIcon.png");
+    private final ImageIcon tableIconDefault = new ImageIcon("Assets/TableIcon.png");
+    private final ImageIcon tableIconClicked = new ImageIcon("Assets/SelectedTableIcon.png");
     
     private JButton addButton;
     private JButton tableButton;
@@ -47,10 +47,7 @@ public class SidePanel extends JPanel {
             }
         }
         
-        // Set the clicked button as active
         activeButton = clickedButton;
-        
-        // Change icon of clicked button
         if (clickedButton == addButton) {
             clickedButton.setIcon(addIconClicked);
         } else if (clickedButton == tableButton) {
