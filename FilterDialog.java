@@ -151,7 +151,6 @@ public class FilterDialog extends JDialog {
         gbc.gridy = 5;
         String[] colleges = collegePrograms.keySet().toArray(new String[0]);
         Arrays.sort(colleges);
-        // Put "All Colleges" at the beginning
         String[] finalColleges = new String[colleges.length];
         finalColleges[0] = "All Colleges";
         int index = 1;
@@ -271,23 +270,21 @@ public class FilterDialog extends JDialog {
         List<RowFilter<DefaultTableModel, Integer>> filters = new ArrayList<>();
     
         if (selectedGender != null && !selectedGender.equals("All Genders")) {
-            filters.add(RowFilter.regexFilter("^" + selectedGender + "$", 3)); // Column index for Gender
+            filters.add(RowFilter.regexFilter("^" + selectedGender + "$", 3));
         }
         
         if (selectedYearLevel != null && !selectedYearLevel.equals("All Year Levels")) {
-            filters.add(RowFilter.regexFilter("^" + selectedYearLevel + "$", 5)); // Column index for Year Level
+            filters.add(RowFilter.regexFilter("^" + selectedYearLevel + "$", 5)); 
         }
         
         if (selectedCollege != null && !selectedCollege.equals("All Colleges")) {
-            // Convert full college name to abbreviation for filtering
             String collegeAbbreviation = CollegeAbbreviationConverter.getCollegeAbbreviation(selectedCollege);
-            filters.add(RowFilter.regexFilter("^" + collegeAbbreviation + "$", 6)); // Column index for College
+            filters.add(RowFilter.regexFilter("^" + collegeAbbreviation + "$", 6));
         }
         
         if (selectedProgram != null && !selectedProgram.equals("All Programs")) {
-            // Convert full program name to abbreviation for filtering
             String programAbbreviation = CollegeAbbreviationConverter.getProgramAbbreviation(selectedProgram);
-            filters.add(RowFilter.regexFilter("^" + programAbbreviation + "$", 7)); // Column index for Program
+            filters.add(RowFilter.regexFilter("^" + programAbbreviation + "$", 7)); 
         }
         
         if (!filters.isEmpty()) {

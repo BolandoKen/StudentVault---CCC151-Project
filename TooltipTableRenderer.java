@@ -11,7 +11,6 @@ public class TooltipTableRenderer extends DefaultTableCellRenderer {
         Component c = super.getTableCellRendererComponent(
             table, value, isSelected, hasFocus, row, column);
         
-        // We only want tooltips for the College and Program columns (6 and 7)
         if (column == 6 || column == 7) {
             String abbreviation = value.toString();
             String fullName;
@@ -22,7 +21,6 @@ public class TooltipTableRenderer extends DefaultTableCellRenderer {
                 fullName = CollegeAbbreviationConverter.getFullProgramName(abbreviation);
             }
             
-            // Only set tooltip if we have a full name
             if (!abbreviation.equals(fullName)) {
                 setToolTipText(fullName);
             } else {

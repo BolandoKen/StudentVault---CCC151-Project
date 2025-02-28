@@ -8,10 +8,8 @@ public class CollegeAbbreviationConverter {
     private static final Map<String, String> abbreviationToProgram = new HashMap<>();
     
     static {
-        // College abbreviations
         initializeColleges();
         
-        // Program abbreviations
         initializePrograms();
     }
     
@@ -101,38 +99,18 @@ public class CollegeAbbreviationConverter {
         abbreviationToProgram.put(abbreviation, programName);
     }
     
-    /**
-     * Converts full college name to abbreviation
-     * @param collegeName The full college name
-     * @return The college abbreviation or the original name if not found
-     */
     public static String getCollegeAbbreviation(String collegeName) {
         return collegeToAbbreviation.getOrDefault(collegeName, collegeName);
     }
     
-    /**
-     * Converts full program name to abbreviation
-     * @param programName The full program name
-     * @return The program abbreviation or the original name if not found
-     */
     public static String getProgramAbbreviation(String programName) {
         return programToAbbreviation.getOrDefault(programName, programName);
     }
     
-    /**
-     * Converts college abbreviation to full name
-     * @param abbreviation The college abbreviation
-     * @return The full college name or the original abbreviation if not found
-     */
     public static String getFullCollegeName(String abbreviation) {
         return abbreviationToCollege.getOrDefault(abbreviation, abbreviation);
     }
     
-    /**
-     * Converts program abbreviation to full name
-     * @param abbreviation The program abbreviation
-     * @return The full program name or the original abbreviation if not found
-     */
     public static String getFullProgramName(String abbreviation) {
         return abbreviationToProgram.getOrDefault(abbreviation, abbreviation);
     }

@@ -13,7 +13,6 @@ public class HoverTooltipTableRenderer extends DefaultTableCellRenderer {
         Component c = super.getTableCellRendererComponent(
             table, value, isSelected, hasFocus, row, column);
         
-        // Handle hover effect
         if (row == hoveredRow && !isSelected) {
             setBackground(new Color(0xF5F5F5));
         } else if (isSelected) {
@@ -24,7 +23,6 @@ public class HoverTooltipTableRenderer extends DefaultTableCellRenderer {
             setForeground(table.getForeground());
         }
         
-        // Handle tooltips for College and Program columns
         if (column == 6 || column == 7) {
             String abbreviation = value != null ? value.toString() : "";
             String fullName;
@@ -35,7 +33,6 @@ public class HoverTooltipTableRenderer extends DefaultTableCellRenderer {
                 fullName = CollegeAbbreviationConverter.getFullProgramName(abbreviation);
             }
             
-            // Only set tooltip if we have a full name
             if (!abbreviation.equals(fullName)) {
                 setToolTipText(fullName);
             } else {

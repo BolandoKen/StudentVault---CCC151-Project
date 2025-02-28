@@ -290,7 +290,6 @@ public class StudentForm extends JPanel {
         });
         add(row5, gbc);
         
-        // Add a cancel button for edit mode
         gbc.gridy = 6;
         JPanel row6 = new JPanel(new GridBagLayout());
         row6.setPreferredSize(new Dimension(450, 54));
@@ -434,15 +433,12 @@ public class StudentForm extends JPanel {
                 JOptionPane.INFORMATION_MESSAGE
             );
 
-            // Refresh table
             if (tablePanel != null) {
                 tablePanel.refreshTable();
             }
             
-            // Clear form fields
             resetForm();
             
-            // Switch back to table view
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
             if (frame instanceof GUI) {
                 ((GUI) frame).switchPanel("TABLE");
