@@ -445,9 +445,9 @@ public final class TablePanel extends JPanel {
             String collegeAbbr = model.getValueAt(modelRow, 6).toString();
             String programAbbr = model.getValueAt(modelRow, 7).toString();
             
-            // Convert abbreviations back to full names for editing
-            String college = CollegeAbbreviationConverter.getFullCollegeName(collegeAbbr);
-            String program = CollegeAbbreviationConverter.getFullProgramName(programAbbr);
+            // Get full names from abbreviations
+            String college = CollegeDataManager.getCollegeName(collegeAbbr);
+            String program = CollegeDataManager.getProgramName(programAbbr);
     
             Student student = new Student(firstName, lastName, gender, idNumber, yearLevel, college, program);
             
@@ -504,44 +504,48 @@ public final class TablePanel extends JPanel {
         }
     }
 
-    public void refreshTable() {
-        model.setRowCount(0); 
-        List<Student> students = StudentManager.loadStudents();
-    
-        System.out.println("Students loaded: " + students.size());
-    
-        for (Student student : students) {
-            model.addRow(new Object[]{
-                false, 
-                student.getFirstName(),
-                student.getLastName(),
-                student.getGender(),
-                student.getIdNumber(),
-                student.getYearLevel(),
-                CollegeAbbreviationConverter.getCollegeAbbreviation(student.getCollege()),
-                CollegeAbbreviationConverter.getProgramAbbreviation(student.getProgram())
-            });
+    // In TablePanel.java, update the refreshTable method
+// Update the refreshTable method
+public void refreshTable() {
+    CollegeDataManager.loadFromCSV(); // Ensure data is up-to-date
+    model.setRowCount(0);
+    List<Student> students = StudentManager.loadStudents();
+
+    List<String> validColleges = CollegeDataManager.getAllColleges();
+
+    for (Student student : students) {
+        String college = student.getCollege();
+        String program = student.getProgram();
+        
+        String collegeDisplay = "N/A";
+        String programDisplay = "N/A";
+        
+        // Check if college exists
+        if (college != null && validColleges.contains(college)) {
+            collegeDisplay = CollegeDataManager.getCollegeAbbr(college);
+            
+            // Check if program exists in the college
+            List<String> collegePrograms = CollegeDataManager.getProgramsForCollege(college);
+            if (program != null && collegePrograms.contains(program)) {
+                programDisplay = CollegeDataManager.getProgramAbbr(program);
+            }
         }
-    
-        model.fireTableDataChanged(); 
-    
-        if (!selectionMode) {
-            table.getColumnModel().getColumn(0).setMinWidth(0);
-            table.getColumnModel().getColumn(0).setMaxWidth(0);
-            table.getColumnModel().getColumn(0).setPreferredWidth(0);
-        }
-    
-        revalidate();
-        repaint();
-    
-        Container parent = getParent();
-        while (parent != null) {
-            parent.revalidate();
-            parent.repaint();
-            parent = parent.getParent();
-        }
+        
+        model.addRow(new Object[]{
+            false, 
+            student.getFirstName(),
+            student.getLastName(),
+            student.getGender(),
+            student.getIdNumber(),
+            student.getYearLevel(),
+            collegeDisplay,
+            programDisplay
+        });
     }
-    
+
+    model.fireTableDataChanged();
+    // Rest of the method remains the same...
+}
     public JTable getTable() {
         return table;
     }

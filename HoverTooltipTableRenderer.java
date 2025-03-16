@@ -23,15 +23,10 @@ public class HoverTooltipTableRenderer extends DefaultTableCellRenderer {
             setForeground(table.getForeground());
         }
         
-        if (column == 6 || column == 7) {
+        // Only set tooltip for program column (column 7)
+        if (column == 7) {
             String abbreviation = value != null ? value.toString() : "";
-            String fullName;
-            
-            if (column == 6) {
-                fullName = CollegeAbbreviationConverter.getFullCollegeName(abbreviation);
-            } else {
-                fullName = CollegeAbbreviationConverter.getFullProgramName(abbreviation);
-            }
+            String fullName = CollegeAbbreviationConverter.getFullProgramName(abbreviation);
             
             if (!abbreviation.equals(fullName)) {
                 setToolTipText(fullName);

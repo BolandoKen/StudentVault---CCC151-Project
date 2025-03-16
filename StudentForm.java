@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,7 +12,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 public class StudentForm extends JPanel {
-    private final TablePanel tablePanel;
+    final TablePanel tablePanel;
     private final RoundedTextField firstnameField;
     private final RoundedTextField lastnameField;
     private final RoundedTextField idField;
@@ -133,85 +132,48 @@ public class StudentForm extends JPanel {
         row3Gbc.insets = new Insets(5, 10, 5, 10);
 
         JPanel collegePanel = new JPanel(new BorderLayout());
-        collegePanel.setBackground(Color.white);
+        collegePanel.setOpaque(false);
 
-        collegePrograms = new HashMap<>();
-        collegePrograms.put("College of Computer Studies", new String[]{
-            "Bachelor of Science in Computer Science",
-            "Bachelor of Science in Information Technology",
-            "Bachelor of Science in Information Systems",
-            "Bachelor of Science in Computer Application"
-        });
-        collegePrograms.put("College of Engineering", new String[]{
-            "Diploma in Chemical Engineering Technology",
-            "Bachelor of Science in Ceramic Engineering",
-            "Bachelor of Science in Civil Engineering",
-            "Bachelor of Science in Electrical Engineering",
-            "Bachelor of Science in Mechanical Engineering",
-            "Bachelor of Science in Chemical Engineering",
-            "Bachelor of Science in Metallurgical Engineering",
-            "Bachelor of Science in Computer Engineering",
-            "Bachelor of Science in Mining Engineering",
-            "Bachelor of Science in Electronics & Communications Engineering",
-            "Bachelor of Science in Environmental Engineering"
-        });
-        collegePrograms.put("College of Science and Mathematics", new String[]{
-            "Bachelor of Science in Biology (Botany)",
-            "Bachelor of Science in Chemistry",
-            "Bachelor of Science in Mathematics",
-            "Bachelor of Science in Physics",
-            "Bachelor of Science in Biology (Zoology)",
-            "Bachelor of Science in Biology (Marine)",
-            "Bachelor of Science in Biology (General)",
-            "Bachelor of Science in Statistics"
-        });
-        collegePrograms.put("College of Economics, Business & Accountancy", new String[]{
-            "Bachelor of Science in Accountancy",
-            "Bachelor of Science in Business Administration (Business Economics)",
-            "Bachelor of Science in Business Administration (Marketing Management)",
-            "Bachelor of Science in Entrepreneurship",
-            "Bachelor of Science in Hospitality Management"
-        });
-        collegePrograms.put("College of Arts and Social Sciences", new String[]{
-            "Bachelor of Arts in English Language Studies",
-            "Bachelor of Arts in Literary and Cultural Studies",
-            "Bachelor of Arts in Filipino",
-            "Bachelor of Arts in Panitikan",
-            "Bachelor of Arts in Political Science",
-            "Bachelor of Arts in Psychology",
-            "Bachelor of Arts in Sociology",
-            "Bachelor of Arts in History (International History Track)",
-            "Bachelor of Science in Philosophy",
-            "Bachelor of Science in Psychology"
-        });
-        collegePrograms.put("College of Education", new String[]{
-            "Bachelor of Elementary Education (Science and Mathematics)",
-            "Bachelor of Elementary Education (Language Education)",
-            "Bachelor of Secondary Education (Biology)",
-            "Bachelor of Secondary Education (Chemistry)",
-            "Bachelor of Secondary Education (Physics)",
-            "Bachelor of Secondary Education (Mathematics)",
-            "Bachelor of Physical Education",
-            "Bachelor of Technology and Livelihood Education (Home Economics)",
-            "Bachelor of Technology and Livelihood Education (Industrial Arts)",
-            "Bachelor of Technical-Vocational Teacher Education (Drafting Technology)"
-        });
-        collegePrograms.put("College of Health Sciences", new String[]{
-            "Bachelor of Science in Nursing"
-        });
+        CollegeManager.loadColleges();
 
-        String[] colleges = collegePrograms.keySet().toArray(new String[0]);
+        String[] colleges = CollegeManager.getCollegeNames();
         collegeComboBox = new RoundedComboBox(
             colleges,
             Color.decode("#E7E7E7"),
             Color.GRAY,
             new Font("Helvetica", Font.PLAIN, 18),
-            10, new Dimension(450, 40),
+            10, new Dimension(360, 40),
             "College",
             Color.decode("#6DBECA")
         );
 
         collegePanel.add(collegeComboBox, BorderLayout.CENTER);
+
+        JButton addCollegeButton = new JButton("+");
+        addCollegeButton.setBackground(new Color(0xE7E7E7));
+        setForeground(Color.BLACK);
+        addCollegeButton.setPreferredSize(new Dimension(80, 40));
+
+        addCollegeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Always show the college admin dialog
+                JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(StudentForm.this);
+                CollegeAdminDialog adminDialog = new CollegeAdminDialog(frame, StudentForm.this);
+                adminDialog.setVisible(true);
+            }
+        });
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+        buttonPanel.add(addCollegeButton);
+
+        collegePanel.removeAll();
+        collegePanel.setLayout(new BorderLayout(10, 0)); 
+        collegePanel.add(collegeComboBox, BorderLayout.CENTER);
+        collegePanel.add(buttonPanel, BorderLayout.EAST);
+
         row3.add(collegePanel, row3Gbc);
         add(row3, gbc);
 
@@ -229,9 +191,10 @@ public class StudentForm extends JPanel {
         row4Gbc.insets = new Insets(5, 10, 5, 10);
 
         JPanel programPanel = new JPanel(new BorderLayout());
-        programPanel.setBackground(Color.white);
+        programPanel.setOpaque(false);
+
         programComboBox = new RoundedComboBox(
-            new String[]{"Program"}, // Empty initially
+            new String[]{"Program"}, 
             Color.decode("#E7E7E7"),
             Color.GRAY,
             new Font("Helvetica", Font.PLAIN, 18),
@@ -239,6 +202,7 @@ public class StudentForm extends JPanel {
             "Program",
             Color.decode("#6DBECA")
         );
+
         programPanel.add(programComboBox, BorderLayout.CENTER);
         row4.add(programPanel, row4Gbc);
         add(row4, gbc);
@@ -267,10 +231,10 @@ public class StudentForm extends JPanel {
         actionPanel.setBackground(Color.white);
         actionButton = new RoundedButton(
             "Add Student",
-            Color.decode("#5C2434"),  // Background color (blue)
-            Color.WHITE,              // Text color
-            new Font("Helvetica", Font.PLAIN, 18), // Custom font
-            10                        // Corner radius
+            Color.decode("#5C2434"),  
+            Color.WHITE,             
+            new Font("Helvetica", Font.PLAIN, 18), 
+            10                       
         );
         actionButton.setPreferredSize(new Dimension(150, 40));
         actionPanel.add(actionButton, BorderLayout.CENTER);
@@ -330,11 +294,17 @@ public class StudentForm extends JPanel {
     
     private void updateProgramComboBox(String selectedCollege) {
         programComboBox.removeAllItems();
-        if (selectedCollege != null && collegePrograms.containsKey(selectedCollege)) {
-            for (String program : collegePrograms.get(selectedCollege)) {
+        programComboBox.addItem("Program"); // Always add the placeholder
+        
+        if (selectedCollege != null && !selectedCollege.equals("College")) {
+            String[] programs = CollegeManager.getProgramsForCollege(selectedCollege);
+            for (String program : programs) {
                 programComboBox.addItem(program);
             }
         }
+        
+        // Default to the first item (placeholder)
+        programComboBox.setSelectedIndex(0);
     }
     
     private boolean validateForm() {
@@ -672,5 +642,42 @@ private void setupNameFields() {
             }
         }
     });
+}
+public void refreshCollegeData() {
+    // Store currently selected college
+    String currentSelection = (String) collegeComboBox.getSelectedItem();
+    
+    // Clear combo box
+    collegeComboBox.removeAllItems();
+    
+    // Add default placeholder
+    collegeComboBox.addItem("College");
+    
+    // Get and add college names
+    String[] collegeNames = CollegeManager.getCollegeNames();
+    for (String college : collegeNames) {
+        collegeComboBox.addItem(college);
+    }
+    
+    // Try to reselect the previously selected college
+    if (currentSelection != null && !currentSelection.equals("College")) {
+        for (int i = 0; i < collegeComboBox.getItemCount(); i++) {
+            if (collegeComboBox.getItemAt(i).equals(currentSelection)) {
+                collegeComboBox.setSelectedIndex(i);
+                updateProgramComboBox(currentSelection);
+                return;
+            }
+        }
+    }
+    
+    // If we couldn't reselect, select the placeholder item
+    collegeComboBox.setSelectedIndex(0);
+    updateProgramComboBox("College");
+}
+// In StudentForm.java
+public void refreshTable() {
+    if (tablePanel != null) {
+        tablePanel.refreshTable();
+    }
 }
 }

@@ -1,5 +1,5 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 public class CollegeAbbreviationConverter {
     private static final Map<String, String> collegeToAbbreviation = new HashMap<>();
@@ -7,86 +7,68 @@ public class CollegeAbbreviationConverter {
     private static final Map<String, String> abbreviationToCollege = new HashMap<>();
     private static final Map<String, String> abbreviationToProgram = new HashMap<>();
     
+    private static final String COLLEGES_CSV_PATH = "colleges.csv";
+    
     static {
-        initializeColleges();
+        // Load colleges and programs from CSV instead of hardcoding
+        loadMappingsFromCSV();
         
+        // Still initialize hardcoded programs as fallback
         initializePrograms();
     }
     
-    private static void initializeColleges() {
-        // Add College mappings
-        addCollegeMapping("College of Engineering", "COE");
-        addCollegeMapping("College of Science and Mathematics", "CSM");
-        addCollegeMapping("College of Computer Studies", "CCS");
-        addCollegeMapping("College of Education", "CED");
-        addCollegeMapping("College of Arts and Social Sciences", "CAS");
-        addCollegeMapping("College of Economics, Business & Accountancy", "CEBA");
-        addCollegeMapping("College of Health Sciences", "CHS");
+    private static void loadMappingsFromCSV() {
+        try (BufferedReader br = new BufferedReader(new FileReader(COLLEGES_CSV_PATH))) {
+            String line;
+            String currentCollege = null;
+            String currentAbbreviation = null;
+            
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                
+                if (line.startsWith("College:")) {
+                    // New college entry
+                    currentCollege = line.substring("College:".length()).trim();
+                } else if (line.startsWith("Abbreviation:")) {
+                    // College abbreviation
+                    String abbr = line.substring("Abbreviation:".length()).trim();
+                    if (!abbr.isEmpty() && currentCollege != null) {
+                        currentAbbreviation = abbr;
+                        addCollegeMapping(currentCollege, currentAbbreviation);
+                    }
+                } else if (line.startsWith("Program:")) {
+                    // Program entry
+                    String programLine = line.substring("Program:".length()).trim();
+                    // Parse program name and abbreviation (Format: "Program Name: ABBR")
+                    if (programLine.contains(":")) {
+                        String[] parts = programLine.split(":");
+                        if (parts.length >= 2) {
+                            String programName = parts[0].trim();
+                            String programAbbr = parts[1].trim();
+                            if (!programName.isEmpty() && !programAbbr.isEmpty()) {
+                                addProgramMapping(programName, programAbbr);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error loading college mappings from CSV: " + e.getMessage());
+            // Fall back to hardcoded mappings
+        }
     }
     
     private static void initializePrograms() {
+        // Keep the fallback program mappings
+        // Only programs not defined in the CSV file will use these
+        
         // Engineering programs
-        addProgramMapping("Diploma in Chemical Engineering Technology", "DCET");
-        addProgramMapping("Bachelor of Science in Ceramic Engineering", "BSCerE");
-        addProgramMapping("Bachelor of Science in Civil Engineering", "BSCE");
-        addProgramMapping("Bachelor of Science in Electrical Engineering", "BSEE");
         addProgramMapping("Bachelor of Science in Mechanical Engineering", "BSME");
-        addProgramMapping("Bachelor of Science in Chemical Engineering", "BSChE");
-        addProgramMapping("Bachelor of Science in Metallurgical Engineering", "BSMetE");
-        addProgramMapping("Bachelor of Science in Computer Engineering", "BSCpE");
-        addProgramMapping("Bachelor of Science in Mining Engineering", "BSMinE");
-        addProgramMapping("Bachelor of Science in Electronics & Communications Engineering", "BSECE");
-        addProgramMapping("Bachelor of Science in Environmental Engineering", "BSEnET");
-        
-        // Science and Mathematics programs
-        addProgramMapping("Bachelor of Science in Biology (Botany)", "BSBio-Bot");
-        addProgramMapping("Bachelor of Science in Chemistry", "BSChem");
-        addProgramMapping("Bachelor of Science in Mathematics", "BSMath");
-        addProgramMapping("Bachelor of Science in Physics", "BSPhys");
-        addProgramMapping("Bachelor of Science in Biology (Zoology)", "BSBio-Zoo");
-        addProgramMapping("Bachelor of Science in Biology (Marine)", "BSBio-Mar");
-        addProgramMapping("Bachelor of Science in Biology (General)", "BSBio-Gen");
-        addProgramMapping("Bachelor of Science in Statistics", "BSStat");
-        
-        // Computer Studies programs
         addProgramMapping("Bachelor of Science in Computer Science", "BSCS");
-        addProgramMapping("Bachelor of Science in Information Technology", "BSIT");
-        addProgramMapping("Bachelor of Science in Information Systems", "BSIS");
-        addProgramMapping("Bachelor of Science in Computer Application", "BSCA");
+        addProgramMapping("Bachelor of Science in Computer Applications", "BSCA");
+        addProgramMapping("Bachelor of Science in Magic", "BSM");
         
-        // Education programs
-        addProgramMapping("Bachelor of Elementary Education (Science and Mathematics)", "BEEd-SciMath");
-        addProgramMapping("Bachelor of Elementary Education (Language Education)", "BEEd-Lang");
-        addProgramMapping("Bachelor of Secondary Education (Biology)", "BSEd-Bio");
-        addProgramMapping("Bachelor of Secondary Education (Chemistry)", "BSEd-Chem");
-        addProgramMapping("Bachelor of Secondary Education (Physics)", "BSEd-Phys");
-        addProgramMapping("Bachelor of Secondary Education (Mathematics)", "BSEd-Math");
-        addProgramMapping("Bachelor of Physical Education", "BPEd");
-        addProgramMapping("Bachelor of Technology and Livelihood Education (Home Economics)", "BTLED-HE");
-        addProgramMapping("Bachelor of Technology and Livelihood Education (Industrial Arts)", "BTLed-IA");
-        addProgramMapping("Bachelor of Technical-Vocational Teacher Education (Drafting Technology)", "BTVTED-DT");
-        
-        // Arts and Social Sciences programs
-        addProgramMapping("Bachelor of Arts in English Language Studies", "BA-ELS");
-        addProgramMapping("Bachelor of Arts in Literary and Cultural Studies", "BA-LCS");
-        addProgramMapping("Bachelor of Arts in Filipino", "BA-FIL");
-        addProgramMapping("Bachelor of Arts in Panitikan", "BA-PAN");
-        addProgramMapping("Bachelor of Arts in Political Science", "BA-POLSCI");
-        addProgramMapping("Bachelor of Arts in Psychology", "BA-PSY");
-        addProgramMapping("Bachelor of Arts in Sociology", "BA-SOC");
-        addProgramMapping("Bachelor of Arts in History (International History Track)", "BA-HIS-IH");
-        addProgramMapping("Bachelor of Science in Philosophy", "BS-PHIL-AE");
-        addProgramMapping("Bachelor of Science in Psychology", "BS-PSY");
-        
-        // Economics, Business & Accountancy programs
-        addProgramMapping("Bachelor of Science in Accountancy", "BS-ACC");
-        addProgramMapping("Bachelor of Science in Business Administration (Business Economics)", "BSBA-BE");
-        addProgramMapping("Bachelor of Science in Business Administration (Marketing Management)", "BSBA-MM");
-        addProgramMapping("Bachelor of Science in Entrepreneurship", "BS-ENT");
-        addProgramMapping("Bachelor of Science in Hospitality Management", "BSHM");
-        
-        // Health Sciences programs
-        addProgramMapping("Bachelor of Science in Nursing", "BSN");
+        // Add more fallback program mappings if needed
     }
     
     private static void addCollegeMapping(String collegeName, String abbreviation) {

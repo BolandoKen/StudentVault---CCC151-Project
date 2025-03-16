@@ -18,6 +18,9 @@ class StudentManager {
             
             pw.println(student.toCSV());
             
+            // Reload college data after saving to ensure latest mappings are available
+            CollegeDataManager.loadFromCSV();
+            
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null,
                 "Error saving student: " + e.getMessage(),
@@ -108,6 +111,10 @@ class StudentManager {
                     found = true;
                 }
             }
+            
+            // Reload college data after updating
+            CollegeDataManager.loadFromCSV();
+            
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null,
                 "Error updating student: " + e.getMessage(),

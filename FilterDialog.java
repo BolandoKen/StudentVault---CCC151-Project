@@ -278,11 +278,12 @@ public class FilterDialog extends JDialog {
         }
         
         if (selectedCollege != null && !selectedCollege.equals("All Colleges")) {
-            String collegeAbbreviation = CollegeAbbreviationConverter.getCollegeAbbreviation(selectedCollege);
-            filters.add(RowFilter.regexFilter("^" + collegeAbbreviation + "$", 6));
+            // Use college name directly instead of abbreviation
+            filters.add(RowFilter.regexFilter("^" + selectedCollege + "$", 6));
         }
         
         if (selectedProgram != null && !selectedProgram.equals("All Programs")) {
+            // Use program abbreviation
             String programAbbreviation = CollegeAbbreviationConverter.getProgramAbbreviation(selectedProgram);
             filters.add(RowFilter.regexFilter("^" + programAbbreviation + "$", 7)); 
         }
