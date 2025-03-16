@@ -2,6 +2,20 @@ College: College of Health Sciences
 Abbreviation: CHS
 Program: Bachelor of Science in Nursing: BSN
 
+College: College of Engineering
+Abbreviation: COE
+Program: Bachelor of Science in Environmental Engineering: BSEnET
+Program: Bachelor of Science in Electronics & Communications Engineering: BSECE
+Program: Diploma in Chemical Engineering Technology: DCET
+Program: Bachelor of Science in Ceramic Engineering: BSCerE
+Program: Bachelor of Science in Mechanical Engineering: BSME
+Program: Bachelor of Science in Computer Engineering: BSCpE
+Program: Bachelor of Science in Mining Engineering: BSMine
+Program: Bachelor of Science in Electrical Engineering: BSEE
+Program: Bachelor of Science in Chemical Engineering: BSChe
+Program: Bachelor of Science in Metallurgical Engineering: BSMetE
+Program: Bachelor of Science in Civil Engineering: BSCE
+
 College: College of Science and Mathematics
 Abbreviation: CSM
 Program: Bachelor of Science in Physics: BSPhys
@@ -54,16 +68,3 @@ Program: Bachelor of Secondary Education (Chemistry): BSEd-Chem
 Program: Bachelor of Secondary Education (Mathematics): BSEd-Math
 Program: Bachelor of Secondary Education (Physics): BSEd-Phys
 
-College: College of Engineering
-Abbreviation: COE
-Program: Diploma in Chemical Engineering Technology: DCET
-Program: Bachelor of Science in Ceramic Engineering: BSCerE
-Program: Bachelor of Science in Civil Engineering: BSCE
-Program: Bachelor of Science in Electrical Engineering: BSEE
-Program: Bachelor of Science in Mechanical Engineering: BSME
-Program: Bachelor of Science in Chemical Engineering: BSChe
-Program: Bachelor of Science in Metallurgical Engineering: BSMetE
-Program: Bachelor of Science in Computer Engineering: BSCpE
-Program: Bachelor of Science in Mining Engineering: BSMine
-Program: Bachelor of Science in Electronics & Communications Engineering: BSECE
-Program: Bachelor of Science in Environmental Engineering: BSEnET

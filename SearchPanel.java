@@ -128,14 +128,71 @@ public class SearchPanel extends JPanel {
         } else {
             // If "All Fields" is selected, search in all columns
             if (searchField.equals("All Fields")) {
-                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
+                // Create a composite filter that checks both abbreviations and full names
+                List<RowFilter<Object, Object>> filters = new ArrayList<>();
+                
+                // Add direct text search for all columns
+                filters.add(RowFilter.regexFilter("(?i)" + searchText));
+                
+                // Add search by full college name
+                for (String college : CollegeDataManager.getAllColleges()) {
+                    if (college.toLowerCase().contains(searchText.toLowerCase())) {
+                        String abbr = CollegeDataManager.getCollegeAbbr(college);
+                        filters.add(RowFilter.regexFilter("(?i)" + abbr, 6));
+                    }
+                }
+                
+                // Add search by full program name
+                for (String college : CollegeDataManager.getAllColleges()) {
+                    for (String program : CollegeDataManager.getProgramsForCollege(college)) {
+                        if (program.toLowerCase().contains(searchText.toLowerCase())) {
+                            String abbr = CollegeDataManager.getProgramAbbr(program);
+                            filters.add(RowFilter.regexFilter("(?i)" + abbr, 7));
+                        }
+                    }
+                }
+                
+                sorter.setRowFilter(RowFilter.orFilter(filters));
             } else {
                 // Get the column index based on the selected field
                 int columnIndex = getColumnIndex(searchField);
                 if (columnIndex != -1) {
-                    List<RowFilter<Object, Object>> filters = new ArrayList<>();
-                    filters.add(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
-                    sorter.setRowFilter(RowFilter.orFilter(filters));
+                    if (columnIndex == 6) { // College column
+                        // Search by college name
+                        List<RowFilter<Object, Object>> filters = new ArrayList<>();
+                        filters.add(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
+                        
+                        // Add search by full college name
+                        for (String college : CollegeDataManager.getAllColleges()) {
+                            if (college.toLowerCase().contains(searchText.toLowerCase())) {
+                                String abbr = CollegeDataManager.getCollegeAbbr(college);
+                                filters.add(RowFilter.regexFilter("(?i)" + abbr, columnIndex));
+                            }
+                        }
+                        
+                        sorter.setRowFilter(RowFilter.orFilter(filters));
+                    } else if (columnIndex == 7) { // Program column
+                        // Search by program name
+                        List<RowFilter<Object, Object>> filters = new ArrayList<>();
+                        filters.add(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
+                        
+                        // Add search by full program name
+                        for (String college : CollegeDataManager.getAllColleges()) {
+                            for (String program : CollegeDataManager.getProgramsForCollege(college)) {
+                                if (program.toLowerCase().contains(searchText.toLowerCase())) {
+                                    String abbr = CollegeDataManager.getProgramAbbr(program);
+                                    filters.add(RowFilter.regexFilter("(?i)" + abbr, columnIndex));
+                                }
+                            }
+                        }
+                        
+                        sorter.setRowFilter(RowFilter.orFilter(filters));
+                    } else {
+                        // For other columns, use standard search
+                        List<RowFilter<Object, Object>> filters = new ArrayList<>();
+                        filters.add(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
+                        sorter.setRowFilter(RowFilter.orFilter(filters));
+                    }
                 }
             }
         }

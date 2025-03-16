@@ -18,6 +18,15 @@ public final class TablePanel extends JPanel {
     private JButton cancelButton;
     private JButton confirmDeleteButton;
     private JPanel buttonsPanel;
+    private int currentPage = 0;
+    private int pageSize = 20;
+    private List<Student> allStudents = new ArrayList<>();
+    private JButton previousButton;
+    private JButton nextButton;
+    private JLabel pageInfoLabel;
+    private List<Student> filteredStudents = new ArrayList<>();
+    private boolean isFiltered = false;
+
 
     public TablePanel() {
         this.setLayout(new GridBagLayout());
@@ -237,6 +246,8 @@ public final class TablePanel extends JPanel {
         
         tableContainer.add(tablePanel, tablePanelConstraints);
         bottomRow.add(tableContainer, BorderLayout.CENTER);
+JPanel paginationPanel = createPaginationPanel();
+bottomRow.add(paginationPanel, BorderLayout.SOUTH);
 
         table.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -431,6 +442,39 @@ public final class TablePanel extends JPanel {
         
         return popup;
     }
+    private JPanel createPaginationPanel() {
+        JPanel paginationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        paginationPanel.setOpaque(false);
+        
+        previousButton = new JButton("← Previous");
+        previousButton.setEnabled(false);
+        previousButton.addActionListener(e -> {
+            if (currentPage > 0) {
+                currentPage--;
+                updateTableForPage(currentPage);
+            }
+        });
+        
+        pageInfoLabel = new JLabel("Page 1");
+        pageInfoLabel.setFont(new Font("Helvetica", Font.PLAIN, 14));
+        pageInfoLabel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
+        
+        nextButton = new JButton("Next →");
+        nextButton.setEnabled(false);
+        nextButton.addActionListener(e -> {
+            int maxPage = (int) Math.ceil((double) allStudents.size() / pageSize) - 1;
+            if (currentPage < maxPage) {
+                currentPage++;
+                updateTableForPage(currentPage);
+            }
+        });
+        
+        paginationPanel.add(previousButton);
+        paginationPanel.add(pageInfoLabel);
+        paginationPanel.add(nextButton);
+        
+        return paginationPanel;
+    }
     
     private void editSelectedStudent() {
         int selectedRow = table.getSelectedRow();
@@ -504,48 +548,63 @@ public final class TablePanel extends JPanel {
         }
     }
 
-    // In TablePanel.java, update the refreshTable method
-// Update the refreshTable method
-public void refreshTable() {
-    CollegeDataManager.loadFromCSV(); // Ensure data is up-to-date
-    model.setRowCount(0);
-    List<Student> students = StudentManager.loadStudents();
-
-    List<String> validColleges = CollegeDataManager.getAllColleges();
-
-    for (Student student : students) {
-        String college = student.getCollege();
-        String program = student.getProgram();
+    public void refreshTable() {
+        CollegeDataManager.loadFromCSV(); // Ensure data is up-to-date
+        allStudents = StudentManager.loadStudents();
         
-        String collegeDisplay = "N/A";
-        String programDisplay = "N/A";
+        // Reset to first page when refreshing
+        currentPage = 0;
         
-        // Check if college exists
-        if (college != null && validColleges.contains(college)) {
-            collegeDisplay = CollegeDataManager.getCollegeAbbr(college);
+        updateTableForPage(currentPage);
+    }
+    
+    private void updateTableForPage(int page) {
+        model.setRowCount(0);
+        
+        int startIndex = page * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allStudents.size());
+        List<String> validColleges = CollegeDataManager.getAllColleges();
+        
+        for (int i = startIndex; i < endIndex; i++) {
+            Student student = allStudents.get(i);
             
-            // Check if program exists in the college
-            List<String> collegePrograms = CollegeDataManager.getProgramsForCollege(college);
-            if (program != null && collegePrograms.contains(program)) {
-                programDisplay = CollegeDataManager.getProgramAbbr(program);
+            String college = student.getCollege();
+            String program = student.getProgram();
+            
+            String collegeDisplay = "N/A";
+            String programDisplay = "N/A";
+            
+            // Check if college exists
+            if (college != null && validColleges.contains(college)) {
+                collegeDisplay = CollegeDataManager.getCollegeAbbr(college);
+                
+                // Check if program exists in the college
+                List<String> collegePrograms = CollegeDataManager.getProgramsForCollege(college);
+                if (program != null && collegePrograms.contains(program)) {
+                    programDisplay = CollegeDataManager.getProgramAbbr(program);
+                }
             }
+            
+            model.addRow(new Object[]{
+                false, 
+                student.getFirstName(),
+                student.getLastName(),
+                student.getGender(),
+                student.getIdNumber(),
+                student.getYearLevel(),
+                collegeDisplay,
+                programDisplay
+            });
         }
         
-        model.addRow(new Object[]{
-            false, 
-            student.getFirstName(),
-            student.getLastName(),
-            student.getGender(),
-            student.getIdNumber(),
-            student.getYearLevel(),
-            collegeDisplay,
-            programDisplay
-        });
+        model.fireTableDataChanged();
+        
+        // Update pagination controls
+        int totalPages = (int) Math.ceil((double) allStudents.size() / pageSize);
+        pageInfoLabel.setText("Page " + (currentPage + 1) + " of " + totalPages);
+        previousButton.setEnabled(currentPage > 0);
+        nextButton.setEnabled(currentPage < totalPages - 1);
     }
-
-    model.fireTableDataChanged();
-    // Rest of the method remains the same...
-}
     public JTable getTable() {
         return table;
     }
@@ -556,9 +615,6 @@ public void refreshTable() {
     
     private void sortTable(String category, String order) {
         if (category == null || order == null) return;
-    
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
-        table.setRowSorter(sorter);
     
         int columnIndex = -1;
         switch (category) {
@@ -571,18 +627,46 @@ public void refreshTable() {
             case "Program": columnIndex = 7; break;
         }
     
-        if (columnIndex == -1) return; 
+        if (columnIndex == -1) return;
     
-        SortOrder sortOrder;
-        if (order.equals("A-Z") || order.equals("Male → Female") || order.equals("Ascending")) {
-            sortOrder = SortOrder.ASCENDING;
-        } else {
-            sortOrder = SortOrder.DESCENDING;
-        }
-    
-        sorter.setSortKeys(List.of(new RowSorter.SortKey(columnIndex, sortOrder)));
-        sorter.sort();
+        // Sort the full list of students
+        final int finalColumnIndex = columnIndex;
+        allStudents.sort((s1, s2) -> {
+            String val1 = getStudentValueForColumn(s1, finalColumnIndex);
+            String val2 = getStudentValueForColumn(s2, finalColumnIndex);
+            
+            int result;
+            if (finalColumnIndex == 4 || finalColumnIndex == 5) { // ID Number or Year Level
+                try {
+                    result = Integer.compare(Integer.parseInt(val1), Integer.parseInt(val2));
+                } catch (NumberFormatException e) {
+                    result = val1.compareTo(val2);
+                }
+            } else {
+                result = val1.compareTo(val2);
+            }
+            
+            return order.equals("A-Z") || order.equals("Male → Female") || order.equals("Ascending") ? 
+                   result : -result;
+        });
+        
+        currentPage = 0;
+        updateTableForPage(currentPage);
     }
+    
+    private String getStudentValueForColumn(Student student, int columnIndex) {
+        switch (columnIndex) {
+            case 1: return student.getFirstName();
+            case 2: return student.getLastName();
+            case 3: return student.getGender();
+            case 4: return student.getIdNumber();
+            case 5: return student.getYearLevel();
+            case 6: return CollegeDataManager.getCollegeAbbr(student.getCollege());
+            case 7: return CollegeDataManager.getProgramAbbr(student.getProgram());
+            default: return "";
+        }
+    }
+
     private void findAndSetStudentForm(Container container, Student student) {
         for (Component comp : container.getComponents()) {
             if (comp instanceof StudentForm) {
@@ -593,4 +677,63 @@ public void refreshTable() {
             }
         }
     }
+    public void resetPage() {
+        currentPage = 0;
+        updateTableForPage(currentPage);
+    }
+    public void applyFilter(RowFilter<DefaultTableModel, Integer> filter) {
+    isFiltered = (filter != null);
+    
+    if (filter == null) {
+        // No filter, use all students
+        filteredStudents = new ArrayList<>(allStudents);
+    } else {
+        // Apply filter to all students
+        filteredStudents = new ArrayList<>();
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        
+        for (Student student : allStudents) {
+            // Convert student to row data
+            Object[] rowData = {
+                false,
+                student.getFirstName(),
+                student.getLastName(),
+                student.getGender(),
+                student.getIdNumber(),
+                student.getYearLevel(),
+                CollegeDataManager.getCollegeAbbr(student.getCollege()),
+                CollegeDataManager.getProgramAbbr(student.getProgram())
+            };
+            
+            // Test if this student matches the filter
+            if (filter.include(new RowFilter.Entry<DefaultTableModel, Integer>() {
+                @Override
+                public DefaultTableModel getModel() {
+                    return model;
+                }
+                
+                @Override
+                public int getValueCount() {
+                    return rowData.length;
+                }
+                
+                @Override
+                public Object getValue(int index) {
+                    return rowData[index];
+                }
+                
+                @Override
+                public Integer getIdentifier() {
+                    return 0; // Not used in this context
+                }
+            })) {
+                filteredStudents.add(student);
+            }
+        }
+    }
+    
+    // Reset to first page and update the table
+    currentPage = 0;
+    updateTableForPage(currentPage);
+}
 }

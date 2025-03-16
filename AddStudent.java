@@ -13,15 +13,15 @@ public class AddStudent extends JPanel {
 
         JPanel topRow = new JPanel(new BorderLayout());
         topRow.setBackground(new Color(0xE7E7E7));
-        topRow.setPreferredSize(new Dimension(1, 100)); // Ensures it has height
+        topRow.setPreferredSize(new Dimension(1, 100)); 
         gbcRow2.gridy = 0;
-        gbcRow2.weighty = 0.02; // Takes 20% of row2's height
+        gbcRow2.weighty = 0.02; 
         this.add(topRow, gbcRow2);
 
         JPanel bottomRow = new JPanel(new BorderLayout());
         bottomRow.setBackground(new Color(0xE7E7E7));
         gbcRow2.gridy = 1;
-        gbcRow2.weighty = 0.98; // Takes 80% of row2's height
+        gbcRow2.weighty = 0.98; 
         this.add(bottomRow, gbcRow2);
 
         JLabel label = new JLabel("StudentVault");

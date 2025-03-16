@@ -272,6 +272,18 @@ public class CollegeAdminDialog extends JDialog {
                     return;
                 }
             }
+
+            if (!abbreviation.isEmpty()) {
+                // Check for duplicate abbreviations
+                Map<String, Map<String, Object>> allColleges = CollegeManager.loadColleges();
+                for (Map.Entry<String, Map<String, Object>> entry : allColleges.entrySet()) {
+                    String existingAbbr = (String) entry.getValue().get("abbreviation");
+                    if (abbreviation.equalsIgnoreCase(existingAbbr)) {
+                        JOptionPane.showMessageDialog(this, "College abbreviation already exists", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+            }
             
             // Add college with abbreviation
             CollegeManager.addCollege(collegeName, abbreviation);
@@ -380,6 +392,19 @@ public class CollegeAdminDialog extends JDialog {
                         }
                     }
                 }
+                if (!newAbbreviation.equals(currentAbbr)) {
+                    // Check for duplicate abbreviations (only if changed)
+                    Map<String, Map<String, Object>> allColleges = CollegeManager.loadColleges();
+                    for (Map.Entry<String, Map<String, Object>> entry : allColleges.entrySet()) {
+                        if (!entry.getKey().equals(selectedCollege)) { // Don't compare with itself
+                            String existingAbbr = (String) entry.getValue().get("abbreviation");
+                            if (newAbbreviation.equalsIgnoreCase(existingAbbr)) {
+                                JOptionPane.showMessageDialog(this, "College abbreviation already exists", "Error", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                        }
+                    }
+                }
                 
                 // Update college with new name and abbreviation
                 if (CollegeManager.updateCollegeName(selectedCollege, newCollegeName, newAbbreviation)) {
@@ -434,7 +459,17 @@ public class CollegeAdminDialog extends JDialog {
                         return;
                     }
                 }
-                
+                if (!abbreviation.isEmpty()) {
+                    // Check for duplicate program abbreviations within the same college
+                    String[] programs = CollegeManager.getProgramsForCollege(selectedCollege);
+                    for (String existingProgram : programs) {
+                        String existingAbbr = CollegeManager.getProgramAbbreviation(selectedCollege, existingProgram);
+                        if (abbreviation.equalsIgnoreCase(existingAbbr)) {
+                            JOptionPane.showMessageDialog(this, "Program abbreviation already exists in this college", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                }
                 // Add program with abbreviation
                 if (CollegeManager.addProgram(selectedCollege, programName, abbreviation)) {
                     updateProgramList();
@@ -492,6 +527,19 @@ public class CollegeAdminDialog extends JDialog {
                         if (programListModel.get(i).equals(newProgramName)) {
                             JOptionPane.showMessageDialog(this, "Program already exists", "Error", JOptionPane.ERROR_MESSAGE);
                             return;
+                        }
+                    }
+                }
+                if (!newAbbreviation.equals(currentAbbr)) {
+                    // Check for duplicate program abbreviations (only if changed)
+                    String[] programs = CollegeManager.getProgramsForCollege(selectedCollege);
+                    for (String existingProgram : programs) {
+                        if (!existingProgram.equals(selectedProgram)) { // Don't compare with itself
+                            String existingAbbr = CollegeManager.getProgramAbbreviation(selectedCollege, existingProgram);
+                            if (newAbbreviation.equalsIgnoreCase(existingAbbr)) {
+                                JOptionPane.showMessageDialog(this, "Program abbreviation already exists in this college", "Error", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
                         }
                     }
                 }
