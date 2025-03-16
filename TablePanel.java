@@ -560,33 +560,36 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
     
     private void updateTableForPage(int page) {
         model.setRowCount(0);
-        
+    
+        // Use filteredStudents if filtering is active, otherwise use allStudents
+        List<Student> studentsToDisplay = isFiltered ? filteredStudents : allStudents;
+    
         int startIndex = page * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, allStudents.size());
+        int endIndex = Math.min(startIndex + pageSize, studentsToDisplay.size());
         List<String> validColleges = CollegeDataManager.getAllColleges();
-        
+    
         for (int i = startIndex; i < endIndex; i++) {
-            Student student = allStudents.get(i);
-            
+            Student student = studentsToDisplay.get(i);
+    
             String college = student.getCollege();
             String program = student.getProgram();
-            
+    
             String collegeDisplay = "N/A";
             String programDisplay = "N/A";
-            
+    
             // Check if college exists
             if (college != null && validColleges.contains(college)) {
                 collegeDisplay = CollegeDataManager.getCollegeAbbr(college);
-                
+    
                 // Check if program exists in the college
                 List<String> collegePrograms = CollegeDataManager.getProgramsForCollege(college);
                 if (program != null && collegePrograms.contains(program)) {
                     programDisplay = CollegeDataManager.getProgramAbbr(program);
                 }
             }
-            
+    
             model.addRow(new Object[]{
-                false, 
+                false,
                 student.getFirstName(),
                 student.getLastName(),
                 student.getGender(),
@@ -596,11 +599,11 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
                 programDisplay
             });
         }
-        
+    
         model.fireTableDataChanged();
-        
+    
         // Update pagination controls
-        int totalPages = (int) Math.ceil((double) allStudents.size() / pageSize);
+        int totalPages = (int) Math.ceil((double) studentsToDisplay.size() / pageSize);
         pageInfoLabel.setText("Page " + (currentPage + 1) + " of " + totalPages);
         previousButton.setEnabled(currentPage > 0);
         nextButton.setEnabled(currentPage < totalPages - 1);
@@ -650,6 +653,7 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
                    result : -result;
         });
         
+        // Reset to the first page after sorting
         currentPage = 0;
         updateTableForPage(currentPage);
     }
@@ -682,58 +686,58 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
         updateTableForPage(currentPage);
     }
     public void applyFilter(RowFilter<DefaultTableModel, Integer> filter) {
-    isFiltered = (filter != null);
+        isFiltered = (filter != null);
     
-    if (filter == null) {
-        // No filter, use all students
-        filteredStudents = new ArrayList<>(allStudents);
-    } else {
-        // Apply filter to all students
-        filteredStudents = new ArrayList<>();
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        
-        for (Student student : allStudents) {
-            // Convert student to row data
-            Object[] rowData = {
-                false,
-                student.getFirstName(),
-                student.getLastName(),
-                student.getGender(),
-                student.getIdNumber(),
-                student.getYearLevel(),
-                CollegeDataManager.getCollegeAbbr(student.getCollege()),
-                CollegeDataManager.getProgramAbbr(student.getProgram())
-            };
-            
-            // Test if this student matches the filter
-            if (filter.include(new RowFilter.Entry<DefaultTableModel, Integer>() {
-                @Override
-                public DefaultTableModel getModel() {
-                    return model;
+        if (filter == null) {
+            // No filter, use all students
+            filteredStudents = new ArrayList<>(allStudents);
+        } else {
+            // Apply filter to all students
+            filteredStudents = new ArrayList<>();
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+    
+            for (Student student : allStudents) {
+                // Convert student to row data
+                Object[] rowData = {
+                    false,
+                    student.getFirstName(),
+                    student.getLastName(),
+                    student.getGender(),
+                    student.getIdNumber(),
+                    student.getYearLevel(),
+                    CollegeDataManager.getCollegeAbbr(student.getCollege()),
+                    CollegeDataManager.getProgramAbbr(student.getProgram())
+                };
+    
+                // Test if this student matches the filter
+                if (filter.include(new RowFilter.Entry<DefaultTableModel, Integer>() {
+                    @Override
+                    public DefaultTableModel getModel() {
+                        return model;
+                    }
+    
+                    @Override
+                    public int getValueCount() {
+                        return rowData.length;
+                    }
+    
+                    @Override
+                    public Object getValue(int index) {
+                        return rowData[index];
+                    }
+    
+                    @Override
+                    public Integer getIdentifier() {
+                        return 0; // Not used in this context
+                    }
+                })) {
+                    filteredStudents.add(student);
                 }
-                
-                @Override
-                public int getValueCount() {
-                    return rowData.length;
-                }
-                
-                @Override
-                public Object getValue(int index) {
-                    return rowData[index];
-                }
-                
-                @Override
-                public Integer getIdentifier() {
-                    return 0; // Not used in this context
-                }
-            })) {
-                filteredStudents.add(student);
             }
         }
-    }
     
-    // Reset to first page and update the table
-    currentPage = 0;
-    updateTableForPage(currentPage);
-}
+        // Reset to first page and update the table
+        currentPage = 0;
+        updateTableForPage(currentPage);
+    }
 }

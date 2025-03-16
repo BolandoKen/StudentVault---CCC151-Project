@@ -188,24 +188,24 @@ public class FilterDialog extends JDialog {
     
     private void applyFilters() {
         String selectedGender = (String) genderComboBox.getSelectedItem();
-    String selectedYearLevel = (String) yearLevelComboBox.getSelectedItem();
-    String selectedCollege = (String) collegeComboBox.getSelectedItem();
-    String selectedProgram = (String) programComboBox.getSelectedItem();
-    
-    // Debugging logs
-    System.out.println("Selected Gender: " + selectedGender);
-    System.out.println("Selected Year Level: " + selectedYearLevel);
-    System.out.println("Selected College: " + selectedCollege);
-    System.out.println("Selected Program: " + selectedProgram);
-    
-    JTable table = tablePanel.getTable();
-    
-    // Reset to first page when filtering
-    tablePanel.resetPage();
-    
-    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
-    table.setRowSorter(sorter);
+        String selectedYearLevel = (String) yearLevelComboBox.getSelectedItem();
+        String selectedCollege = (String) collegeComboBox.getSelectedItem();
+        String selectedProgram = (String) programComboBox.getSelectedItem();
         
+        // Debugging logs
+        System.out.println("Selected Gender: " + selectedGender);
+        System.out.println("Selected Year Level: " + selectedYearLevel);
+        System.out.println("Selected College: " + selectedCollege);
+        System.out.println("Selected Program: " + selectedProgram);
+        
+        JTable table = tablePanel.getTable();
+        
+        // Reset to first page when filtering
+        tablePanel.resetPage();
+        
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
+        table.setRowSorter(sorter);
+            
         List<RowFilter<DefaultTableModel, Integer>> filters = new ArrayList<>();
         
         // Gender filter (column 3)
