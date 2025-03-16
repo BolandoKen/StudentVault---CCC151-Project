@@ -11,7 +11,7 @@ public class FilterDialog extends JDialog {
     private JComboBox<String> yearLevelComboBox;
     private JComboBox<String> collegeComboBox;
     private JComboBox<String> programComboBox;
-    private Map<String, String[]> collegePrograms;
+    private Map<String, List<String>> collegePrograms;
     
     public FilterDialog(Window parent, TablePanel tablePanel) {
         super(parent, "Filter Students");
@@ -23,82 +23,29 @@ public class FilterDialog extends JDialog {
         setSize(600, 500);
         setResizable(true);
         setLocationRelativeTo(parent);
-        
     }
     
     private void initializeCollegePrograms() {
+        // Make sure the data is loaded
+        CollegeDataManager.loadFromCSV();
+        
         collegePrograms = new HashMap<>();
-        collegePrograms.put("All Colleges", new String[]{"All Programs"});
-        collegePrograms.put("College of Computer Studies", new String[]{
-            "All Programs",
-            "Bachelor of Science in Computer Science",
-            "Bachelor of Science in Information Technology",
-            "Bachelor of Science in Information Systems",
-            "Bachelor of Science in Computer Application"
-        });
-        collegePrograms.put("College of Engineering", new String[]{
-            "All Programs",
-            "Diploma in Chemical Engineering Technology",
-            "Bachelor of Science in Ceramic Engineering",
-            "Bachelor of Science in Civil Engineering",
-            "Bachelor of Science in Electrical Engineering",
-            "Bachelor of Science in Mechanical Engineering",
-            "Bachelor of Science in Chemical Engineering",
-            "Bachelor of Science in Metallurgical Engineering",
-            "Bachelor of Science in Computer Engineering",
-            "Bachelor of Science in Mining Engineering",
-            "Bachelor of Science in Electronics & Communications Engineering",
-            "Bachelor of Science in Environmental Engineering"
-        });
-        collegePrograms.put("College of Science and Mathematics", new String[]{
-            "All Programs",
-            "Bachelor of Science in Biology (Botany)",
-            "Bachelor of Science in Chemistry",
-            "Bachelor of Science in Mathematics",
-            "Bachelor of Science in Physics",
-            "Bachelor of Science in Biology (Zoology)",
-            "Bachelor of Science in Biology (Marine)",
-            "Bachelor of Science in Biology (General)",
-            "Bachelor of Science in Statistics"
-        });
-        collegePrograms.put("College of Economics and Business Accountancy", new String[]{
-            "All Programs",
-            "Bachelor of Science in Accountancy",
-            "Bachelor of Science in Business Administration (Business Economics)",
-            "Bachelor of Science in Business Administration (Marketing Management)",
-            "Bachelor of Science in Entrepreneurship",
-            "Bachelor of Science in Hospitality Management"
-        });
-        collegePrograms.put("College of Arts and Social Sciences", new String[]{
-            "All Programs",
-            "Bachelor of Arts in English Language Studies",
-            "Bachelor of Arts in Literary and Cultural Studies",
-            "Bachelor of Arts in Filipino",
-            "Bachelor of Arts in Panitikan",
-            "Bachelor of Arts in Political Science",
-            "Bachelor of Arts in Psychology",
-            "Bachelor of Arts in Sociology",
-            "Bachelor of Arts in History (International History Track)",
-            "Bachelor of Science in Philosophy",
-            "Bachelor of Science in Psychology"
-        });
-        collegePrograms.put("College of Education", new String[]{
-            "All Programs",
-            "Bachelor of Elementary Education (Science and Mathematics)",
-            "Bachelor of Elementary Education (Language Education)",
-            "Bachelor of Secondary Education (Biology)",
-            "Bachelor of Secondary Education (Chemistry)",
-            "Bachelor of Secondary Education (Physics)",
-            "Bachelor of Secondary Education (Mathematics)",
-            "Bachelor of Physical Education",
-            "Bachelor of Technology and Livelihood Education (Home Economics)",
-            "Bachelor of Technology and Livelihood Education (Industrial Arts)",
-            "Bachelor of Technical-Vocational Teacher Education (Drafting Technology)"
-        });
-        collegePrograms.put("College of Health Sciences", new String[]{
-            "All Programs",
-            "Bachelor of Science in Nursing"
-        });
+        
+        // Add "All Colleges" as default option
+        collegePrograms.put("All Colleges", Collections.singletonList("All Programs"));
+        
+        // Get all colleges from CollegeDataManager
+        List<String> colleges = CollegeDataManager.getAllColleges();
+        
+        // For each college, get its programs
+        for (String college : colleges) {
+            List<String> programs = new ArrayList<>();
+            programs.add("All Programs"); // Add default option
+            programs.addAll(CollegeDataManager.getProgramsForCollege(college)); // Add all programs for this college
+            
+            // Store in our map
+            collegePrograms.put(college, programs);
+        }
     }
     
     private void initComponents() {
@@ -149,17 +96,13 @@ public class FilterDialog extends JDialog {
         
         gbc.gridx = 0;
         gbc.gridy = 5;
-        String[] colleges = collegePrograms.keySet().toArray(new String[0]);
-        Arrays.sort(colleges);
-        String[] finalColleges = new String[colleges.length];
-        finalColleges[0] = "All Colleges";
-        int index = 1;
-        for (String college : colleges) {
-            if (!college.equals("All Colleges")) {
-                finalColleges[index++] = college;
-            }
-        }
-        collegeComboBox = new JComboBox<>(finalColleges);
+        // Create a sorted list of colleges with "All Colleges" first
+        List<String> sortedColleges = new ArrayList<>(collegePrograms.keySet());
+        sortedColleges.remove("All Colleges");
+        Collections.sort(sortedColleges);
+        sortedColleges.add(0, "All Colleges");
+        
+        collegeComboBox = new JComboBox<>(sortedColleges.toArray(new String[0]));
         collegeComboBox.setFont(new Font("Helvetica", Font.PLAIN, 14));
         filterPanel.add(collegeComboBox, gbc);
         
@@ -224,20 +167,6 @@ public class FilterDialog extends JDialog {
         add(buttonPanel, BorderLayout.SOUTH);
     }
     
-    private JButton createStyledButton(String text, Color backgroundColor) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("Helvetica", Font.PLAIN, 14));
-        button.setBackground(backgroundColor);
-        if (backgroundColor.equals(new Color(0x6DBECA))) {
-            button.setForeground(Color.WHITE);
-        } else {
-            button.setForeground(Color.BLACK);
-        }
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-        return button;
-    }
-    
     private void updateProgramComboBox(String selectedCollege) {
         programComboBox.removeAllItems();
         
@@ -263,35 +192,52 @@ public class FilterDialog extends JDialog {
         String selectedCollege = (String) collegeComboBox.getSelectedItem();
         String selectedProgram = (String) programComboBox.getSelectedItem();
         
+        // Debugging logs
+        System.out.println("Selected Gender: " + selectedGender);
+        System.out.println("Selected Year Level: " + selectedYearLevel);
+        System.out.println("Selected College: " + selectedCollege);
+        System.out.println("Selected Program: " + selectedProgram);
+        
         JTable table = tablePanel.getTable();
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
         table.setRowSorter(sorter);
         
         List<RowFilter<DefaultTableModel, Integer>> filters = new ArrayList<>();
-    
+        
+        // Gender filter (column 3)
         if (selectedGender != null && !selectedGender.equals("All Genders")) {
-            filters.add(RowFilter.regexFilter("^" + selectedGender + "$", 3));
+            filters.add(RowFilter.regexFilter("^" + selectedGender.trim() + "$", 3));
+            System.out.println("Added Gender Filter: " + selectedGender);
         }
         
+        // Year Level filter (column 5)
         if (selectedYearLevel != null && !selectedYearLevel.equals("All Year Levels")) {
-            filters.add(RowFilter.regexFilter("^" + selectedYearLevel + "$", 5)); 
+            filters.add(RowFilter.regexFilter("^" + selectedYearLevel.trim() + "$", 5));
+            System.out.println("Added Year Level Filter: " + selectedYearLevel);
         }
         
+        // College filter (column 6)
         if (selectedCollege != null && !selectedCollege.equals("All Colleges")) {
-            // Use college name directly instead of abbreviation
-            filters.add(RowFilter.regexFilter("^" + selectedCollege + "$", 6));
+            // Get abbreviation if filtering by full name
+            String collegeAbbr = CollegeDataManager.getCollegeAbbr(selectedCollege);
+            filters.add(RowFilter.regexFilter("^" + collegeAbbr.trim() + "$", 6));
+            System.out.println("Added College Filter (Abbreviation): " + collegeAbbr);
         }
         
+        // Program filter (column 7)
         if (selectedProgram != null && !selectedProgram.equals("All Programs")) {
-            // Use program abbreviation
-            String programAbbreviation = CollegeAbbreviationConverter.getProgramAbbreviation(selectedProgram);
-            filters.add(RowFilter.regexFilter("^" + programAbbreviation + "$", 7)); 
+            // Get abbreviation if filtering by full name
+            String programAbbr = CollegeDataManager.getProgramAbbr(selectedProgram);
+            filters.add(RowFilter.regexFilter("^" + programAbbr.trim() + "$", 7));
+            System.out.println("Added Program Filter (Abbreviation): " + programAbbr);
         }
         
         if (!filters.isEmpty()) {
             sorter.setRowFilter(RowFilter.andFilter(filters));
+            System.out.println("Filters Applied: " + filters.size());
         } else {
             sorter.setRowFilter(null);
+            System.out.println("No Filters Applied");
         }
     }
 }

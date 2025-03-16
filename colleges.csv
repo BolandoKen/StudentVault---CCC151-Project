@@ -2,11 +2,68 @@ College: College of Health Sciences
 Abbreviation: CHS
 Program: Bachelor of Science in Nursing: BSN
 
+College: College of Science and Mathematics
+Abbreviation: CSM
+Program: Bachelor of Science in Physics: BSPhys
+Program: Bachelor of Science in Statistics: BSStat
+Program: Bachelor of Science in Biology (Zoology): BSBio-Zoo
+Program: Bachelor of Science in Biology (Marine): BSBio-Mar
+Program: Bachelor of Science in Chemistry: BSChem
+Program: Bachelor of Science in Biology (General): BSBio-Gen
+Program: Bachelor of Science in Mathematics: BSMath
+Program: Bachelor of Science in Biology (Botany): BSBio-Bot
+
+College: College of Economics, Business & Accountancy
+Abbreviation: CEBA
+Program: Bachelor of Science in Business Administration (Business Economics): BSBA-BE
+Program: Bachelor of Science in Entrepreneurship: BS-ENT
+Program: Bachelor of Science in Hospitality Management: BSHM
+Program: Bachelor of Science in Accountancy: BS-ACC
+Program: Bachelor of Science in Business Administration (Marketing Management): BSBA-MM
+
 College: College of Arts and Social Sciences
 Abbreviation: CASS
-Program: Bachelor of Science in Political Science: BSPS
+Program: Bachelor of Arts in Psychology: BA-PSY
+Program: Bachelor of Arts in History (International History Track): BA-HIS-IH
+Program: Bachelor of Science in Philosophy: BS-PHIL-AE
+Program: Bachelor of Arts in Panitikan: BA-PAN
+Program: Bachelor of Arts in English Language Studies: BA-ELS
+Program: Bachelor of Arts in Literary and Cultural Studies: BA-LCS
+Program: Bachelor of Arts in Political Science: BA-POLSCI
+Program: Bachelor of Arts in Sociology: BA-SOC
+Program: Bachelor of Science in Psychology: BS-PSY
+Program: Bachelor of Arts in Filipino: BA-FIL
 
 College: College of Computer Studies
 Abbreviation: CCS
-Program: Bachelor of Science in Computer Aplications: BSCA
+Program: Bachelor of Science in Information Systems: BSIS
+Program: Bachelor of Science in Computer Science: BSCS
+Program: Bachelor of Science in Computer Application: BSCA
+Program: Bachelor of Science in Information Technology: BSIT
 
+College: College of Education
+Abbreviation: CED
+Program: Bachelor of Physical Education: BPEd
+Program: Bachelor of Secondary Education (Biology): BSEd-Bio
+Program: Bachelor of Technology and Livelihood Education (Home Economics): BTLED-HE
+Program: Bachelor of Technology and Livelihood Education (Industrial Arts): BTLed-IA
+Program: Bachelor of Elementary Education (Language Education): BEEd-Lang
+Program: Bachelor of Elementary Education (Science and Mathematics): BEEd-SciMath
+Program: Bachelor of Technical-Vocational Teacher Education (Drafting Technology): BTVTED-DT
+Program: Bachelor of Secondary Education (Chemistry): BSEd-Chem
+Program: Bachelor of Secondary Education (Mathematics): BSEd-Math
+Program: Bachelor of Secondary Education (Physics): BSEd-Phys
+
+College: College of Engineering
+Abbreviation: COE
+Program: Diploma in Chemical Engineering Technology: DCET
+Program: Bachelor of Science in Ceramic Engineering: BSCerE
+Program: Bachelor of Science in Civil Engineering: BSCE
+Program: Bachelor of Science in Electrical Engineering: BSEE
+Program: Bachelor of Science in Mechanical Engineering: BSME
+Program: Bachelor of Science in Chemical Engineering: BSChe
+Program: Bachelor of Science in Metallurgical Engineering: BSMetE
+Program: Bachelor of Science in Computer Engineering: BSCpE
+Program: Bachelor of Science in Mining Engineering: BSMine
+Program: Bachelor of Science in Electronics & Communications Engineering: BSECE
+Program: Bachelor of Science in Environmental Engineering: BSEnET
