@@ -6,10 +6,14 @@ public class SidePanel extends JPanel {
     private final ImageIcon addIconClicked = new ImageIcon("Assets/SelectedAddIcon.png");
     private final ImageIcon tableIconDefault = new ImageIcon("Assets/TableIcon.png");
     private final ImageIcon tableIconClicked = new ImageIcon("Assets/SelectedTableIcon.png");
+    private final ImageIcon collegeIconDefault = new ImageIcon("Assets/CollegeIcon.png");
+    private final ImageIcon programIconDefault = new ImageIcon("Assets/ProgramIcon.png");
     
     private JButton addButton;
     private JButton tableButton;
     private JButton activeButton = null;
+    private JButton collegeButton;
+    private JButton programButton;
 
     public SidePanel(GUI parentFrame) { 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -21,22 +25,35 @@ public class SidePanel extends JPanel {
 
         addButton = createButton(addIconDefault);
         tableButton = createButton(tableIconDefault);
+        collegeButton = createButton(collegeIconDefault);
+        programButton = createButton(programIconDefault);
 
         this.add(logo);
         this.add(addButton);
+        this.add(collegeButton);
+        this.add(programButton);
         this.add(tableButton);
-
+       
         addButton.addActionListener(e -> {
             updateButtonState(addButton);
             parentFrame.switchPanel("ADD_STUDENT");
         });
-        
+
+        collegeButton.addActionListener(e -> {
+            //updateButtonState(collegeButton);
+            parentFrame.switchPanel("COLLEGETABLEPANEL");
+        });
+
+        programButton.addActionListener(e -> {
+            //updateButtonState(programButton);
+            parentFrame.switchPanel("PROGRAMTABLEPANEL");
+        });
+
         tableButton.addActionListener(e -> {
             updateButtonState(tableButton);
             parentFrame.switchPanel("TABLE");
         });
     }
-
     private void updateButtonState(JButton clickedButton) {
         // Reset previously active button if exists
         if (activeButton != null && activeButton != clickedButton) {

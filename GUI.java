@@ -58,9 +58,13 @@ public class GUI extends JFrame {
         tableView.add(tableScrollPane, gbc2);
 
         JPanel addStudentPanel = new AddStudent(tablePanel);
+        JPanel collegeTablePanel = new CollegeTablePanel();
+        JPanel programTablePanel = new ProgramTablePanel();
 
         contentPanel.add(tableView, "TABLE");
         contentPanel.add(addStudentPanel, "ADD_STUDENT");
+        contentPanel.add(collegeTablePanel, "COLLEGETABLEPANEL");
+        contentPanel.add(programTablePanel, "PROGRAMTABLEPANEL");
 
         gbc.gridx = 1;
         gbc.weightx = 0.95;
