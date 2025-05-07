@@ -35,11 +35,22 @@ public final class ProgramTablePanel extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
 
+        JPanel searchPanelContainer = new JPanel(new BorderLayout());
+        searchPanelContainer.setOpaque(false);
+        gbc.gridy = 0;
+        gbc.weighty = 0.02;
+
+        SearchPanel searchPanel = new SearchPanel();
+        searchPanel.setProgramTablePanel(this);
+
+        searchPanelContainer.add(searchPanel, BorderLayout.CENTER);
+        this.add(searchPanelContainer, gbc);
+
         JPanel topRow = new JPanel(new GridBagLayout());
         topRow.setOpaque(false);
         topRow.setPreferredSize(new Dimension(1, 100));
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridy = 1;
         gbc.weighty = 0.2;
         this.add(topRow, gbc);
 
@@ -70,7 +81,7 @@ public final class ProgramTablePanel extends JPanel {
         buttonsPanel.setOpaque(false);
         rightPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
-        JLabel studentVaultText = new JLabel("StudentVault");
+        JLabel studentVaultText = new JLabel("Programs");
         studentVaultText.setFont(new Font("Helvetica", Font.BOLD, 32));
         JLabel sortbytext = new JLabel("Sort by: ");
         sortbytext.setFont(new Font("Helvetica", Font.PLAIN, 16));
@@ -159,7 +170,7 @@ public final class ProgramTablePanel extends JPanel {
 
         JPanel bottomRow = new JPanel(new BorderLayout());
         bottomRow.setOpaque(false);
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.weighty = 0.8;
         this.add(bottomRow, gbc);
 

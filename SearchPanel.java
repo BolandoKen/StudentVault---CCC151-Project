@@ -10,6 +10,8 @@ public class SearchPanel extends JPanel {
     private TablePanel tablePanel;
     private RoundedTextField searchField;
     private RoundedComboBox searchByField;
+    private CollegeTablePanel collegeTablePanel;
+    private ProgramTablePanel programTablePanel;
     
     public SearchPanel() {
         this.setLayout(new GridBagLayout());
@@ -113,7 +115,14 @@ public class SearchPanel extends JPanel {
     public void setTablePanel(TablePanel tablePanel) {
         this.tablePanel = tablePanel;
     }
+
+    public void setCollegeTablePanel(CollegeTablePanel collegeTablePanel) {
+        this.collegeTablePanel = collegeTablePanel;
+    }
     
+    public void setProgramTablePanel(ProgramTablePanel programTablePanel) {
+        this.programTablePanel = programTablePanel;
+    }
     private void performSearch(String searchText, String searchField) {
         if (tablePanel == null) return;
     

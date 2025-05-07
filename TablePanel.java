@@ -70,7 +70,7 @@ public final class TablePanel extends JPanel {
         buttonsPanel.setOpaque(false);
         rightPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
-        JLabel studentVaultText = new JLabel("StudentVault");
+        JLabel studentVaultText = new JLabel("Students");
         studentVaultText.setFont(new Font("Helvetica", Font.BOLD, 32));
         JLabel sortbytext = new JLabel("Sort by: ");
         sortbytext.setFont(new Font("Helvetica", Font.PLAIN, 16));
