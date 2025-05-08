@@ -159,7 +159,7 @@ public class StudentForm extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 // Always show the college admin dialog
                 JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(StudentForm.this);
-                CollegeAdminDialog adminDialog = new CollegeAdminDialog(frame, StudentForm.this);
+                CollegeAdminDialog adminDialog = new CollegeAdminDialog(frame, StudentForm.this, null, null);
                 adminDialog.setVisible(true);
             }
         });

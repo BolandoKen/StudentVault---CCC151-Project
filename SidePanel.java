@@ -7,15 +7,19 @@ public class SidePanel extends JPanel {
     private final ImageIcon tableIconDefault = new ImageIcon("Assets/TableIcon.png");
     private final ImageIcon tableIconClicked = new ImageIcon("Assets/SelectedTableIcon.png");
     private final ImageIcon collegeIconDefault = new ImageIcon("Assets/CollegeIcon.png");
+    private final ImageIcon collegeIconClicked = new ImageIcon("Assets/CollegeIcon.png"); // New clicked state
     private final ImageIcon programIconDefault = new ImageIcon("Assets/ProgramIcon.png");
+    private final ImageIcon programIconClicked = new ImageIcon("Assets/ProgramIcon.png"); // New clicked state
     
     private JButton addButton;
     private JButton tableButton;
     private JButton activeButton = null;
     private JButton collegeButton;
     private JButton programButton;
+    private GUI parentFrame;
 
     public SidePanel(GUI parentFrame) { 
+        this.parentFrame = parentFrame;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBackground(new Color(0x5C2434));
 
@@ -40,12 +44,12 @@ public class SidePanel extends JPanel {
         });
 
         collegeButton.addActionListener(e -> {
-            //updateButtonState(collegeButton);
+            updateButtonState(collegeButton);
             parentFrame.switchPanel("COLLEGETABLEPANEL");
         });
 
         programButton.addActionListener(e -> {
-            //updateButtonState(programButton);
+            updateButtonState(programButton);
             parentFrame.switchPanel("PROGRAMTABLEPANEL");
         });
 
@@ -54,6 +58,7 @@ public class SidePanel extends JPanel {
             parentFrame.switchPanel("TABLE");
         });
     }
+    
     private void updateButtonState(JButton clickedButton) {
         // Reset previously active button if exists
         if (activeButton != null && activeButton != clickedButton) {
@@ -61,14 +66,24 @@ public class SidePanel extends JPanel {
                 activeButton.setIcon(addIconDefault);
             } else if (activeButton == tableButton) {
                 activeButton.setIcon(tableIconDefault);
+            } else if (activeButton == collegeButton) {
+                activeButton.setIcon(collegeIconDefault);
+            } else if (activeButton == programButton) {
+                activeButton.setIcon(programIconDefault);
             }
         }
         
         activeButton = clickedButton;
+        
+        // Set clicked button state
         if (clickedButton == addButton) {
             clickedButton.setIcon(addIconClicked);
         } else if (clickedButton == tableButton) {
             clickedButton.setIcon(tableIconClicked);
+        } else if (clickedButton == collegeButton) {
+            clickedButton.setIcon(collegeIconClicked);
+        } else if (clickedButton == programButton) {
+            clickedButton.setIcon(programIconClicked);
         }
     }
 

@@ -1,7 +1,3 @@
-College: College of Health Sciences
-Abbreviation: CHS
-Program: Bachelor of Science in Nursing: BSN
-
 College: College of Engineering
 Abbreviation: COE
 Program: Bachelor of Science in Environmental Engineering: BSEnET
@@ -14,7 +10,11 @@ Program: Bachelor of Science in Mining Engineering: BSMine
 Program: Bachelor of Science in Electrical Engineering: BSEE
 Program: Bachelor of Science in Chemical Engineering: BSChe
 Program: Bachelor of Science in Metallurgical Engineering: BSMetE
+Program: BBBBBBBBB: hello
 Program: Bachelor of Science in Civil Engineering: BSCE
+
+College: test 2
+Abbreviation: t2
 
 College: College of Science and Mathematics
 Abbreviation: CSM
@@ -34,6 +34,14 @@ Program: Bachelor of Science in Entrepreneurship: BS-ENT
 Program: Bachelor of Science in Hospitality Management: BSHM
 Program: Bachelor of Science in Accountancy: BS-ACC
 Program: Bachelor of Science in Business Administration (Marketing Management): BSBA-MM
+
+College: Now you see me
+Abbreviation: NYSM
+Program: ndkadabndkada: adkak
+
+College: hello
+Abbreviation: world
+Program: ma man: mm
 
 College: College of Arts and Social Sciences
 Abbreviation: CASS

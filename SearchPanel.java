@@ -119,7 +119,8 @@ public class SearchPanel extends JPanel {
     public void setCollegeTablePanel(CollegeTablePanel collegeTablePanel) {
         this.collegeTablePanel = collegeTablePanel;
     }
-    
+
+
     public void setProgramTablePanel(ProgramTablePanel programTablePanel) {
         this.programTablePanel = programTablePanel;
     }

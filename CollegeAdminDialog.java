@@ -20,10 +20,14 @@ public class CollegeAdminDialog extends JDialog {
     private JButton editProgramButton;
     private JTextField collegeAbbrField;
     private JTextField programAbbrField;
+    private CollegeTablePanel collegeTablePanel;
+    private ProgramTablePanel programTablePanel;
 
-    public CollegeAdminDialog(Frame owner, StudentForm parentForm) {
+    public CollegeAdminDialog(Frame owner, StudentForm parentForm, CollegeTablePanel collegeTablePanel, ProgramTablePanel programTablePanel) {
         super(owner, "College and Program Administration", true);
         this.parentForm = parentForm;
+        this.collegeTablePanel = collegeTablePanel;
+        this.programTablePanel = programTablePanel;
         
         setSize(800, 500);
         setLocationRelativeTo(owner);
@@ -185,6 +189,7 @@ public class CollegeAdminDialog extends JDialog {
         JPanel closePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(new ActionListener() {
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -236,6 +241,25 @@ public class CollegeAdminDialog extends JDialog {
         addProgramButton.setEnabled(collegeSelected);
         removeProgramButton.setEnabled(programSelected);
         editProgramButton.setEnabled(programSelected);
+    }
+    
+    // Method to refresh all UI components after changes
+    private void refreshAllUI() {
+        // Refresh parent form if available
+        if (parentForm != null) {
+            parentForm.refreshCollegeData();
+            parentForm.refreshTable();
+        }
+        
+        // Refresh college table if available
+        if (collegeTablePanel != null) {
+            collegeTablePanel.refreshCollegeTable();
+        }
+        
+        // Refresh program table if available
+        if (programTablePanel != null) {
+            programTablePanel.refreshProgramTable();;
+        }
     }
     
     private void addCollege() {
@@ -292,12 +316,11 @@ public class CollegeAdminDialog extends JDialog {
             // Select the newly added college
             collegeList.setSelectedValue(collegeName, true);
             
-            // Refresh parent form
-            if (parentForm != null) {
-                parentForm.refreshCollegeData();
-            }
+            // Refresh all UI components
+            refreshAllUI();
         }
     }
+    
     private void removeCollege() {
         String selectedCollege = collegeList.getSelectedValue();
         if (selectedCollege != null) {
@@ -312,11 +335,8 @@ public class CollegeAdminDialog extends JDialog {
                 if (CollegeManager.removeCollege(selectedCollege)) {
                     loadCollegeData();
                     
-                    // Refresh parent form AND table
-                    if (parentForm != null) {
-                        parentForm.refreshCollegeData();
-                        parentForm.refreshTable(); // Use public method instead of direct access
-                    }
+                    // Refresh all UI components
+                    refreshAllUI();
                 } else {
                     JOptionPane.showMessageDialog(this, "Failed to remove college", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -340,17 +360,15 @@ public class CollegeAdminDialog extends JDialog {
                 if (CollegeManager.removeProgram(selectedCollege, selectedProgram)) {
                     updateProgramList();
                     
-                    // Refresh parent form AND table
-                    if (parentForm != null) {
-                        parentForm.refreshCollegeData();
-                        parentForm.refreshTable();
-                    }
+                    // Refresh all UI components
+                    refreshAllUI();
                 } else {
                     JOptionPane.showMessageDialog(this, "Failed to remove program", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
     } // Closing brace for removeProgram()
+    
     // Add these methods to the CollegeAdminDialog class
     private void editCollege() {
         String selectedCollege = collegeList.getSelectedValue();
@@ -413,16 +431,15 @@ public class CollegeAdminDialog extends JDialog {
                     // Select the edited college
                     collegeList.setSelectedValue(newCollegeName, true);
                     
-                    // Refresh parent form
-                    if (parentForm != null) {
-                        parentForm.refreshCollegeData();
-                    }
+                    // Refresh all UI components
+                    refreshAllUI();
                 } else {
                     JOptionPane.showMessageDialog(this, "Failed to update college", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
     }
+    
     private void addProgram() {
         String selectedCollege = collegeList.getSelectedValue();
         if (selectedCollege != null) {
@@ -477,10 +494,8 @@ public class CollegeAdminDialog extends JDialog {
                     // Select the newly added program
                     programList.setSelectedValue(programName, true);
                     
-                    // Refresh parent form
-                    if (parentForm != null) {
-                        parentForm.refreshCollegeData();
-                    }
+                    // Refresh all UI components
+                    refreshAllUI();
                 } else {
                     JOptionPane.showMessageDialog(this, "Failed to add program", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -551,35 +566,33 @@ public class CollegeAdminDialog extends JDialog {
                     // Select the edited program
                     programList.setSelectedValue(newProgramName, true);
                     
-                    // Refresh parent form
-                    if (parentForm != null) {
-                        parentForm.refreshCollegeData();
-                    }
+                    // Refresh all UI components
+                    refreshAllUI();
                 } else {
                     JOptionPane.showMessageDialog(this, "Failed to update program", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
     }
-private void updateCollegeAbbreviation() {
-    String selectedCollege = collegeList.getSelectedValue();
-    if (selectedCollege != null) {
-        String abbr = CollegeManager.getCollegeAbbreviation(selectedCollege);
-        collegeAbbrField.setText(abbr);
-    } else {
-        collegeAbbrField.setText("");
+    
+    private void updateCollegeAbbreviation() {
+        String selectedCollege = collegeList.getSelectedValue();
+        if (selectedCollege != null) {
+            String abbr = CollegeManager.getCollegeAbbreviation(selectedCollege);
+            collegeAbbrField.setText(abbr);
+        } else {
+            collegeAbbrField.setText("");
+        }
     }
-}
 
-private void updateProgramAbbreviation() {
-    String selectedCollege = collegeList.getSelectedValue();
-    String selectedProgram = programList.getSelectedValue();
-    if (selectedCollege != null && selectedProgram != null) {
-        String abbr = CollegeManager.getProgramAbbreviation(selectedCollege, selectedProgram);
-        programAbbrField.setText(abbr);
-    } else {
-        programAbbrField.setText("");
+    private void updateProgramAbbreviation() {
+        String selectedCollege = collegeList.getSelectedValue();
+        String selectedProgram = programList.getSelectedValue();
+        if (selectedCollege != null && selectedProgram != null) {
+            String abbr = CollegeManager.getProgramAbbreviation(selectedCollege, selectedProgram);
+            programAbbrField.setText(abbr);
+        } else {
+            programAbbrField.setText("");
+        }
     }
-}
-
 }
