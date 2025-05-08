@@ -164,4 +164,7 @@ public final class CollegeTablePanel extends JPanel {
             }
         }
     }
+    public JTable getCollegeTable() {
+        return collegeTable;
+    }
 }

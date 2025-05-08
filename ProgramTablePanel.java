@@ -201,4 +201,7 @@ public final class ProgramTablePanel extends JPanel {
             }
         }
     }
+    public JTable getProgramTable() {
+        return programTable;
+    }
 }

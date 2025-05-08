@@ -46,6 +46,7 @@ public class SidePanel extends JPanel {
         collegeButton.addActionListener(e -> {
             updateButtonState(collegeButton);
             parentFrame.switchPanel("COLLEGETABLEPANEL");
+            
         });
 
         programButton.addActionListener(e -> {

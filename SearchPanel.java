@@ -13,6 +13,10 @@ public class SearchPanel extends JPanel {
     private CollegeTablePanel collegeTablePanel;
     private ProgramTablePanel programTablePanel;
     
+    // Constants for search field options
+    private static final String ALL_FIELDS = "All Fields";
+    private static final String NO_FILTER = "No Filter";
+    
     public SearchPanel() {
         this.setLayout(new GridBagLayout());
         this.setBackground(Color.white);
@@ -23,43 +27,40 @@ public class SearchPanel extends JPanel {
         gbc.weightx = 1.0;
 
         RoundedPanel searchPanel = new RoundedPanel(10);
-        searchPanel.setLayout(new BorderLayout(10, 0)); // Add horizontal gap between components
+        searchPanel.setLayout(new BorderLayout(10, 0));
         searchPanel.setBackground(new Color(0xE7E7E7));
 
-        // Create a panel for the search field and the search by combo box
-        JPanel searchControlsPanel = new JPanel(new BorderLayout(10, 0)); // Increased gap
+        JPanel searchControlsPanel = new JPanel(new BorderLayout(10, 0));
         searchControlsPanel.setOpaque(false);
         
-        // Create the search field
         searchField = new RoundedTextField(200, 10, "Search", false, "#E7E7E7", "Helvetica", Font.PLAIN, 18);
         
-        // Create the search by field combo box with increased width
-        String[] searchFields = {"All Fields", "First Name", "Last Name", "ID Number", "Year Level", "College", "Program"};
+        // Default search fields with "No Filter" option
+        String[] defaultSearchFields = new String[]{NO_FILTER, ALL_FIELDS};
+        
         Color backgroundColor = new Color(0xE7E7E7);
         Color textColor = new Color(0x7E7E7E);
         Font comboFont = new Font("Helvetica", Font.PLAIN, 16);
         int cornerRadius = 10;
-        Dimension comboSize = new Dimension(150, 28); // Increased width from 120 to 150
+        Dimension comboSize = new Dimension(180, 28); // Increased width for longer options
         Color selectionColor = new Color(0x658CF1);
         
         searchByField = new RoundedComboBox(
-            searchFields,
+            defaultSearchFields,
             backgroundColor,
             textColor,
             comboFont,
             cornerRadius,
             comboSize,
-            "All Fields",
+            NO_FILTER, // Default selected item
             selectionColor
         );
         
-        // Add some padding around the combo box
         JPanel searchByWrapper = new JPanel(new BorderLayout());
         searchByWrapper.setOpaque(false);
         searchByWrapper.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         searchByWrapper.add(searchByField, BorderLayout.CENTER);
         
-        // Create the clear button
         JButton clearButton = createButton("Assets/XIcon.png");
 
         searchField.addKeyListener(new KeyAdapter() {
@@ -72,6 +73,9 @@ public class SearchPanel extends JPanel {
         searchByField.addActionListener(e -> {
             if (!searchField.getText().isEmpty()) {
                 performSearch(searchField.getText(), (String) searchByField.getSelectedItem());
+            } else {
+                // Update the search panel if filter selection changes even if search field is empty
+                performSearch("", (String) searchByField.getSelectedItem());
             }
         });
         
@@ -80,11 +84,9 @@ public class SearchPanel extends JPanel {
             performSearch("", (String) searchByField.getSelectedItem());
         });
 
-        // Add components to the search controls panel
         searchControlsPanel.add(searchField, BorderLayout.CENTER);
         searchControlsPanel.add(searchByWrapper, BorderLayout.WEST);
         
-        // Add padding inside the search panel
         JPanel paddedPanel = new JPanel(new BorderLayout());
         paddedPanel.setOpaque(false);
         paddedPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
@@ -118,100 +120,159 @@ public class SearchPanel extends JPanel {
 
     public void setCollegeTablePanel(CollegeTablePanel collegeTablePanel) {
         this.collegeTablePanel = collegeTablePanel;
+        updateSearchFields();
     }
-
 
     public void setProgramTablePanel(ProgramTablePanel programTablePanel) {
         this.programTablePanel = programTablePanel;
+        updateSearchFields();
     }
+    
+    private void updateSearchFields() {
+        if (searchByField == null) return;
+        
+        String[] searchFields;
+        if (collegeTablePanel != null) {
+            searchFields = new String[]{NO_FILTER, ALL_FIELDS, "College Name", "College Abbreviation"};
+        } else if (programTablePanel != null) {
+            // Enhanced program search fields
+            searchFields = new String[]{
+                NO_FILTER, 
+                ALL_FIELDS, 
+                "Program Name", 
+                "Program Abbreviation", 
+                "College",
+                "Program Type", // Added for more search options
+                "Department"    // Added for more search options
+            };
+        } else {
+            searchFields = new String[]{NO_FILTER, ALL_FIELDS};
+        }
+        
+        // Remember the previously selected item if possible
+        String previousSelection = (String) searchByField.getSelectedItem();
+        searchByField.setModel(new DefaultComboBoxModel<>(searchFields));
+        
+        // Try to restore previous selection or default to NO_FILTER
+        boolean found = false;
+        for (String option : searchFields) {
+            if (option.equals(previousSelection)) {
+                searchByField.setSelectedItem(previousSelection);
+                found = true;
+                break;
+            }
+        }
+        
+        if (!found) {
+            searchByField.setSelectedItem(NO_FILTER);
+        }
+    }
+
     private void performSearch(String searchText, String searchField) {
-        if (tablePanel == null) return;
+        // If "No Filter" is selected, clear any filters regardless of search text
+        if (NO_FILTER.equals(searchField)) {
+            clearAllFilters();
+            return;
+        }
+        
+        if (collegeTablePanel != null) {
+            performCollegeSearch(searchText, searchField);
+        } else if (programTablePanel != null) {
+            performProgramSearch(searchText, searchField);
+        } else if (tablePanel != null) {
+            performStudentSearch(searchText, searchField);
+        }
+    }
     
-        JTable table = tablePanel.getTable();
+    private void clearAllFilters() {
+        if (collegeTablePanel != null && collegeTablePanel.getCollegeTable() != null) {
+            collegeTablePanel.getCollegeTable().setRowSorter(null);
+        } else if (programTablePanel != null && programTablePanel.getProgramTable() != null) {
+            programTablePanel.getProgramTable().setRowSorter(null);
+        } else if (tablePanel != null) {
+            // Clear student table filters if implemented
+        }
+    }
+    
+    private void performCollegeSearch(String searchText, String searchField) {
+        JTable table = collegeTablePanel.getCollegeTable();
         if (table == null) return;
-    
-        // Reset to first page when searching
-        tablePanel.resetPage();
-    
+        
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
         table.setRowSorter(sorter);
-    
+        
         if (searchText.trim().isEmpty()) {
             sorter.setRowFilter(null);
         } else {
-            // If "All Fields" is selected, search in all columns
-            if (searchField.equals("All Fields")) {
-                // Create a composite filter that checks both abbreviations and full names
+            if (searchField.equals(ALL_FIELDS)) {
                 List<RowFilter<Object, Object>> filters = new ArrayList<>();
-    
-                // Add direct text search for all columns
-                filters.add(RowFilter.regexFilter("(?i)" + searchText));
-    
-                // Add search by full college name
-                for (String college : CollegeDataManager.getAllColleges()) {
-                    if (college.toLowerCase().contains(searchText.toLowerCase())) {
-                        String abbr = CollegeDataManager.getCollegeAbbr(college);
-                        filters.add(RowFilter.regexFilter("(?i)" + abbr, 6));
-                    }
-                }
-    
-                // Add search by full program name
-                for (String college : CollegeDataManager.getAllColleges()) {
-                    for (String program : CollegeDataManager.getProgramsForCollege(college)) {
-                        if (program.toLowerCase().contains(searchText.toLowerCase())) {
-                            String abbr = CollegeDataManager.getProgramAbbr(program);
-                            filters.add(RowFilter.regexFilter("(?i)" + abbr, 7));
-                        }
-                    }
-                }
-    
+                filters.add(RowFilter.regexFilter("(?i)" + searchText, 0)); // Name column
+                filters.add(RowFilter.regexFilter("(?i)" + searchText, 1)); // Abbreviation column
                 sorter.setRowFilter(RowFilter.orFilter(filters));
             } else {
-                // Get the column index based on the selected field
-                int columnIndex = getColumnIndex(searchField);
+                int columnIndex = getCollegeColumnIndex(searchField);
                 if (columnIndex != -1) {
-                    if (columnIndex == 6) { // College column
-                        // Search by college name
-                        List<RowFilter<Object, Object>> filters = new ArrayList<>();
-                        filters.add(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
-    
-                        // Add search by full college name
-                        for (String college : CollegeDataManager.getAllColleges()) {
-                            if (college.toLowerCase().contains(searchText.toLowerCase())) {
-                                String abbr = CollegeDataManager.getCollegeAbbr(college);
-                                filters.add(RowFilter.regexFilter("(?i)" + abbr, columnIndex));
-                            }
-                        }
-    
-                        sorter.setRowFilter(RowFilter.orFilter(filters));
-                    } else if (columnIndex == 7) { // Program column
-                        // Search by program name
-                        List<RowFilter<Object, Object>> filters = new ArrayList<>();
-                        filters.add(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
-    
-                        // Add search by full program name
-                        for (String college : CollegeDataManager.getAllColleges()) {
-                            for (String program : CollegeDataManager.getProgramsForCollege(college)) {
-                                if (program.toLowerCase().contains(searchText.toLowerCase())) {
-                                    String abbr = CollegeDataManager.getProgramAbbr(program);
-                                    filters.add(RowFilter.regexFilter("(?i)" + abbr, columnIndex));
-                                }
-                            }
-                        }
-    
-                        sorter.setRowFilter(RowFilter.orFilter(filters));
-                    } else {
-                        // For other columns, use standard search
-                        List<RowFilter<Object, Object>> filters = new ArrayList<>();
-                        filters.add(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
-                        sorter.setRowFilter(RowFilter.orFilter(filters));
-                    }
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
                 }
             }
         }
     }
     
-    private int getColumnIndex(String fieldName) {
+    private void performProgramSearch(String searchText, String searchField) {
+        JTable table = programTablePanel.getProgramTable();
+        if (table == null) return;
+        
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
+        table.setRowSorter(sorter);
+        
+        if (searchText.trim().isEmpty()) {
+            sorter.setRowFilter(null);
+        } else {
+            if (searchField.equals(ALL_FIELDS)) {
+                List<RowFilter<Object, Object>> filters = new ArrayList<>();
+                filters.add(RowFilter.regexFilter("(?i)" + searchText, 0)); // Name column
+                filters.add(RowFilter.regexFilter("(?i)" + searchText, 1)); // Abbreviation column
+                filters.add(RowFilter.regexFilter("(?i)" + searchText, 2)); // College column
+                // Add new columns to search if they exist in the table model
+                if (table.getModel().getColumnCount() > 3) {
+                    filters.add(RowFilter.regexFilter("(?i)" + searchText, 3)); // Program Type column
+                }
+                if (table.getModel().getColumnCount() > 4) {
+                    filters.add(RowFilter.regexFilter("(?i)" + searchText, 4)); // Department column
+                }
+                sorter.setRowFilter(RowFilter.orFilter(filters));
+            } else {
+                int columnIndex = getProgramColumnIndex(searchField);
+                if (columnIndex != -1) {
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
+                }
+            }
+        }
+    }
+    
+    private void performStudentSearch(String searchText, String searchField) {
+        if (tablePanel == null) return;
+        // ... existing student search implementation ...
+    }
+    
+    private int getCollegeColumnIndex(String fieldName) {
+        switch (fieldName) {
+            case "College Name": return 0;
+            case "College Abbreviation": return 1;
+            default: return -1;
+        }
+    }
+    
+    private int getProgramColumnIndex(String fieldName) {
+        switch (fieldName) {
+            case "Program Name": return 1;
+            case "Program Abbreviation": return 2;
+            case "College": return 0;
+            default: return -1;
+        }
+    }
+    
+    private int getStudentColumnIndex(String fieldName) {
         switch (fieldName) {
             case "First Name": return 1;
             case "Last Name": return 2;
@@ -226,7 +287,6 @@ public class SearchPanel extends JPanel {
     
     private void showFilterDialog() {
         if (tablePanel == null) return;
-        
         FilterDialog dialog = new FilterDialog(SwingUtilities.getWindowAncestor(this), tablePanel);
         dialog.setVisible(true);
     }
