@@ -25,6 +25,9 @@ public final class CollegeTablePanel extends JPanel {
 
         SearchPanel searchPanel = new SearchPanel();
         searchPanel.setCollegeTablePanel(this);
+        searchPanel.setFilterButtonAction(e -> {
+            JOptionPane.showMessageDialog(this, "No available filters", "Filter Info", JOptionPane.INFORMATION_MESSAGE);
+        });
 
         searchPanelContainer.add(searchPanel, BorderLayout.CENTER);
         this.add(searchPanelContainer, gbc);
