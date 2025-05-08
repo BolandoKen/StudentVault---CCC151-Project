@@ -12,7 +12,7 @@ public class SearchPanel extends JPanel {
     private RoundedComboBox searchByField;
     private CollegeTablePanel collegeTablePanel;
     private ProgramTablePanel programTablePanel;
-    private JButton filterButton;
+    private final JButton filterButton;
     
     // Constants for search field options
     private static final String ALL_FIELDS = "All Fields";
@@ -124,6 +124,7 @@ public class SearchPanel extends JPanel {
     
     public void setTablePanel(TablePanel tablePanel) {
         this.tablePanel = tablePanel;
+        updateSearchFields();
     }
 
     public void setCollegeTablePanel(CollegeTablePanel collegeTablePanel) {
@@ -138,20 +139,30 @@ public class SearchPanel extends JPanel {
     
     private void updateSearchFields() {
         if (searchByField == null) return;
-        
+    
         String[] searchFields;
         if (collegeTablePanel != null) {
             searchFields = new String[]{NO_FILTER, ALL_FIELDS, "College Name", "College Abbreviation"};
         } else if (programTablePanel != null) {
-            // Enhanced program search fields
             searchFields = new String[]{
                 NO_FILTER, 
                 ALL_FIELDS, 
                 "Program Name", 
                 "Program Abbreviation", 
                 "College",
-                "Program Type", // Added for more search options
-                "Department"    // Added for more search options
+            };
+        } else if (tablePanel != null) {
+            // Properly set up student-specific search fields
+            searchFields = new String[]{
+                NO_FILTER,
+                ALL_FIELDS,
+                "First Name",
+                "Last Name",
+                "ID Number",
+                "Gender",
+                "Year Level",
+                "College",
+                "Program"
             };
         } else {
             searchFields = new String[]{NO_FILTER, ALL_FIELDS};
@@ -260,7 +271,34 @@ public class SearchPanel extends JPanel {
     
     private void performStudentSearch(String searchText, String searchField) {
         if (tablePanel == null) return;
-        // ... existing student search implementation ...
+    
+    JTable table = tablePanel.getTable();
+    if (table == null) return;
+    
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
+    table.setRowSorter(sorter);
+    
+    if (searchText.trim().isEmpty()) {
+        sorter.setRowFilter(null);
+    } else {
+        if (searchField.equals(ALL_FIELDS)) {
+            List<RowFilter<Object, Object>> filters = new ArrayList<>();
+            // Add filters for all searchable columns
+            filters.add(RowFilter.regexFilter("(?i)" + searchText, 1)); // First Name
+            filters.add(RowFilter.regexFilter("(?i)" + searchText, 2)); // Last Name
+            filters.add(RowFilter.regexFilter("(?i)" + searchText, 4)); // ID Number
+            filters.add(RowFilter.regexFilter("(?i)" + searchText, 3)); // Gender
+            filters.add(RowFilter.regexFilter("(?i)" + searchText, 5)); // Year Level
+            filters.add(RowFilter.regexFilter("(?i)" + searchText, 6)); // College
+            filters.add(RowFilter.regexFilter("(?i)" + searchText, 7)); // Program
+            sorter.setRowFilter(RowFilter.orFilter(filters));
+        } else {
+            int columnIndex = getStudentColumnIndex(searchField);
+            if (columnIndex != -1) {
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
+            }
+        }
+    }
     }
     
     private int getCollegeColumnIndex(String fieldName) {
