@@ -12,10 +12,12 @@ public class SearchPanel extends JPanel {
     private RoundedComboBox searchByField;
     private CollegeTablePanel collegeTablePanel;
     private ProgramTablePanel programTablePanel;
+    private JButton filterButton;
     
     // Constants for search field options
     private static final String ALL_FIELDS = "All Fields";
     private static final String NO_FILTER = "No Filter";
+    private ActionListener customFilterAction;
     
     public SearchPanel() {
         this.setLayout(new GridBagLayout());
@@ -100,8 +102,14 @@ public class SearchPanel extends JPanel {
         gbc.gridx = 1;
         gbc.weightx = 0.0;
         gbc.insets = new Insets(10, 0, 10, 10);
-        JButton filterButton = createButton("Assets/FilterIcon.png");
-        filterButton.addActionListener(e -> showFilterDialog());
+        filterButton = createButton("Assets/FilterIcon.png");
+        filterButton.addActionListener(e -> {
+            if (customFilterAction != null) {
+                customFilterAction.actionPerformed(e);
+            } else {
+                showFilterDialog(); // Default behavior
+            }
+        });
         this.add(filterButton, gbc);
     }
 
@@ -289,5 +297,11 @@ public class SearchPanel extends JPanel {
         if (tablePanel == null) return;
         FilterDialog dialog = new FilterDialog(SwingUtilities.getWindowAncestor(this), tablePanel);
         dialog.setVisible(true);
+    }
+    public JButton getFilterButton() {
+        return filterButton;
+    }
+    public void setFilterButtonAction(ActionListener action) {
+    this.customFilterAction = action;
     }
 }

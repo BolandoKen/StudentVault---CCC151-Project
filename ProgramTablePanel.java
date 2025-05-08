@@ -25,6 +25,14 @@ public final class ProgramTablePanel extends JPanel {
 
         SearchPanel searchPanel = new SearchPanel();
         searchPanel.setProgramTablePanel(this);
+        searchPanel.setFilterButtonAction(e -> {
+            ProgramsFilterDialog dialog = new ProgramsFilterDialog(
+                SwingUtilities.getWindowAncestor(ProgramTablePanel.this), 
+                ProgramTablePanel.this
+            );
+            dialog.setVisible(true);
+        });
+        
 
         searchPanelContainer.add(searchPanel, BorderLayout.CENTER);
         this.add(searchPanelContainer, gbc);
