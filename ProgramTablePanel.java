@@ -9,9 +9,8 @@ public final class ProgramTablePanel extends JPanel {
     private boolean selectionMode = false;
     private JButton deleteButton;
     private JButton cancelButton;
-    private JButton confirmDeleteButton;
     private JPanel buttonsPanel;
-    private JButton editbutton;
+    private JButton editButton;
     private CollegeTablePanel collegeTablePanel;
 
     public ProgramTablePanel() {
@@ -43,7 +42,7 @@ public final class ProgramTablePanel extends JPanel {
         topRow.setOpaque(false);
         topRow.setPreferredSize(new Dimension(1, 100));
         gbc.gridy = 1;
-        gbc.weighty = 0.2;
+        gbc.weighty = 0.1;
         this.add(topRow, gbc);
 
         GridBagConstraints gbcTopRow = new GridBagConstraints();
@@ -75,14 +74,15 @@ public final class ProgramTablePanel extends JPanel {
         rightPanel.setOpaque(false); // Changed from BLUE to transparent
         topRow.add(rightPanel, gbcTopRow);
 
-        buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, -5));
+        buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 5));
         buttonsPanel.setOpaque(false);
         rightPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
-        JButton addProgramButton = new JButton("+");
-        addProgramButton.setBackground(new Color(0xE7E7E7));
+        JButton addProgramButton = new JButton(new ImageIcon("Assets/PlusIcon.png"));
+        addProgramButton.setBorderPainted(false);
+        addProgramButton.setFocusPainted(false);
+        addProgramButton.setContentAreaFilled(false);
         setForeground(Color.BLACK);
-        addProgramButton.setPreferredSize(new Dimension(80, 40));
 
         addProgramButton.addActionListener(new ActionListener() {
 
@@ -113,32 +113,33 @@ public final class ProgramTablePanel extends JPanel {
             }
         });
         
-        deleteButton = new JButton("Delete");
-        deleteButton.setBackground(new Color(0xE7E7E7));
-        deleteButton.setForeground(Color.BLACK);
+        deleteButton = new JButton(new ImageIcon("Assets/DeleteIcon.png"));
+        deleteButton.setBorderPainted(false);
+        deleteButton.setFocusPainted(false);
+        deleteButton.setContentAreaFilled(false);
         deleteButton.addActionListener(e -> removeProgram());
 
-        editbutton = new JButton("Edit");
-        editbutton.setBackground(new Color(0xE7E7E7));
-        editbutton.setForeground(Color.BLACK);
-        editbutton.addActionListener(e -> editProgram());
+        editButton = new JButton(new ImageIcon("Assets/EditIcon.png"));
+        editButton.setBorderPainted(false);
+        editButton.setFocusPainted(false);
+        editButton.setContentAreaFilled(false);
+        editButton.addActionListener(e -> editProgram());
         buttonsPanel.add(addProgramButton);
         buttonsPanel.add(deleteButton);
-        buttonsPanel.add(editbutton);
+        buttonsPanel.add(editButton);
 
-        JLabel programsVaultText = new JLabel("Programs");
-        programsVaultText.setFont(new Font("Helvetica", Font.BOLD, 32));
-        leftPanel.add(programsVaultText, BorderLayout.CENTER);
-        
-        JLabel sortbytext = new JLabel("");
-        sortbytext.setFont(new Font("Helvetica", Font.PLAIN, 16));
-        sortbytext.setForeground(new Color(0x7E7E7E));
-        sortPanel.add(sortbytext);
+        JLabel programsText = new JLabel("Programs");
+        programsText.setFont(new Font("Helvetica", Font.BOLD, 32));
+        JPanel textContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        textContainer.setOpaque(false);
+
+        textContainer.add(programsText);
+        leftPanel.add(textContainer, BorderLayout.SOUTH);
 
         JPanel bottomRow = new JPanel(new BorderLayout());
         bottomRow.setOpaque(false); // Changed from RED to transparent
         gbc.gridy = 2;
-        gbc.weighty = 0.8;
+        gbc.weighty = 0.9;
         this.add(bottomRow, gbc);
 
         programTable = new JTable();

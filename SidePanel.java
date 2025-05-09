@@ -2,14 +2,14 @@ import java.awt.*;
 import javax.swing.*;
 
 public class SidePanel extends JPanel {
-    private final ImageIcon addIconDefault = new ImageIcon("Assets/AddIcon.png");
-    private final ImageIcon addIconClicked = new ImageIcon("Assets/SelectedAddIcon.png");
-    private final ImageIcon tableIconDefault = new ImageIcon("Assets/TableIcon.png");
-    private final ImageIcon tableIconClicked = new ImageIcon("Assets/SelectedTableIcon.png");
+    private final ImageIcon addIconDefault = new ImageIcon("Assets/AddStudentIcon.png");
+    private final ImageIcon addIconClicked = new ImageIcon("Assets/SelectedAddStudentIcon.png");
+    private final ImageIcon tableIconDefault = new ImageIcon("Assets/StudentIcon.png");
+    private final ImageIcon tableIconClicked = new ImageIcon("Assets/SelectedStudentIcon.png");
     private final ImageIcon collegeIconDefault = new ImageIcon("Assets/CollegeIcon.png");
-    private final ImageIcon collegeIconClicked = new ImageIcon("Assets/CollegeIcon.png"); // New clicked state
+    private final ImageIcon collegeIconClicked = new ImageIcon("Assets/SelectedCollegeIcon.png"); 
     private final ImageIcon programIconDefault = new ImageIcon("Assets/ProgramIcon.png");
-    private final ImageIcon programIconClicked = new ImageIcon("Assets/ProgramIcon.png"); // New clicked state
+    private final ImageIcon programIconClicked = new ImageIcon("Assets/SelectedProgramIcon.png"); 
     
     private JButton addButton;
     private JButton tableButton;

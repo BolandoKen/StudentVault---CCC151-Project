@@ -11,7 +11,7 @@ public final class CollegeTablePanel extends JPanel {
     private JButton cancelButton;
     private JButton confirmDeleteButton;
     private JPanel buttonsPanel;
-    private JButton editbutton;
+    private JButton editButton;
     private ProgramTablePanel programTablePanel;
 
     public CollegeTablePanel() {
@@ -38,7 +38,7 @@ public final class CollegeTablePanel extends JPanel {
         topRow.setOpaque(false);
         topRow.setPreferredSize(new Dimension(1, 100));
         gbc.gridy = 1;
-        gbc.weighty = 0.2;
+        gbc.weighty = 0.1;
         this.add(topRow, gbc);
 
         GridBagConstraints gbcTopRow = new GridBagConstraints();
@@ -54,12 +54,8 @@ public final class CollegeTablePanel extends JPanel {
 
         //setup TopLeftPanel
         JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.setOpaque(false); // Changed from GREEN to transparent
+        leftPanel.setOpaque(false); 
         topRow.add(leftPanel, gbcTopRow);
-
-        final JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        sortPanel.setOpaque(false); // Changed from BLUE to transparent
-        leftPanel.add(sortPanel, BorderLayout.SOUTH);
 
         gbcTopRow.gridx = 1;
         gbcTopRow.weightx = 0.5; 
@@ -67,17 +63,18 @@ public final class CollegeTablePanel extends JPanel {
 
         //setup TopRightPanel
         JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.setOpaque(false); // Changed from BLUE to transparent
+        rightPanel.setOpaque(false);
         topRow.add(rightPanel, gbcTopRow);
 
-        buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, -5));
+        buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 5));
         buttonsPanel.setOpaque(false);
         rightPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
-        JButton addCollegeButton = new JButton("+");
+        JButton addCollegeButton = new JButton(new ImageIcon("Assets/PlusIcon.png"));
+        addCollegeButton.setBorderPainted(false);
+        addCollegeButton.setFocusPainted(false);
+        addCollegeButton.setContentAreaFilled(false);
         addCollegeButton.setBackground(new Color(0xE7E7E7));
-        setForeground(Color.BLACK);
-        addCollegeButton.setPreferredSize(new Dimension(80, 40));
 
         addCollegeButton.addActionListener(new ActionListener() {
             @Override
@@ -103,32 +100,33 @@ public final class CollegeTablePanel extends JPanel {
             }
         });
  
-        deleteButton = new JButton("Delete");
-        deleteButton.setBackground(new Color(0xE7E7E7));
-        deleteButton.setForeground(Color.BLACK);
+        deleteButton = new JButton(new ImageIcon("Assets/DeleteIcon.png"));
+        deleteButton.setBorderPainted(false);
+        deleteButton.setFocusPainted(false);
+        deleteButton.setContentAreaFilled(false);
         deleteButton.addActionListener(e -> removeCollege());
 
-        editbutton = new JButton("Edit");
-        editbutton.setBackground(new Color(0xE7E7E7));
-        editbutton.setForeground(Color.BLACK);
-        editbutton.addActionListener(e -> editCollege());
+        editButton = new JButton(new ImageIcon("Assets/EditIcon.png"));
+        editButton.setBorderPainted(false);
+        editButton.setFocusPainted(false);
+        editButton.setContentAreaFilled(false);
+        editButton.addActionListener(e -> editCollege());
         buttonsPanel.add(addCollegeButton);
         buttonsPanel.add(deleteButton);
-        buttonsPanel.add(editbutton);
+        buttonsPanel.add(editButton);
 
-        JLabel collegeVaultText = new JLabel("Colleges");
-        collegeVaultText.setFont(new Font("Helvetica", Font.BOLD, 32));
-        leftPanel.add(collegeVaultText, BorderLayout.CENTER);
+        JLabel collegeText = new JLabel("Colleges");
+        collegeText.setFont(new Font("Helvetica", Font.BOLD, 32));
+        JPanel textContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        textContainer.setOpaque(false);
 
-        JLabel sortbytext = new JLabel("");
-        sortbytext.setFont(new Font("Helvetica", Font.PLAIN, 16));
-        sortbytext.setForeground(new Color(0x7E7E7E));
-        sortPanel.add(sortbytext);
+        textContainer.add(collegeText);
+        leftPanel.add(textContainer, BorderLayout.SOUTH);
 
         JPanel bottomRow = new JPanel(new BorderLayout());
         bottomRow.setOpaque(false); // Changed from RED to transparent
         gbc.gridy = 2;
-        gbc.weighty = 0.8;
+        gbc.weighty = 0.9;
         this.add(bottomRow, gbc);
 
         collegeTable = new JTable();
