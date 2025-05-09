@@ -87,7 +87,7 @@ public final class CollegeTablePanel extends JPanel {
                 
                 // Get the parent frame and pass the CollegeTablePanel instance
                 JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(CollegeTablePanel.this);
-                CollegeAdminDialog adminDialog = new CollegeAdminDialog(frame, null, CollegeTablePanel.this, programTablePanel);
+                CollegeAdminDialog adminDialog = new CollegeAdminDialog(frame, null, CollegeTablePanel.this, programTablePanel, null);
                 adminDialog.setVisible(true);
                 
                 // Refresh the table after closing the dialog

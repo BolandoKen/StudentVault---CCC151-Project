@@ -115,4 +115,24 @@ public class ProgramsFilterDialog extends JDialog {
             sorter.setRowFilter(null);
         }
     }
+    public void refreshCollegeList() {
+        // Get the current selection to restore it after refresh
+        String currentSelection = (String) collegeComboBox.getSelectedItem();
+        
+        // Create a sorted list of colleges with "All Colleges" first
+        List<String> colleges = CollegeDataManager.getAllColleges();
+        Collections.sort(colleges);
+        colleges.add(0, "All Colleges");
+        
+        // Update the combo box model
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(colleges.toArray(new String[0]));
+        collegeComboBox.setModel(model);
+        
+        // Restore previous selection if it still exists
+        if (currentSelection != null && colleges.contains(currentSelection)) {
+            collegeComboBox.setSelectedItem(currentSelection);
+        } else {
+            collegeComboBox.setSelectedIndex(0); // Default to "All Colleges"
+        }
+    }
 }

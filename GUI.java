@@ -100,11 +100,15 @@ public class GUI extends JFrame {
                 break;
             case "PROGRAMTABLEPANEL":
                 programTablePanel.refreshProgramTable();
+                // Refresh the filter dialog when switching to program panel
+                ProgramsFilterDialog filterDialog = programTablePanel.getFilterDialog();
+                if (filterDialog != null && filterDialog.isVisible()) {
+                    filterDialog.refreshCollegeList();
+                }
                 break;
         }
         cardLayout.show(cardPanel, panelName);
     }
-    
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -127,4 +131,11 @@ public class GUI extends JFrame {
     public TablePanel getTablePanel() {
         return tablePanel;
     }
+    public ProgramsFilterDialog getProgramsFilterDialog() {
+        if (programTablePanel != null) {
+            return programTablePanel.getFilterDialog(); // You'll need to add this getter
+        }
+        return null;
+    }
+    
 }

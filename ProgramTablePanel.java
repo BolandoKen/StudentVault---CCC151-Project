@@ -12,6 +12,7 @@ public final class ProgramTablePanel extends JPanel {
     private JPanel buttonsPanel;
     private JButton editButton;
     private CollegeTablePanel collegeTablePanel;
+    private ProgramsFilterDialog dialog;
 
     public ProgramTablePanel() {
         this.setLayout(new GridBagLayout());
@@ -27,10 +28,11 @@ public final class ProgramTablePanel extends JPanel {
         SearchPanel searchPanel = new SearchPanel();
         searchPanel.setProgramTablePanel(this);
         searchPanel.setFilterButtonAction(e -> {
-            ProgramsFilterDialog dialog = new ProgramsFilterDialog(
+                dialog = new ProgramsFilterDialog(
                 SwingUtilities.getWindowAncestor(ProgramTablePanel.this), 
                 ProgramTablePanel.this
             );
+            dialog.refreshCollegeList();
             dialog.setVisible(true);
         });
         
@@ -85,7 +87,6 @@ public final class ProgramTablePanel extends JPanel {
         setForeground(Color.BLACK);
 
         addProgramButton.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Find the parent GUI frame to get access to both panels
@@ -101,7 +102,17 @@ public final class ProgramTablePanel extends JPanel {
                 
                 // Get the parent frame and pass both table panel instances
                 JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(ProgramTablePanel.this);
-                CollegeAdminDialog adminDialog = new CollegeAdminDialog(frame, null, collegeTablePanel, ProgramTablePanel.this);
+                
+                // Create the filter dialog first if it doesn't exist
+                ProgramsFilterDialog filterDialog = new ProgramsFilterDialog(frame, ProgramTablePanel.this);
+                
+                CollegeAdminDialog adminDialog = new CollegeAdminDialog(
+                    frame, 
+                    null, 
+                    collegeTablePanel, 
+                    ProgramTablePanel.this,
+                    filterDialog
+                );
                 adminDialog.setVisible(true);
                 
                 // Refresh both tables after closing the dialog
@@ -409,5 +420,9 @@ private void editProgram() {
             JOptionPane.WARNING_MESSAGE
         );
     }
+}
+public ProgramsFilterDialog getFilterDialog() {
+    // This assumes you've stored the filterDialog reference as shown in previous solutions
+    return dialog;
 }
 }

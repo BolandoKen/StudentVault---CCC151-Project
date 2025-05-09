@@ -22,12 +22,14 @@ public class CollegeAdminDialog extends JDialog {
     private JTextField programAbbrField;
     private CollegeTablePanel collegeTablePanel;
     private ProgramTablePanel programTablePanel;
+    private ProgramsFilterDialog filterDialog;
 
-    public CollegeAdminDialog(Frame owner, StudentForm parentForm, CollegeTablePanel collegeTablePanel, ProgramTablePanel programTablePanel) {
+    public CollegeAdminDialog(Frame owner, StudentForm parentForm, CollegeTablePanel collegeTablePanel, ProgramTablePanel programTablePanel, ProgramsFilterDialog filterDialog) {
         super(owner, "College and Program Administration", true);
         this.parentForm = parentForm;
         this.collegeTablePanel = collegeTablePanel;
         this.programTablePanel = programTablePanel;
+        this.filterDialog = filterDialog;
         
         setSize(800, 500);
         setLocationRelativeTo(owner);
@@ -258,7 +260,12 @@ public class CollegeAdminDialog extends JDialog {
         
         // Refresh program table if available
         if (programTablePanel != null) {
-            programTablePanel.refreshProgramTable();;
+            programTablePanel.refreshProgramTable();
+        }
+        
+        // Refresh filter dialog if available
+        if (filterDialog != null) {
+            filterDialog.refreshCollegeList();
         }
     }
     
