@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public final class CollegeTablePanel extends JPanel {
     private JTable collegeTable;
@@ -10,6 +11,7 @@ public final class CollegeTablePanel extends JPanel {
     private JButton cancelButton;
     private JButton confirmDeleteButton;
     private JPanel buttonsPanel;
+    private JButton editbutton;
     private ProgramTablePanel programTablePanel;
 
     public CollegeTablePanel() {
@@ -100,14 +102,25 @@ public final class CollegeTablePanel extends JPanel {
                 }
             }
         });
+ 
+        deleteButton = new JButton("Delete");
+        deleteButton.setBackground(new Color(0xE7E7E7));
+        deleteButton.setForeground(Color.BLACK);
+        deleteButton.addActionListener(e -> removeCollege());
 
+        editbutton = new JButton("Edit");
+        editbutton.setBackground(new Color(0xE7E7E7));
+        editbutton.setForeground(Color.BLACK);
+        editbutton.addActionListener(e -> editCollege());
         buttonsPanel.add(addCollegeButton);
+        buttonsPanel.add(deleteButton);
+        buttonsPanel.add(editbutton);
 
         JLabel collegeVaultText = new JLabel("Colleges");
         collegeVaultText.setFont(new Font("Helvetica", Font.BOLD, 32));
         leftPanel.add(collegeVaultText, BorderLayout.CENTER);
 
-        JLabel sortbytext = new JLabel("Sort by: ");
+        JLabel sortbytext = new JLabel("");
         sortbytext.setFont(new Font("Helvetica", Font.PLAIN, 16));
         sortbytext.setForeground(new Color(0x7E7E7E));
         sortPanel.add(sortbytext);
@@ -169,5 +182,158 @@ public final class CollegeTablePanel extends JPanel {
     }
     public JTable getCollegeTable() {
         return collegeTable;
+    }
+    private void removeCollege() {
+        int selectedRow = collegeTable.getSelectedRow();
+        
+        if (selectedRow >= 0) {
+            // Convert view row to model row (important for sorted/filtered tables)
+            int modelRow = collegeTable.convertRowIndexToModel(selectedRow);
+            DefaultTableModel model = (DefaultTableModel) collegeTable.getModel();
+            
+            // Get data from selected row
+            String collegeName = (String) model.getValueAt(modelRow, 0);
+            String collegeCode = (String) model.getValueAt(modelRow, 1);
+            
+            // Confirmation dialog
+            int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "<html>Confirm removal of college:<br><b>" + collegeName + "</b> (" + collegeCode + ")?<br>" +
+                "This will also remove all its programs.</html>",
+                "Confirm College Removal",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            );
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    // Attempt removal
+                    if (CollegeManager.removeCollege(collegeName)) {
+                        // Remove from table model
+                        model.removeRow(modelRow);
+                        
+                        // Notify program table panel of changes
+                        notifyProgramTableOfChanges();
+                        
+                        // Success message
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "College removed successfully",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                    } else {
+                        throw new Exception("CollegeManager failed to remove the college");
+                    }
+                } catch (Exception e) {
+                    // Error message
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Error removing college: " + e.getMessage(),
+                        "Removal Failed",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    // Fallback refresh
+                    refreshCollegeTable();
+                }
+            }
+        } else {
+            // No selection warning
+            JOptionPane.showMessageDialog(
+                this,
+                "Please select a college to remove first",
+                "No Selection",
+                JOptionPane.WARNING_MESSAGE
+            );
+        }
+    }
+
+    private void editCollege() {
+        int selectedRow = collegeTable.getSelectedRow();
+        
+        if (selectedRow >= 0) {
+            int modelRow = collegeTable.convertRowIndexToModel(selectedRow);
+            DefaultTableModel model = (DefaultTableModel) collegeTable.getModel();
+            
+            // Get current values
+            String currentCollegeName = (String) model.getValueAt(modelRow, 0);
+            String currentCollegeCode = (String) model.getValueAt(modelRow, 1);
+            
+            // Create edit dialog
+            JPanel editPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+            JTextField collegeNameField = new JTextField(currentCollegeName);
+            JTextField collegeCodeField = new JTextField(currentCollegeCode);
+            
+            editPanel.add(new JLabel("College Name:"));
+            editPanel.add(collegeNameField);
+            editPanel.add(new JLabel("College Abbreviation:"));
+            editPanel.add(collegeCodeField);
+            
+            int result = JOptionPane.showConfirmDialog(
+                this,
+                editPanel,
+                "Edit College",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+            );
+            
+            if (result == JOptionPane.OK_OPTION) {
+                String newCollegeName = collegeNameField.getText().trim();
+                String newCollegeCode = collegeCodeField.getText().trim();
+                
+                // Validate input
+                if (newCollegeName.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "College name cannot be empty",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+                
+                try {
+                    // Attempt update
+                    if (CollegeManager.updateCollegeName(
+                        currentCollegeName,
+                        newCollegeName,
+                        newCollegeCode
+                    )) {
+                        // Update table model
+                        model.setValueAt(newCollegeName, modelRow, 0);
+                        model.setValueAt(newCollegeCode, modelRow, 1);
+                        
+                        // Notify program table panel of changes
+                        notifyProgramTableOfChanges();
+                        
+                        // Success message
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "College updated successfully",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                    } else {
+                        throw new Exception("Failed to update college (possibly duplicate name)");
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Error updating college: " + e.getMessage(),
+                        "Update Failed",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    // Fallback refresh
+                    refreshCollegeTable();
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(
+                this,
+                "Please select a college to edit first",
+                "No Selection",
+                JOptionPane.WARNING_MESSAGE
+            );
+        }
     }
 }

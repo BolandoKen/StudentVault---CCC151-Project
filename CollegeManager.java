@@ -242,17 +242,29 @@ public static boolean removeProgram(String collegeName, String programName) {
         return false;
     }
     
-    public static boolean updateProgramName(String collegeName, String oldProgramName, String newProgramName, String newAbbreviation) {
+    public static boolean updateProgramName(
+        String collegeName, 
+        String oldProgramName, 
+        String newProgramName,
+        String newAbbreviation
+    ) {
         if (collegeDetails.containsKey(collegeName)) {
             @SuppressWarnings("unchecked")
             Map<String, String> programs = (Map<String, String>) collegeDetails.get(collegeName).get("programs");
             
-            if (programs.containsKey(oldProgramName) && (oldProgramName.equals(newProgramName) || !programs.containsKey(newProgramName))) {
-                String abbr = programs.get(oldProgramName);
-                programs.remove(oldProgramName);
+            if (programs.containsKey(oldProgramName)) {
+                // Check if new name already exists (unless it's the same as old name)
+                if (!oldProgramName.equals(newProgramName) && programs.containsKey(newProgramName)) {
+                    return false;
+                }
                 
-                // Update abbreviation if provided
-                programs.put(newProgramName, newAbbreviation != null ? newAbbreviation : abbr);
+                // Preserve old abbreviation if new one is empty
+                String abbreviation = newAbbreviation.isEmpty() 
+                    ? programs.get(oldProgramName)
+                    : newAbbreviation;
+                
+                programs.remove(oldProgramName);
+                programs.put(newProgramName, abbreviation);
                 saveColleges();
                 return true;
             }
@@ -262,6 +274,15 @@ public static boolean removeProgram(String collegeName, String programName) {
     public static boolean addProgram(String collegeName, String programName) {
         // Call the three-parameter version with an empty abbreviation
         return addProgram(collegeName, programName, "");
+    }
+    public static String getCollegeNameByAbbreviation(String abbreviation) {
+        for (Map.Entry<String, Map<String, Object>> entry : collegeDetails.entrySet()) {
+            String currentAbbr = (String) entry.getValue().get("abbreviation");
+            if (abbreviation.equals(currentAbbr)) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
     
 }

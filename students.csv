@@ -3,7 +3,7 @@ First Name,Last Name,Gender,ID Number,Year Level,College,Program
 "Michael","Johnson","Male","2045-9101","3rd Year","College of Computer Studies","Bachelor of Science in Computer Science"
 "Emily","Davis","Female","2045-1121","4th Year","College of Education","Bachelor of Secondary Education (Mathematics)"
 "David","Wilson","Male","2045-3141","1st Year","College of Arts and Social Sciences","Bachelor of Arts in Psychology"
-"Daniel","Martinez","Male","2045-7181","3rd Year","hello","ma man"
+"Daniel","Martinez","Male","2045-7181","3rd Year","",""
 "Olivia","Garcia","Female","2045-9202","4th Year","",""
 "James","Rodriguez","Male","2045-3242","1st Year","College of Science and Mathematics","Bachelor of Science in Chemistry"
 "Sophia","Martinez","Female","2045-5262","2nd Year","College of Computer Studies","Bachelor of Science in Information Technology"
@@ -72,3 +72,4 @@ First Name,Last Name,Gender,ID Number,Year Level,College,Program
 "Jan Atkinson","Bolando","Male","2023-1864","2nd Year","College of Computer Studies","Bachelor of Science in Computer Science"
 "Vsause","Michael","Male","0001-0001","2nd Year","College of Computer Studies",""
 "John","Doe","Male","4324-3242","1st Year","College of Engineering","Bachelor of Science in Computer Engineering"
+"Sarah","Duterte","Female","2344-2344","2nd Year","",""

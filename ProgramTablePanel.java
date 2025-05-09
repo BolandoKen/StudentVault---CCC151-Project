@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public final class ProgramTablePanel extends JPanel {
     private JTable programTable;
@@ -10,6 +11,7 @@ public final class ProgramTablePanel extends JPanel {
     private JButton cancelButton;
     private JButton confirmDeleteButton;
     private JPanel buttonsPanel;
+    private JButton editbutton;
     private CollegeTablePanel collegeTablePanel;
 
     public ProgramTablePanel() {
@@ -83,6 +85,7 @@ public final class ProgramTablePanel extends JPanel {
         addProgramButton.setPreferredSize(new Dimension(80, 40));
 
         addProgramButton.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Find the parent GUI frame to get access to both panels
@@ -109,14 +112,25 @@ public final class ProgramTablePanel extends JPanel {
                 }
             }
         });
+        
+        deleteButton = new JButton("Delete");
+        deleteButton.setBackground(new Color(0xE7E7E7));
+        deleteButton.setForeground(Color.BLACK);
+        deleteButton.addActionListener(e -> removeProgram());
 
+        editbutton = new JButton("Edit");
+        editbutton.setBackground(new Color(0xE7E7E7));
+        editbutton.setForeground(Color.BLACK);
+        editbutton.addActionListener(e -> editProgram());
         buttonsPanel.add(addProgramButton);
+        buttonsPanel.add(deleteButton);
+        buttonsPanel.add(editbutton);
 
         JLabel programsVaultText = new JLabel("Programs");
         programsVaultText.setFont(new Font("Helvetica", Font.BOLD, 32));
         leftPanel.add(programsVaultText, BorderLayout.CENTER);
         
-        JLabel sortbytext = new JLabel("Sort by: ");
+        JLabel sortbytext = new JLabel("");
         sortbytext.setFont(new Font("Helvetica", Font.PLAIN, 16));
         sortbytext.setForeground(new Color(0x7E7E7E));
         sortPanel.add(sortbytext);
@@ -212,4 +226,187 @@ public final class ProgramTablePanel extends JPanel {
     public JTable getProgramTable() {
         return programTable;
     }
+    private void removeProgram() {
+    int selectedRow = programTable.getSelectedRow();
+    
+    if (selectedRow >= 0) {
+        // Convert view row to model row (important for sorted/filtered tables)
+        int modelRow = programTable.convertRowIndexToModel(selectedRow);
+        DefaultTableModel model = (DefaultTableModel) programTable.getModel();
+        
+        // Get data from selected row
+        String collegeCode = (String) model.getValueAt(modelRow, 0);
+        String programName = (String) model.getValueAt(modelRow, 1);
+        String programCode = (String) model.getValueAt(modelRow, 2);
+        
+        // Find full college name by abbreviation
+        String collegeName = CollegeManager.getCollegeNameByAbbreviation(collegeCode);
+        
+        if (collegeName != null) {
+            // Confirmation dialog
+            int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "<html>Confirm removal of:<br><b>" + programName + "</b> (" + programCode + ")<br>" +
+                "from <b>" + collegeName + "</b> (" + collegeCode + ")?</html>",
+                "Confirm Program Removal",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            );
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    // Attempt removal
+                    if (CollegeManager.removeProgram(collegeName, programName)) {
+                        // Remove from table model
+                        model.removeRow(modelRow);
+                        
+                        // Notify other components
+                        notifyCollegeTableOfChanges();
+                        
+                        // Success message
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Program removed successfully",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                    } else {
+                        throw new Exception("CollegeManager failed to remove the program");
+                    }
+                } catch (Exception e) {
+                    // Error message
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Error removing program: " + e.getMessage(),
+                        "Removal Failed",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    // Fallback refresh
+                    refreshProgramTable();
+                }
+            }
+        } else {
+            // College not found error
+            JOptionPane.showMessageDialog(
+                this,
+                "Could not find college with code: " + collegeCode,
+                "Invalid College",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
+    } else {
+        // No selection warning
+        JOptionPane.showMessageDialog(
+            this,
+            "Please select a program to remove first",
+            "No Selection",
+            JOptionPane.WARNING_MESSAGE
+        );
+    }
+}
+
+private void editProgram() {
+    int selectedRow = programTable.getSelectedRow();
+    
+    if (selectedRow >= 0) {
+        int modelRow = programTable.convertRowIndexToModel(selectedRow);
+        DefaultTableModel model = (DefaultTableModel) programTable.getModel();
+        
+        // Get current values
+        String collegeCode = (String) model.getValueAt(modelRow, 0);
+        String currentProgramName = (String) model.getValueAt(modelRow, 1);
+        String currentProgramCode = (String) model.getValueAt(modelRow, 2);
+        
+        // Find full college name by abbreviation
+        String collegeName = CollegeManager.getCollegeNameByAbbreviation(collegeCode);
+        
+        if (collegeName != null) {
+            // Create edit dialog
+            JPanel editPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+            JTextField programNameField = new JTextField(currentProgramName);
+            JTextField programCodeField = new JTextField(currentProgramCode);
+            
+            editPanel.add(new JLabel("Program Name:"));
+            editPanel.add(programNameField);
+            editPanel.add(new JLabel("Program Abbreviation:"));
+            editPanel.add(programCodeField);
+            editPanel.add(new JLabel("College:"));
+            editPanel.add(new JLabel(collegeName + " (" + collegeCode + ")"));
+            
+            int result = JOptionPane.showConfirmDialog(
+                this,
+                editPanel,
+                "Edit Program",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+            );
+            
+            if (result == JOptionPane.OK_OPTION) {
+                String newProgramName = programNameField.getText().trim();
+                String newProgramCode = programCodeField.getText().trim();
+                
+                // Validate input
+                if (newProgramName.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Program name cannot be empty",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+                
+                try {
+                    // Attempt update
+                    if (CollegeManager.updateProgramName(
+                        collegeName,
+                        currentProgramName,
+                        newProgramName,
+                        newProgramCode
+                    )) {
+                        // Update table model
+                        model.setValueAt(newProgramName, modelRow, 1);
+                        model.setValueAt(newProgramCode, modelRow, 2);
+                        
+                        // Notify other components
+                        notifyCollegeTableOfChanges();
+                        
+                        // Success message
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Program updated successfully",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                    } else {
+                        throw new Exception("Failed to update program (possibly duplicate name)");
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Error updating program: " + e.getMessage(),
+                        "Update Failed",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    // Fallback refresh
+                    refreshProgramTable();
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(
+                this,
+                "Could not find college with code: " + collegeCode,
+                "Invalid College",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
+    } else {
+        JOptionPane.showMessageDialog(
+            this,
+            "Please select a program to edit first",
+            "No Selection",
+            JOptionPane.WARNING_MESSAGE
+        );
+    }
+}
 }
