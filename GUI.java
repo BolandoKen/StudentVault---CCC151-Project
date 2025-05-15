@@ -95,6 +95,10 @@ public class GUI extends JFrame {
             case "TABLE":
                 tablePanel.refreshTable();
                 break;
+            case "ADD_STUDENT":
+                AddStudent addStudentPanel = (AddStudent) cardPanel.getComponent(1);
+                addStudentPanel.getStudentForm().refreshCollegeData();
+                break;
             case "COLLEGETABLEPANEL":
                 collegeTablePanel.refreshCollegeTable();
                 break;
@@ -109,7 +113,7 @@ public class GUI extends JFrame {
         }
         cardLayout.show(cardPanel, panelName);
     }
-    public static void main(String[] args) {
+        public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -137,5 +141,6 @@ public class GUI extends JFrame {
         }
         return null;
     }
+    
     
 }

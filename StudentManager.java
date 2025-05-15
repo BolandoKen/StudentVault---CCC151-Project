@@ -7,18 +7,22 @@ class StudentManager {
     
     // Save a student to CSV
     public static void saveStudent(Student student) {
-        try (FileWriter fw = new FileWriter(FILE_PATH, true);
-             BufferedWriter bw = new BufferedWriter(fw);
-             PrintWriter pw = new PrintWriter(bw)) {
-             
-            // Check if file is empty, if so add header
-            if (new File(FILE_PATH).length() == 0) {
-                pw.println("First Name,Last Name,Gender,ID Number,Year Level,College,Program");
-            }
+        // Load existing students first
+        List<Student> existingStudents = loadStudents();
+        
+        try (PrintWriter pw = new PrintWriter(new FileWriter(FILE_PATH))) {
+            // Write header
+            pw.println("First Name,Last Name,Gender,ID Number,Year Level,College,Program");
             
+            // Write the NEW student first
             pw.println(student.toCSV());
             
-            // Reload college data after saving to ensure latest mappings are available
+            // Write all existing students after the new one
+            for (Student existingStudent : existingStudents) {
+                pw.println(existingStudent.toCSV());
+            }
+            
+            // Reload college data to ensure mappings are updated
             CollegeDataManager.loadFromCSV();
             
         } catch (IOException e) {

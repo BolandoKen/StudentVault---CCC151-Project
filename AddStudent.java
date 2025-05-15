@@ -2,10 +2,14 @@ import java.awt.*;
 import javax.swing.*;
 
 public class AddStudent extends JPanel {
+    private final StudentForm studentForm;  // Store the StudentForm instance
     
     public AddStudent(TablePanel tablePanel) {
         this.setLayout(new GridBagLayout());
         this.setBackground(Color.white);
+
+        // Create and store the StudentForm instance
+        this.studentForm = new StudentForm(tablePanel);
 
         GridBagConstraints gbcRow2 = new GridBagConstraints();
         gbcRow2.fill = GridBagConstraints.BOTH;
@@ -37,10 +41,12 @@ public class AddStudent extends JPanel {
         RoundedPanel formPanel = new RoundedPanel(10);
         formPanel.setLayout(new GridBagLayout());
         formPanel.setBackground(new Color(0xffffff));
-        formPanel.add(new StudentForm(tablePanel));
+        formPanel.add(studentForm);  // Use the stored instance
         formPanel.setPreferredSize(new Dimension(400, 300));
         bottomRow.add(formPanel, BorderLayout.CENTER);
+    }
 
-
+    public StudentForm getStudentForm() {
+        return studentForm;
     }
 }

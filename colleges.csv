@@ -12,6 +12,9 @@ Program: Bachelor of Science in Chemical Engineering: BSChe
 Program: Bachelor of Science in Metallurgical Engineering: BSMetE
 Program: Bachelor of Science in Civil Engineering: BSCE
 
+College: Test ADD
+Abbreviation: TA
+
 College: College of Science and Mathematics
 Abbreviation: CSM
 Program: Bachelor of Science in Physics: BSPhys
@@ -22,9 +25,6 @@ Program: Bachelor of Science in Chemistry: BSChem
 Program: Bachelor of Science in Biology (General): BSBio-Gen
 Program: Bachelor of Science in Mathematics: BSMath
 Program: Bachelor of Science in Biology (Botany): BSBio-Bot
-
-College: test college 2
-Abbreviation: TC2
 
 College: College of Economics, Business & Accountancy
 Abbreviation: CEBA
@@ -66,7 +66,4 @@ Program: Bachelor of Technical-Vocational Teacher Education (Drafting Technology
 Program: Bachelor of Secondary Education (Chemistry): BSEd-Chem
 Program: Bachelor of Secondary Education (Mathematics): BSEd-Math
 Program: Bachelor of Secondary Education (Physics): BSEd-Phys
-
-College: test college
-Abbreviation: TC
 
