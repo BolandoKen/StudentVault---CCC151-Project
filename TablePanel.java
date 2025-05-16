@@ -8,7 +8,6 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-
 public final class TablePanel extends JPanel {
     private JTable table;
     private final DefaultTableModel model;
@@ -379,56 +378,60 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
     }
 
     private void updateSortOrderOptions(String selectedCategory, JPanel sortPanel, Color backgroundColor, 
-                                       Color textColor, Font comboFont, int cornerRadius, 
-                                       Dimension comboSize, Color selectionColor) {
-        String[] options;
-        switch (selectedCategory) {
-            case "First Name":
-            case "Last Name":
-            case "College":
-            case "Program":
-                options = new String[]{"A-Z", "Z-A"};
-                break;
-            case "Gender":
-                options = new String[]{"Male → Female", "Female → Male"};
-                break;
-            case "ID Number":
-            case "Year Level":
-                options = new String[]{"Ascending", "Descending"};
-                break;
-            default:
-                options = new String[]{};
-        }
-        
-        sortPanel.remove(sortOrderBox);
-        
-        sortOrderBox = new RoundedComboBox(
-            options,
-            backgroundColor,
-            textColor,
-            comboFont,
-            cornerRadius,
-            comboSize,
-            "Select Order",
-            selectionColor
-        );
-        
-        final RoundedComboBox finalSortCategoryBox = (RoundedComboBox) sortPanel.getComponent(2);
-        sortOrderBox.addActionListener(orderEvent -> {
-            if (sortOrderBox.getSelectedIndex() > 0 || 
-                (sortOrderBox.getSelectedIndex() == 0 && !sortOrderBox.getItemAt(0).equals("Select Order"))) {
-                String category = (String) finalSortCategoryBox.getSelectedItem();
-                String order = (String) sortOrderBox.getSelectedItem();
-                if (category != null && order != null) {
+                                   Color textColor, Font comboFont, int cornerRadius, 
+                                   Dimension comboSize, Color selectionColor) {
+    String[] options;
+    switch (selectedCategory) {
+        case "First Name":
+        case "Last Name":
+        case "College":
+        case "Program":
+            options = new String[]{"A-Z", "Z-A", "Reset"};
+            break;
+        case "Gender":
+            options = new String[]{"Male → Female", "Female → Male", "Reset"};
+            break;
+        case "ID Number":
+        case "Year Level":
+            options = new String[]{"Ascending", "Descending", "Reset"};
+            break;
+        default:
+            options = new String[]{};
+    }
+    
+    sortPanel.remove(sortOrderBox);
+    
+    sortOrderBox = new RoundedComboBox(
+        options,
+        backgroundColor,
+        textColor,
+        comboFont,
+        cornerRadius,
+        comboSize,
+        "Select Order",
+        selectionColor
+    );
+    
+    final RoundedComboBox finalSortCategoryBox = (RoundedComboBox) sortPanel.getComponent(2);
+    sortOrderBox.addActionListener(orderEvent -> {
+        if (sortOrderBox.getSelectedIndex() > 0 || 
+            (sortOrderBox.getSelectedIndex() == 0 && !sortOrderBox.getItemAt(0).equals("Select Order"))) {
+            String category = (String) finalSortCategoryBox.getSelectedItem();
+            String order = (String) sortOrderBox.getSelectedItem();
+            if (category != null && order != null) {
+                if (order.equals("Reset")) {
+                    refreshTable(); // This will reset to original order
+                } else {
                     sortTable(category, order);
                 }
             }
-        });
-        
-        sortPanel.add(sortOrderBox);
-        sortPanel.revalidate();
-        sortPanel.repaint();
-    }
+        }
+    });
+    
+    sortPanel.add(sortOrderBox);
+    sortPanel.revalidate();
+    sortPanel.repaint();
+}
     
     private JPopupMenu createPopupMenu() {
         JPopupMenu popup = new JPopupMenu();
@@ -622,8 +625,10 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
     }
     
     private void sortTable(String category, String order) {
-        if (category == null || order == null) return;
-    
+    if (category == null || order == null || order.equals("Reset")) {
+        refreshTable();
+        return;
+    }
         int columnIndex = -1;
         switch (category) {
             case "First Name": columnIndex = 1; break;
