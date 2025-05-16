@@ -8,6 +8,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+
 public final class TablePanel extends JPanel {
     private JTable table;
     private final DefaultTableModel model;
@@ -559,55 +560,59 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
     }
     
     private void updateTableForPage(int page) {
-        model.setRowCount(0);
-    
-        // Use filteredStudents if filtering is active, otherwise use allStudents
-        List<Student> studentsToDisplay = isFiltered ? filteredStudents : allStudents;
-    
-        int startIndex = page * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, studentsToDisplay.size());
-        List<String> validColleges = CollegeDataManager.getAllColleges();
-    
-        for (int i = startIndex; i < endIndex; i++) {
-            Student student = studentsToDisplay.get(i);
-    
-            String college = student.getCollege();
-            String program = student.getProgram();
-    
-            String collegeDisplay = "N/A";
-            String programDisplay = "N/A";
-    
-            // Check if college exists
-            if (college != null && validColleges.contains(college)) {
-                collegeDisplay = CollegeDataManager.getCollegeAbbr(college);
-    
-                // Check if program exists in the college
-                List<String> collegePrograms = CollegeDataManager.getProgramsForCollege(college);
-                if (program != null && collegePrograms.contains(program)) {
-                    programDisplay = CollegeDataManager.getProgramAbbr(program);
-                }
+    model.setRowCount(0);
+
+    // Use filteredStudents if filtering is active, otherwise use allStudents
+    List<Student> studentsToDisplay = isFiltered ? filteredStudents : allStudents;
+
+    int startIndex = page * pageSize;
+    int endIndex = Math.min(startIndex + pageSize, studentsToDisplay.size());
+    List<String> validColleges = CollegeDataManager.getAllColleges();
+
+    for (int i = startIndex; i < endIndex; i++) {
+        Student student = studentsToDisplay.get(i);
+
+        String college = student.getCollege();
+        String program = student.getProgram();
+
+        String collegeDisplay = "N/A";
+        String programDisplay = "N/A";
+
+        // Check if college exists
+        if (college != null && validColleges.contains(college)) {
+            collegeDisplay = CollegeDataManager.getCollegeAbbr(college);
+
+            // Check if program exists in the college
+            List<String> collegePrograms = CollegeDataManager.getProgramsForCollege(college);
+            if (program != null && collegePrograms.contains(program)) {
+                programDisplay = CollegeDataManager.getProgramAbbr(program);
+            } else {
+                // If program doesn't exist, set both college and program to N/A
+                collegeDisplay = "N/A";
+                programDisplay = "N/A";
             }
-    
-            model.addRow(new Object[]{
-                false,
-                student.getFirstName(),
-                student.getLastName(),
-                student.getGender(),
-                student.getIdNumber(),
-                student.getYearLevel(),
-                collegeDisplay,
-                programDisplay
-            });
         }
-    
-        model.fireTableDataChanged();
-    
-        // Update pagination controls
-        int totalPages = (int) Math.ceil((double) studentsToDisplay.size() / pageSize);
-        pageInfoLabel.setText("Page " + (currentPage + 1) + " of " + totalPages);
-        previousButton.setEnabled(currentPage > 0);
-        nextButton.setEnabled(currentPage < totalPages - 1);
+
+        model.addRow(new Object[]{
+            false,
+            student.getFirstName(),
+            student.getLastName(),
+            student.getGender(),
+            student.getIdNumber(),
+            student.getYearLevel(),
+            collegeDisplay,
+            programDisplay
+        });
     }
+
+    model.fireTableDataChanged();
+
+    // Update pagination controls
+    int totalPages = (int) Math.ceil((double) studentsToDisplay.size() / pageSize);
+    pageInfoLabel.setText("Page " + (currentPage + 1) + " of " + totalPages);
+    previousButton.setEnabled(currentPage > 0);
+    nextButton.setEnabled(currentPage < totalPages - 1);
+}
     public JTable getTable() {
         return table;
     }
