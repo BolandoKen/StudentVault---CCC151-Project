@@ -494,8 +494,8 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
             String programAbbr = model.getValueAt(modelRow, 7).toString();
             
             // Get full names from abbreviations
-            String college = CollegeDataManager.getCollegeName(collegeAbbr);
-            String program = CollegeDataManager.getProgramName(programAbbr);
+            String college = CollegeManager.getCollegeName(collegeAbbr);
+            String program = CollegeManager.getProgramName(programAbbr);
     
             Student student = new Student(firstName, lastName, gender, idNumber, yearLevel, college, program);
             
@@ -553,7 +553,7 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
     }
 
     public void refreshTable() {
-        CollegeDataManager.loadFromCSV(); // Ensure data is up-to-date
+        CollegeManager.loadColleges(); // Ensure data is up-to-date
         allStudents = StudentManager.loadStudents();
         
         // Reset to first page when refreshing
@@ -570,7 +570,7 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
 
     int startIndex = page * pageSize;
     int endIndex = Math.min(startIndex + pageSize, studentsToDisplay.size());
-    List<String> validColleges = CollegeDataManager.getAllColleges();
+    List<String> validColleges = CollegeManager.getAllColleges();
 
     for (int i = startIndex; i < endIndex; i++) {
         Student student = studentsToDisplay.get(i);
@@ -583,12 +583,12 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
 
         // Check if college exists
         if (college != null && validColleges.contains(college)) {
-            collegeDisplay = CollegeDataManager.getCollegeAbbr(college);
+            collegeDisplay = CollegeManager.getCollegeAbbr(college);
 
             // Check if program exists in the college
-            List<String> collegePrograms = CollegeDataManager.getProgramsForCollege(college);
+            List<String> collegePrograms = CollegeManager.getProgramsForCollegeList(college);
             if (program != null && collegePrograms.contains(program)) {
-                programDisplay = CollegeDataManager.getProgramAbbr(program);
+                programDisplay = CollegeManager.getProgramAbbr(program);
             } else {
                 // If program doesn't exist, set both college and program to N/A
                 collegeDisplay = "N/A";
@@ -675,8 +675,8 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
             case 3: return student.getGender();
             case 4: return student.getIdNumber();
             case 5: return student.getYearLevel();
-            case 6: return CollegeDataManager.getCollegeAbbr(student.getCollege());
-            case 7: return CollegeDataManager.getProgramAbbr(student.getProgram());
+            case 6: return CollegeManager.getCollegeAbbr(student.getCollege());
+            case 7: return CollegeManager.getProgramAbbr(student.getProgram());
             default: return "";
         }
     }
@@ -715,8 +715,8 @@ bottomRow.add(paginationPanel, BorderLayout.SOUTH);
                     student.getGender(),
                     student.getIdNumber(),
                     student.getYearLevel(),
-                    CollegeDataManager.getCollegeAbbr(student.getCollege()),
-                    CollegeDataManager.getProgramAbbr(student.getProgram())
+                    CollegeManager.getCollegeAbbr(student.getCollege()),
+                    CollegeManager.getProgramAbbr(student.getProgram())
                 };
     
                 // Test if this student matches the filter

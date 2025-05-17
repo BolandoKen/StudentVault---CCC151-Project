@@ -43,7 +43,7 @@ public class ProgramsFilterDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 1;
         // Create a sorted list of colleges with "All Colleges" first
-        List<String> colleges = CollegeDataManager.getAllColleges();
+        List<String> colleges = CollegeManager.getAllColleges();
         Collections.sort(colleges);
         colleges.add(0, "All Colleges");
         
@@ -109,7 +109,7 @@ public class ProgramsFilterDialog extends JDialog {
         // College filter (column 0 in program table)
         if (selectedCollege != null && !selectedCollege.equals("All Colleges")) {
             // Get abbreviation if filtering by full name
-            String collegeAbbr = CollegeDataManager.getCollegeAbbr(selectedCollege);
+            String collegeAbbr = CollegeManager.getCollegeAbbr(selectedCollege);
             sorter.setRowFilter(RowFilter.regexFilter("^" + collegeAbbr.trim() + "$", 0));
         } else {
             sorter.setRowFilter(null);
@@ -120,7 +120,7 @@ public class ProgramsFilterDialog extends JDialog {
         String currentSelection = (String) collegeComboBox.getSelectedItem();
         
         // Create a sorted list of colleges with "All Colleges" first
-        List<String> colleges = CollegeDataManager.getAllColleges();
+        List<String> colleges = CollegeManager.getAllColleges();
         Collections.sort(colleges);
         colleges.add(0, "All Colleges");
         

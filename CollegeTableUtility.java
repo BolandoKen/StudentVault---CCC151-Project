@@ -1,7 +1,7 @@
+import java.awt.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.util.Map;
 
 public class CollegeTableUtility {
 
@@ -10,37 +10,29 @@ public class CollegeTableUtility {
      * @param table The JTable to populate
      * @return The populated JTable
      */
-    public static JTable populateCollegeTable(JTable table) {
-        // Create table model with column names
-        String[] columnNames = {"College Name", "College Code"};
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // Make table non-editable
-            }
-        };
-        
-        // Get college data from CollegeManager
-        Map<String, Map<String, Object>> collegeData = CollegeManager.loadColleges();
-        
-        // Populate table with college data
-        for (Map.Entry<String, Map<String, Object>> entry : collegeData.entrySet()) {
-            String collegeName = entry.getKey();
-            String collegeCode = (String) entry.getValue().get("abbreviation");
-            
-            // Add row to table model
-            model.addRow(new Object[]{collegeName, collegeCode});
+   public static JTable populateCollegeTable(JTable table) {
+    String[] columnNames = {"College Name", "College Code"};
+    DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
         }
-        
-        // Set the model to the table
-        table.setModel(model);
-        
-        // Set column widths for better display
-        table.getColumnModel().getColumn(0).setPreferredWidth(400);
-        table.getColumnModel().getColumn(1).setPreferredWidth(100);
-        
-        return table;
+    };
+    
+    // Use the new getAllColleges() method
+    List<String> colleges = CollegeManager.getAllColleges();
+    
+    for (String collegeName : colleges) {
+        String collegeCode = CollegeManager.getCollegeAbbr(collegeName);
+        model.addRow(new Object[]{collegeName, collegeCode});
     }
+    
+    table.setModel(model);
+    table.getColumnModel().getColumn(0).setPreferredWidth(400);
+    table.getColumnModel().getColumn(1).setPreferredWidth(100);
+    
+    return table;
+}
     
     /**
      * Creates a panel containing a JTable with college data

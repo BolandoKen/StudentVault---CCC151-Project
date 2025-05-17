@@ -26,24 +26,20 @@ public class FilterDialog extends JDialog {
     }
     
     private void initializeCollegePrograms() {
-        // Make sure the data is loaded
-        CollegeDataManager.loadFromCSV();
-        
         collegePrograms = new HashMap<>();
         
         // Add "All Colleges" as default option
         collegePrograms.put("All Colleges", Collections.singletonList("All Programs"));
         
-        // Get all colleges from CollegeDataManager
-        List<String> colleges = CollegeDataManager.getAllColleges();
+        // Get all colleges from CollegeManager
+        List<String> colleges = CollegeManager.getAllColleges();
         
         // For each college, get its programs
         for (String college : colleges) {
             List<String> programs = new ArrayList<>();
-            programs.add("All Programs"); // Add default option
-            programs.addAll(CollegeDataManager.getProgramsForCollege(college)); // Add all programs for this college
+            programs.add("All Programs");
+            programs.addAll(CollegeManager.getProgramsForCollegeList(college));
             
-            // Store in our map
             collegePrograms.put(college, programs);
         }
     }
@@ -192,15 +188,12 @@ public class FilterDialog extends JDialog {
         String selectedCollege = (String) collegeComboBox.getSelectedItem();
         String selectedProgram = (String) programComboBox.getSelectedItem();
         
-        // Debugging logs
         System.out.println("Selected Gender: " + selectedGender);
         System.out.println("Selected Year Level: " + selectedYearLevel);
         System.out.println("Selected College: " + selectedCollege);
         System.out.println("Selected Program: " + selectedProgram);
         
         JTable table = tablePanel.getTable();
-        
-        // Reset to first page when filtering
         tablePanel.resetPage();
         
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
@@ -208,40 +201,28 @@ public class FilterDialog extends JDialog {
             
         List<RowFilter<DefaultTableModel, Integer>> filters = new ArrayList<>();
         
-        // Gender filter (column 3)
         if (selectedGender != null && !selectedGender.equals("All Genders")) {
             filters.add(RowFilter.regexFilter("^" + selectedGender.trim() + "$", 3));
-            System.out.println("Added Gender Filter: " + selectedGender);
         }
         
-        // Year Level filter (column 5)
         if (selectedYearLevel != null && !selectedYearLevel.equals("All Year Levels")) {
             filters.add(RowFilter.regexFilter("^" + selectedYearLevel.trim() + "$", 5));
-            System.out.println("Added Year Level Filter: " + selectedYearLevel);
         }
         
-        // College filter (column 6)
         if (selectedCollege != null && !selectedCollege.equals("All Colleges")) {
-            // Get abbreviation if filtering by full name
-            String collegeAbbr = CollegeDataManager.getCollegeAbbr(selectedCollege);
+            String collegeAbbr = CollegeManager.getCollegeAbbr(selectedCollege);
             filters.add(RowFilter.regexFilter("^" + collegeAbbr.trim() + "$", 6));
-            System.out.println("Added College Filter (Abbreviation): " + collegeAbbr);
         }
         
-        // Program filter (column 7)
         if (selectedProgram != null && !selectedProgram.equals("All Programs")) {
-            // Get abbreviation if filtering by full name
-            String programAbbr = CollegeDataManager.getProgramAbbr(selectedProgram);
+            String programAbbr = CollegeManager.getProgramAbbr(selectedProgram);
             filters.add(RowFilter.regexFilter("^" + programAbbr.trim() + "$", 7));
-            System.out.println("Added Program Filter (Abbreviation): " + programAbbr);
         }
         
         if (!filters.isEmpty()) {
             sorter.setRowFilter(RowFilter.andFilter(filters));
-            System.out.println("Filters Applied: " + filters.size());
         } else {
             sorter.setRowFilter(null);
-            System.out.println("No Filters Applied");
         }
     }
 }

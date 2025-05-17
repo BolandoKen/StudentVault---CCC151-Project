@@ -6,67 +6,107 @@ public class CollegeManager {
     private static final String COLLEGES_FILE = "colleges.csv";
     private static Map<String, List<String>> collegePrograms = new HashMap<>();
     private static Map<String, Map<String, Object>> collegeDetails = new HashMap<>();
+// Add these at the class level (with other static maps)
+    private static Map<String, String> collegeToAbbr = new HashMap<>(); // From CollegeDataManager
+    private static Map<String, String> programToAbbr = new HashMap<>(); // From CollegeDataManager
+    private static Map<String, String> abbrToCollege = new HashMap<>(); // From CollegeDataManager
+    private static Map<String, String> abbrToProgram = new HashMap<>(); // From CollegeDataManager
 
+// Add these methods to CollegeManager
+public static String getCollegeAbbr(String college) {
+    return collegeToAbbr.getOrDefault(college, college);
+}
+
+public static String getProgramAbbr(String program) {
+    return programToAbbr.getOrDefault(program, program);
+}
+
+public static String getCollegeName(String abbr) {
+    return abbrToCollege.getOrDefault(abbr, abbr);
+}
+
+public static String getProgramName(String abbr) {
+    return abbrToProgram.getOrDefault(abbr, abbr);
+}
+
+public static List<String> getAllColleges() {
+    return new ArrayList<>(collegeToAbbr.keySet());
+}
+
+public static List<String> getProgramsForCollegeList(String college) {
+    return collegePrograms.getOrDefault(college, new ArrayList<>());
+}
+
+// Modify loadColleges() to populate all maps:
+public static Map<String, Map<String, Object>> loadColleges() {
+    // Clear all maps
+    collegeDetails.clear();
+    collegeToAbbr.clear();
+    programToAbbr.clear();
+    abbrToCollege.clear();
+    abbrToProgram.clear();
+    collegePrograms.clear();
     
-    // Load colleges and programs from CSV file
-    public static Map<String, Map<String, Object>> loadColleges() {
-        collegeDetails.clear();
-        Path path = Paths.get(COLLEGES_FILE);
-        
-        // Create the file if it doesn't exist
-        if (!Files.exists(path)) {
-            try {
-                initializeDefaultColleges();
-            } catch (IOException e) {
-                System.err.println("Error creating college file: " + e.getMessage());
-            }
+    Path path = Paths.get(COLLEGES_FILE);
+    
+    if (!Files.exists(path)) {
+        try {
+            initializeDefaultColleges();
+        } catch (IOException e) {
+            System.err.println("Error creating college file: " + e.getMessage());
         }
+    }
+    
+    try (BufferedReader reader = Files.newBufferedReader(path)) {
+        String line;
+        String currentCollege = null;
+        String currentCollegeAbbr = "";
         
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
-            String line;
-            String currentCollege = null;
-            String currentCollegeAbbr = "";
+        while ((line = reader.readLine()) != null) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
             
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty()) continue;
+            if (line.startsWith("College:")) {
+                currentCollege = line.substring(8).trim();
                 
-                if (line.startsWith("College:")) {
-                    currentCollege = line.substring(8).trim();
+                Map<String, Object> details = new HashMap<>();
+                details.put("programs", new HashMap<String, String>());
+                details.put("abbreviation", "");
+                collegeDetails.put(currentCollege, details);
+                collegePrograms.put(currentCollege, new ArrayList<>());
+            } else if (line.startsWith("Abbreviation:") && currentCollege != null) {
+                String abbr = line.substring("Abbreviation:".length()).trim();
+                collegeDetails.get(currentCollege).put("abbreviation", abbr);
+                collegeToAbbr.put(currentCollege, abbr);
+                abbrToCollege.put(abbr, currentCollege);
+            } else if (line.startsWith("Program:") && currentCollege != null) {
+                String programInfo = line.substring("Program:".length()).trim();
+                int separatorPos = programInfo.lastIndexOf(":");
+                
+                if (separatorPos > 0) {
+                    String programName = programInfo.substring(0, separatorPos).trim();
+                    String programAbbr = programInfo.substring(separatorPos + 1).trim();
                     
-                    // Initialize college with empty programs list and empty abbreviation
-                    Map<String, Object> details = new HashMap<>();
-                    details.put("programs", new HashMap<String, String>());
-                    details.put("abbreviation", "");
-                    collegeDetails.put(currentCollege, details);
-                } else if (line.startsWith("Abbreviation:") && currentCollege != null) {
-                    String abbr = line.substring("Abbreviation:".length()).trim();
-                    collegeDetails.get(currentCollege).put("abbreviation", abbr);
-                } else if (line.startsWith("Program:") && currentCollege != null) {
-                    String programInfo = line.substring("Program:".length()).trim();
-                    int separatorPos = programInfo.lastIndexOf(":");
-                    
-                    if (separatorPos > 0) {
-                        String programName = programInfo.substring(0, separatorPos).trim();
-                        String programAbbr = programInfo.substring(separatorPos + 1).trim();
-                        
-                        @SuppressWarnings("unchecked")
-                        Map<String, String> programs = (Map<String, String>) collegeDetails.get(currentCollege).get("programs");
-                        programs.put(programName, programAbbr);
-                    } else {
-                        // No abbreviation provided, use empty string
-                        @SuppressWarnings("unchecked")
-                        Map<String, String> programs = (Map<String, String>) collegeDetails.get(currentCollege).get("programs");
-                        programs.put(programInfo, "");
-                    }
+                    @SuppressWarnings("unchecked")
+                    Map<String, String> programs = (Map<String, String>) collegeDetails.get(currentCollege).get("programs");
+                    programs.put(programName, programAbbr);
+                    programToAbbr.put(programName, programAbbr);
+                    abbrToProgram.put(programAbbr, programName);
+                    collegePrograms.get(currentCollege).add(programName);
+                } else {
+                    @SuppressWarnings("unchecked")
+                    Map<String, String> programs = (Map<String, String>) collegeDetails.get(currentCollege).get("programs");
+                    programs.put(programInfo, "");
+                    collegePrograms.get(currentCollege).add(programInfo);
                 }
             }
-        } catch (IOException e) {
-            System.err.println("Error reading college file: " + e.getMessage());
         }
-        
-        return collegeDetails;
+    } catch (IOException e) {
+        System.err.println("Error reading college file: " + e.getMessage());
     }
+    
+    return collegeDetails;
+}
     
     // Save colleges and programs to CSV file
     public static void saveColleges() {
@@ -138,7 +178,6 @@ public class CollegeManager {
         }
         return "";
     }
-    
     
     // In CollegeManager.java
 public static boolean removeCollege(String collegeName) {

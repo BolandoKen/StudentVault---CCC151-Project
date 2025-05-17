@@ -23,7 +23,7 @@ class StudentManager {
             }
             
             // Reload college data to ensure mappings are updated
-            CollegeDataManager.loadFromCSV();
+            CollegeManager.loadColleges();
             
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null,
@@ -117,7 +117,7 @@ class StudentManager {
             }
             
             // Reload college data after updating
-            CollegeDataManager.loadFromCSV();
+            CollegeManager.loadColleges();
             
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null,
