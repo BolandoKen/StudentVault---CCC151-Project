@@ -1,0 +1,49 @@
+program_code,program_name,college_code
+BA-ELS,BBachelor of Arts in English Language Studies,CASS
+BA-FIL,Bachelor of Arts in Filipino,CASS
+BA-HIS-IH,Bachelor of Arts in History (International History Track),CASS
+BA-LCS,Bachelor of Arts in Literary and Cultural Studies,CASS
+BA-PAN,Bachelor of Arts in Panitikan,CASS
+BA-POLSCI,Bachelor of Arts in Political Science,CASS
+BA-PSY,Bachelor of Arts in Psychology,CASS
+BA-SOC,Bachelor of Arts in Sociology,CASS
+BEEd-Lang,Bachelor of Elementary Education (Language Education),CED
+BEEd-SciMath,Bachelor of Elementary Education (Science and Mathematics),CED
+BPEd,Bachelor of Physical Education,CED
+BS-ACC,Bachelor of Science in Accountancy,CEBA
+BS-ENT,Bachelor of Science in Entrepreneurship,CEBA
+BS-PHIL-AE,Bachelor of Science in Philosophy,CASS
+BS-PSY,Bachelor of Science in Psychology,CASS
+BSBA-BE,Bachelor of Science in Business Administration (Business Economics),CEBA
+BSBA-MM,Bachelor of Science in Business Administration (Marketing Management),CEBA
+BSBio-Bot,Bachelor of Science in Biology (Botany),CSM
+BSBio-Gen,Bachelor of Science in Biology (General),CSM
+BSBio-Mar,Bachelor of Science in Biology (Marine),CSM
+BSBio-Zoo,Bachelor of Science in Biology (Zoology),CSM
+BSCA,Bachelor of Science in Computer Application,CCS
+BSCE,Bachelor of Science in Civil Engineering,COE
+BSCerE,Bachelor of Science in Ceramic Engineering,COE
+BSChe,Bachelor of Science in Chemical Engineering,COE
+BSChem,Bachelor of Science in Chemistry,CSM
+BSCpE,Bachelor of Science in Computer Engineering,COE
+BSCS,Bachelor of Science in Computer Science,CCS
+BSECE,Bachelor of Science in Electronics & Communications Engineering,COE
+BSEd-Bio,Bachelor of Secondary Education (Biology),CED
+BSEd-Chem,Bachelor of Secondary Education (Chemistry),CED
+BSEd-Math,Bachelor of Secondary Education (Mathematics),CED
+BSEd-Phys,Bachelor of Secondary Education (Physics),CED
+BSEE,Bachelor of Science in Electrical Engineering,COE
+BSEnET,Bachelor of Science in Environmental Engineering,COE
+BSHM,Bachelor of Science in Hospitality Management,CEBA
+BSIS,Bachelor of Science in Information Systems,CCS
+BSIT,Bachelor of Science in Information Technology,CCS
+BSMath,Bachelor of Science in Mathematics,CSM
+BSME,Bachelor of Science in Mechanical Engineering,COE
+BSMetE,Bachelor of Science in Metallurgical Engineering,COE
+BSMine,Bachelor of Science in Mining Engineering,COE
+BSPhys,Bachelor of Science in Physics,CSM
+BSStat,Bachelor of Science in Statistics,CSM
+BTLED-HE,Bachelor of Technology and Livelihood Education (Home Economics),CED
+BTLed-IA,Bachelor of Technology and Livelihood Education (Industrial Arts),CED
+BTVTED-DT,Bachelor of Technical-Vocational Teacher Education (Drafting Technology),CED
+DCET,Diploma in Chemical Engineering Technology,COE

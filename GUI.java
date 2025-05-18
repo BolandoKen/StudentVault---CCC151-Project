@@ -4,9 +4,12 @@ import javax.swing.*;
 public class GUI extends JFrame {
     private final CardLayout cardLayout;
     private final JPanel cardPanel;
-    private final TablePanel tablePanel;
-    private final CollegeTablePanel collegeTablePanel;
-    private final ProgramTablePanel programTablePanel;
+    //private final PSearchPanel searchPanel;
+    //private final PAddStudentPanel addStudentPanel;
+    private final PStudentTablePanel studentTablePanel;
+    private final PCollegeTablePanel collegeTablePanel;
+    private final PProgramTablePanel programTablePanel;
+    private final CProgramTable programTable = null;
     
     public GUI() {
         // Frame settings
@@ -28,9 +31,9 @@ public class GUI extends JFrame {
         cardPanel.setBackground(new Color(0xE7E7E7));
         
         // Create table panels
-        tablePanel = new TablePanel();
-        collegeTablePanel = new CollegeTablePanel();
-        programTablePanel = new ProgramTablePanel();
+        studentTablePanel = new PStudentTablePanel();
+        collegeTablePanel = new PCollegeTablePanel();
+        //programTablePanel = new ProgramTablePanel();
         
         // Create the main table view with search panel
         JPanel tableView = new JPanel(new GridBagLayout());
@@ -41,15 +44,15 @@ public class GUI extends JFrame {
         gbc.weightx = 1.0;
         
         // Add search panel
-        SearchPanel searchPanel = new SearchPanel();
-        searchPanel.setTablePanel(tablePanel);
+        //searchPanel = new PSearchPanel();
+        //searchPanel.setTablePanel(tablePanel);
         
         gbc.gridy = 0;
         gbc.weighty = 0.02;
-        tableView.add(searchPanel, gbc);
+        //tableView.add(searchPanel, gbc);
         
         // Add table with scroll pane
-        JScrollPane tableScrollPane = new JScrollPane(tablePanel);
+        JScrollPane tableScrollPane = new JScrollPane(studentTablePanel);
         tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         tableScrollPane.getVerticalScrollBar().setUnitIncrement(20);
@@ -61,16 +64,17 @@ public class GUI extends JFrame {
         tableView.add(tableScrollPane, gbc);
         
         // Create add student panel
-        JPanel addStudentPanel = new AddStudent(tablePanel);
+        //addStudentPanel = new PAddStudentPanel(this, tablePanel);
+        this.programTablePanel = new PProgramTablePanel();
         
         // Add all panels to card layout
         cardPanel.add(tableView, "TABLE");
-        cardPanel.add(addStudentPanel, "ADD_STUDENT");
+        //cardPanel.add(addStudentPanel, "ADD_STUDENT");
         cardPanel.add(collegeTablePanel, "COLLEGETABLEPANEL");
         cardPanel.add(programTablePanel, "PROGRAMTABLEPANEL");
         
         // Create side panel
-        SidePanel sidePanel = new SidePanel(this);
+        PSidePanel sidePanel = new PSidePanel(this);
         
         // Layout setup
         GridBagConstraints mainGbc = new GridBagConstraints();
@@ -93,27 +97,18 @@ public class GUI extends JFrame {
         // Refresh data before showing the panel if needed
         switch (panelName) {
             case "TABLE":
-                tablePanel.refreshTable();
-                break;
-            case "ADD_STUDENT":
-                AddStudent addStudentPanel = (AddStudent) cardPanel.getComponent(1);
-                addStudentPanel.getStudentForm().refreshCollegeData();
+                studentTablePanel.getStudentTableComponent().refreshTable(); 
                 break;
             case "COLLEGETABLEPANEL":
-                collegeTablePanel.refreshCollegeTable();
+               collegeTablePanel.getCollegeTableComponent().refreshTable();
                 break;
             case "PROGRAMTABLEPANEL":
-                programTablePanel.refreshProgramTable();
-                // Refresh the filter dialog when switching to program panel
-                ProgramsFilterDialog filterDialog = programTablePanel.getFilterDialog();
-                if (filterDialog != null && filterDialog.isVisible()) {
-                    filterDialog.refreshCollegeList();
-                }
+                programTablePanel.getProgramTable().refreshData();
                 break;
         }
         cardLayout.show(cardPanel, panelName);
     }
-        public static void main(String[] args) {
+    public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -124,22 +119,13 @@ public class GUI extends JFrame {
     }
     
     // Getter methods for accessing panels if needed
-    public CollegeTablePanel getCollegeTablePanel() {
+    
+    public PCollegeTablePanel getCollegeTablePanel() {
         return collegeTablePanel;
     }
     
-    public ProgramTablePanel getProgramTablePanel() {
+    public PProgramTablePanel getProgramTablePanel() {
         return programTablePanel;
-    }
-    
-    public TablePanel getTablePanel() {
-        return tablePanel;
-    }
-    public ProgramsFilterDialog getProgramsFilterDialog() {
-        if (programTablePanel != null) {
-            return programTablePanel.getFilterDialog(); // You'll need to add this getter
-        }
-        return null;
     }
     
     
