@@ -9,11 +9,12 @@ public final class PCollegeTablePanel extends JPanel {
     private JButton confirmDeleteButton;
     private JPanel buttonsPanel;
     private JButton editButton;
+    private JButton sortButton;
     private CSearchPanels.CollegeSearchPanel searchPanel;
 
     public PCollegeTablePanel() {
         collegeTable = new CCollegeTable();
-
+        
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -139,9 +140,31 @@ public final class PCollegeTablePanel extends JPanel {
         collegeText.setFont(new Font("Helvetica", Font.BOLD, 32));
         JPanel textContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
         textContainer.setOpaque(false);
-
         textContainer.add(collegeText);
+
+        sortButton = new JButton(new ImageIcon("Assets/DecendingIcon.png"));
+        sortButton.setBorderPainted(false);
+        sortButton.setFocusPainted(false);
+        sortButton.setContentAreaFilled(false);
+
+        // Change your sort button action listener to:
+sortButton.addActionListener(e -> {
+    collegeTable.toggleSorting();
+    
+    // Update button icon based on sort state
+    if (collegeTable.getTable().getRowSorter() == null) {
+        sortButton.setIcon(new ImageIcon("Assets/SortDisabledIcon.png"));
+    } else {
+        sortButton.setIcon(new ImageIcon(
+            collegeTable.getCurrentSortOrder() == SortOrder.ASCENDING 
+            ? "Assets/AscendingIcon.png" 
+            : "Assets/DecendingIcon.png"
+        ));
+    }
+});
+        textContainer.add(sortButton);
         leftPanel.add(textContainer, BorderLayout.SOUTH);
+        
 
         JPanel bottomRow = new JPanel(new BorderLayout());
         bottomRow.setOpaque(false); 

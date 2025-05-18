@@ -2,7 +2,8 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
-import javax.swing.RowFilter;
+
+import java.util.Collections;
 import java.util.Map;
 
 public class CCollegeTable extends JPanel {
@@ -11,6 +12,8 @@ public class CCollegeTable extends JPanel {
     private TableRowSorter<DefaultTableModel> sorter;
     private JTextField searchField;
     private JComboBox<String> searchColumnComboBox;
+    private boolean isSorted = false;
+    private SortOrder currentSortOrder = SortOrder.ASCENDING;
 
     public CCollegeTable() {
         setLayout(new BorderLayout());
@@ -26,11 +29,11 @@ public class CCollegeTable extends JPanel {
             }
         };
         
-        // Create table with the model
         table = new JTable(tableModel);
         
-        // Create and add the sorter for search filtering
         sorter = new TableRowSorter<>(tableModel);
+        sorter.setSortable(0, true);  
+        sorter.setSortable(1, true);  
         table.setRowSorter(sorter);
         
         table.setRowHeight(25);
@@ -67,15 +70,12 @@ public class CCollegeTable extends JPanel {
         searchPanel.add(searchButton);
         searchPanel.add(clearButton);
         
-        add(searchPanel, BorderLayout.NORTH);
+        //add(searchPanel, BorderLayout.NORTH);
         
         // Load college data
         loadCollegeData();
     }
     
-    /**
-     * Performs the search based on the search field and column selection
-     */
     private void performSearch() {
         String searchText = searchField.getText().toLowerCase().trim();
         if (searchText.isEmpty()) {
@@ -108,23 +108,12 @@ public class CCollegeTable extends JPanel {
         }
     }
     
-    /**
-     * Search by a specific term in all columns
-     * 
-     * @param searchTerm The term to search for
-     */
     public void searchAllColumns(String searchTerm) {
         searchField.setText(searchTerm);
         searchColumnComboBox.setSelectedIndex(0); // All columns
         performSearch();
     }
     
-    /**
-     * Search in a specific column
-     * 
-     * @param searchTerm The term to search for
-     * @param columnName The name of the column to search in ("College Code" or "College Name")
-     */
     public void searchByColumn(String searchTerm, String columnName) {
         searchField.setText(searchTerm);
         
@@ -140,17 +129,11 @@ public class CCollegeTable extends JPanel {
         performSearch();
     }
     
-    /**
-     * Clear the current search and show all rows
-     */
     public void clearSearch() {
         searchField.setText("");
         performSearch();
     }
     
-    /**
-     * Loads college data from CSV using CollegeDataManager
-     */
     private void loadCollegeData() {
         // Clear existing data
         tableModel.setRowCount(0);
@@ -171,9 +154,6 @@ public class CCollegeTable extends JPanel {
             });
     }
     
-    /**
-     * Refreshes the table data while maintaining selection and search state
-     */
     public void refreshTable() {
         // Save current selection and search state
         int selectedRow = table.getSelectedRow();
@@ -214,18 +194,10 @@ public class CCollegeTable extends JPanel {
         }
     }
     
-    /**
-     * Get the JTable component
-     * @return The JTable
-     */
     public JTable getTable() {
         return table;
     }
     
-    /**
-     * Get the code of the currently selected college
-     * @return The selected college code, or null if none selected
-     */
     public String getSelectedCollegeCode() {
         int viewRow = table.getSelectedRow();
         if (viewRow < 0) {
@@ -237,19 +209,39 @@ public class CCollegeTable extends JPanel {
         return (String) tableModel.getValueAt(modelRow, 0);
     }
     
-    /**
-     * Get the search field component
-     * @return The search field JTextField
-     */
     public JTextField getSearchField() {
         return searchField;
     }
     
-    /**
-     * Get the search column combo box component
-     * @return The column selection JComboBox
-     */
     public JComboBox<String> getSearchColumnComboBox() {
+
         return searchColumnComboBox;
     }
+public void toggleSorting() {
+    if (!isSorted) {
+        // Enable sorting
+        table.setRowSorter(sorter);
+        // Sort by first column (College Code) by default
+        sorter.setSortKeys(Collections.singletonList(
+            new RowSorter.SortKey(0, currentSortOrder)
+        ));
+        isSorted = true;
+    } else {
+        // Toggle sort direction
+        currentSortOrder = currentSortOrder == SortOrder.ASCENDING 
+                         ? SortOrder.DESCENDING 
+                         : SortOrder.ASCENDING;
+        sorter.setSortKeys(Collections.singletonList(
+            new RowSorter.SortKey(0, currentSortOrder)
+        ));
+    }
+    
+    // Update the UI to reflect changes
+    sorter.sort();
+}
+
+public SortOrder getCurrentSortOrder() {
+    return currentSortOrder;
+}
+
 }
