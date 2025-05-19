@@ -1,5 +1,7 @@
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 public class PStudentTablePanel extends JPanel{
     private CStudentTable studentTable;
@@ -8,7 +10,9 @@ public class PStudentTablePanel extends JPanel{
     private JButton confirmDeleteButton;
     private JPanel buttonsPanel;
     private JButton editButton;
-
+    private JButton sortButton;
+    private JComboBox<String> sortByBox;
+    private CSearchPanels.StudentSearchPanel searchPanel;
     public PStudentTablePanel() {
         studentTable = new CStudentTable();
 
@@ -22,8 +26,50 @@ public class PStudentTablePanel extends JPanel{
         gbc.gridy = 0;
         gbc.weighty = 0.02;
 
-       
-        //searchPanelContainer.add(searchPanel, BorderLayout.NORTH);
+        searchPanel = new CSearchPanels.StudentSearchPanel(searchParams -> {
+    String searchText = searchParams[0].toLowerCase();
+    String columnName = searchParams[1];
+
+    // Get the existing sorter from CStudentTable instead of creating a new one
+    TableRowSorter<DefaultTableModel> sorter;
+    
+    // If the table is already sorted, use that sorter, otherwise create a temporary one
+    if (studentTable.isSorted()) {
+        sorter = (TableRowSorter<DefaultTableModel>) studentTable.getTable().getRowSorter();
+    } else {
+        // Create a new sorter and apply it
+        DefaultTableModel model = (DefaultTableModel) studentTable.getTable().getModel();
+        sorter = new TableRowSorter<>(model);
+        studentTable.getTable().setRowSorter(sorter);
+    }
+
+    // Apply the filter to the existing sorter
+    if (searchText.isEmpty()) {
+        sorter.setRowFilter(null);
+    } else {
+        if ("All".equals(columnName)) {
+            sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
+        } else {
+            // Map column names to column indices
+            int columnIndex = -1;
+            switch (columnName) {
+                case "ID Number": columnIndex = 0; break;
+                case "First Name": columnIndex = 1; break;
+                case "Last Name": columnIndex = 2; break;
+                case "Gender": columnIndex = 3; break;
+                case "Year Level": columnIndex = 4; break;
+                case "Program Code": columnIndex = 5; break;
+            }
+            if (columnIndex >= 0) {
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
+            }
+        }
+    }
+    
+    // Update sort button icon to reflect current state
+    updateSortButtonIcon();
+});
+        searchPanelContainer.add(searchPanel, BorderLayout.NORTH);
         this.add(searchPanelContainer, gbc);
 
         JPanel topRow = new JPanel(new GridBagLayout());
@@ -61,6 +107,31 @@ public class PStudentTablePanel extends JPanel{
         buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 5));
         buttonsPanel.setOpaque(false);
         rightPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
+        JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        sortPanel.setOpaque(false);
+
+        // Create the sort by combobox
+        JLabel sortByLabel = new JLabel("Sort by:");
+        sortByBox = new JComboBox<>(new String[]{"ID-Number", "First Name", "Last Name", "Gender", "Year Level", "Program Code"});
+        
+        // Create the sort button
+        sortButton = new JButton(new ImageIcon("Assets/DecendingIcon.png"));
+        sortButton.setBorderPainted(false);
+        sortButton.setFocusPainted(false);
+        sortButton.setContentAreaFilled(false);
+
+        sortButton.addActionListener(e -> {
+            System.out.println("Sort button clicked");
+            int columnIndex = sortByBox.getSelectedIndex();
+            studentTable.toggleSorting(columnIndex);
+            updateSortButtonIcon();
+        });
+        
+        // Add sort components to panel
+        sortPanel.add(sortByLabel);
+        sortPanel.add(sortByBox);
+        sortPanel.add(sortButton);
 
         JButton addCollegeButton = new JButton(new ImageIcon("Assets/PlusIcon.png"));
         addCollegeButton.setBorderPainted(false);
@@ -112,8 +183,6 @@ public class PStudentTablePanel extends JPanel{
             } 
         });
         
-        
-
         buttonsPanel.add(addCollegeButton);
         buttonsPanel.add(deleteButton);
         buttonsPanel.add(editButton);
@@ -124,6 +193,7 @@ public class PStudentTablePanel extends JPanel{
         textContainer.setOpaque(false);
 
         textContainer.add(collegeText);
+        textContainer.add(sortPanel);
         leftPanel.add(textContainer, BorderLayout.SOUTH);
 
         JPanel bottomRow = new JPanel(new BorderLayout());
@@ -138,9 +208,20 @@ public class PStudentTablePanel extends JPanel{
         bottomRow.add(scrollPane, BorderLayout.CENTER);
     }
     // In PStudentTablePanel.java
-public CStudentTable getStudentTableComponent() {
-    return studentTable;
-}
+    public CStudentTable getStudentTableComponent() {
+        return studentTable;
+    }
+    private void updateSortButtonIcon() {
+        if (!studentTable.isSorted()) {
+            sortButton.setIcon(new ImageIcon("Assets/SortDisabledIcon.png"));
+        } else {
+         sortButton.setIcon(new ImageIcon(
+            studentTable.getCurrentSortOrder() == SortOrder.ASCENDING 
+            ? "Assets/AscendingIcon.png" 
+            : "Assets/DecendingIcon.png"
+         ));
+        }
+    }
     
   
    

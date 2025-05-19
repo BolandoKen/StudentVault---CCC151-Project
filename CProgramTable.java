@@ -147,26 +147,14 @@ public class CProgramTable extends JPanel {
         sorter.sort();
     }
     
-    /**
-     * Get the current sort order
-     * @return The current sort order
-     */
     public SortOrder getCurrentSortOrder() {
         return currentSortOrder;
     }
     
-    /**
-     * Get the current sort column index
-     * @return The current sort column index
-     */
     public int getCurrentSortColumn() {
         return currentSortColumn;
     }
     
-    /**
-     * Check if the table is currently sorted
-     * @return true if the table is sorted, false otherwise
-     */
     public boolean isSorted() {
         return isSorted;
     }

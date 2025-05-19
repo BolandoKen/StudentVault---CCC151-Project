@@ -5,6 +5,7 @@ import javax.swing.table.TableRowSorter;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class CStudentTable extends JPanel {
     private JTable table;
@@ -13,20 +14,23 @@ public class CStudentTable extends JPanel {
     private JTextField searchField;
     private JComboBox<String> searchColumnComboBox;
     private List<String> columnNames;
+    private boolean isSorted = false;
+    private SortOrder currentSortOrder = SortOrder.ASCENDING;
+    private int currentSortColumn = 0; // Default sort column (ID Number)
+
 
     public CStudentTable() {
         setLayout(new BorderLayout());
         
         // Define column headers based on Students.csv structure
-columnNames = new ArrayList<>();
-columnNames.add("ID Number");
-columnNames.add("First Name");
-columnNames.add("Last Name");
-columnNames.add("Gender");
-columnNames.add("Year Level");
-columnNames.add("Program Code");
+        columnNames = new ArrayList<>();
+        columnNames.add("ID Number");
+        columnNames.add("First Name");
+        columnNames.add("Last Name");
+        columnNames.add("Gender");
+        columnNames.add("Year Level");
+        columnNames.add("Program Code");
         
-        // Create a table model that doesn't allow cell editing
         tableModel = new DefaultTableModel(columnNames.toArray(new String[0]), 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -34,22 +38,23 @@ columnNames.add("Program Code");
             }
         };
         
-        // Create table with the model
         table = new JTable(tableModel);
-        
-        // Create and add the sorter for search filtering
+
         sorter = new TableRowSorter<>(tableModel);
-        table.setRowSorter(sorter);
+        sorter.setSortable(0, true);  // ID Number
+        sorter.setSortable(1, true);  // First Name
+        sorter.setSortable(2, true);  // Last Name
+        sorter.setSortable(3, true);  // Gender
+        sorter.setSortable(4, true);  // Year Level
+        sorter.setSortable(5, true);  // Program Code
         
-        // Set table appearance
         table.setRowHeight(25);
         table.setFont(new Font("Helvetica", Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font("Helvetica", Font.BOLD, 14));
         
-        // Add the table to a scroll pane
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
-        
+
         // Create the search panel
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         
@@ -81,15 +86,14 @@ columnNames.add("Program Code");
         searchPanel.add(searchButton);
         searchPanel.add(clearButton);
         
-        add(searchPanel, BorderLayout.NORTH);
+        //add(searchPanel, BorderLayout.NORTH);
         
         // Load student data
+        
+       
         loadStudentData();
     }
     
-    /**
-     * Performs the search based on the search field and column selection
-     */
     private void performSearch() {
         String searchText = searchField.getText().toLowerCase().trim();
         if (searchText.isEmpty()) {
@@ -99,7 +103,7 @@ columnNames.add("Program Code");
         
         int selectedIndex = searchColumnComboBox.getSelectedIndex();
         
-        if (selectedIndex == 0) { // All Columns
+        if (selectedIndex == 0) { 
             RowFilter<DefaultTableModel, Integer> filter = new RowFilter<DefaultTableModel, Integer>() {
                 @Override
                 public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
@@ -120,45 +124,28 @@ columnNames.add("Program Code");
         }
     }
     
-    /**
-     * Search in a specific column
-     * 
-     * @param searchTerm The term to search for
-     * @param columnName The name of the column to search in
-     */
     public void searchByColumn(String searchTerm, String columnName) {
         searchField.setText(searchTerm);
         
-        // Find the column index by name
         for (int i = 0; i < columnNames.size(); i++) {
             if (columnNames.get(i).equals(columnName)) {
-                searchColumnComboBox.setSelectedIndex(i + 1); // +1 because "All Columns" is at index 0
-                break;
+                searchColumnComboBox.setSelectedIndex(i + 1); 
             }
         }
         
         performSearch();
     }
     
-    /**
-     * Clear the current search and show all rows
-     */
     public void clearSearch() {
         searchField.setText("");
         performSearch();
     }
     
-    /**
-     * Loads student data from CSV using StudentDataManager
-     */
     private void loadStudentData() {
-        // Clear existing data
         tableModel.setRowCount(0);
         
-        // Get student data from StudentDataManager
         List<Student> students = StudentDataManager.loadStudents();
         
-        // Add each student to the table
         for (Student student : students) {
             Object[] rowData = {
                 student.getIdNumber(),
@@ -167,34 +154,46 @@ columnNames.add("Program Code");
                 student.getGender(),
                 student.getYearLevel(),
                 student.getProgramCode()
-                // Removed programName, collegeName, and collegeCode
             };
             tableModel.addRow(rowData);
         }
     }
     
-    /**
-     * Refreshes the table data while maintaining selection and search state
-     */
     public void refreshTable() {
-        // Save current selection and search state
         int selectedRow = table.getSelectedRow();
         String selectedId = selectedRow >= 0 ? (String) table.getValueAt(selectedRow, table.convertColumnIndexToView(0)) : null;
         
         String currentSearch = searchField.getText();
         int currentSearchColumn = searchColumnComboBox.getSelectedIndex();
-
+    
+        // Save the current sort state
+        boolean wasSorted = isSorted;
+        int sortColumn = currentSortColumn;
+        SortOrder sortOrder = currentSortOrder;
+        
         Cursor oldCursor = getCursor();
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         
         try {
-            // Clear current filters
-            sorter.setRowFilter(null);
+            // Clear any filtering/sorting temporarily
+            if (wasSorted) {
+                table.setRowSorter(null);
+                isSorted = false;
+            }
             
             // Reload data
             loadStudentData();
             
-            // Restore selection if possible
+            // Restore sorting if it was active
+            if (wasSorted) {
+                table.setRowSorter(sorter);
+                sorter.setSortKeys(Collections.singletonList(
+                    new RowSorter.SortKey(sortColumn, sortOrder)
+                ));
+                isSorted = true;
+                sorter.sort();
+            }
+            
             if (selectedId != null) {
                 for (int i = 0; i < table.getRowCount(); i++) {
                     if (selectedId.equals(table.getValueAt(i, table.convertColumnIndexToView(0)))) {
@@ -204,54 +203,71 @@ columnNames.add("Program Code");
                 }
             }
             
-            // Restore search if there was one
             if (!currentSearch.isEmpty()) {
                 searchField.setText(currentSearch);
                 searchColumnComboBox.setSelectedIndex(currentSearchColumn);
                 performSearch();
             }
         } finally {
-            // Restore cursor
             setCursor(oldCursor);
         }
     }
     
-    /**
-     * Get the JTable component
-     * @return The JTable
-     */
     public JTable getTable() {
         return table;
     }
     
-    /**
-     * Get the ID of the currently selected student
-     * @return The selected student ID, or null if none selected
-     */
     public String getSelectedStudentId() {
         int viewRow = table.getSelectedRow();
         if (viewRow < 0) {
             return null;
         }
         
-        // Convert view row index to model row index
         int modelRow = table.convertRowIndexToModel(viewRow);
         return (String) tableModel.getValueAt(modelRow, 0);
     }
     
-    /**
-     * Get the search field component
-     * @return The search field JTextField
-     */
     public JTextField getSearchField() {
         return searchField;
     }
     
-    /**
-     * Get the search column combo box component
-     * @return The column selection JComboBox
-     */
     public JComboBox<String> getSearchColumnComboBox() {
         return searchColumnComboBox;
     }
+
+    public void toggleSorting(int columnIndex) {
+    currentSortColumn = columnIndex;
+    
+    if (!isSorted) {
+        // Enable sorting
+        table.setRowSorter(sorter);
+        sorter.setSortKeys(Collections.singletonList(
+            new RowSorter.SortKey(currentSortColumn, currentSortOrder)
+        ));
+        isSorted = true;
+    } else {
+        // Toggle sort direction
+        currentSortOrder = currentSortOrder == SortOrder.ASCENDING 
+                         ? SortOrder.DESCENDING 
+                         : SortOrder.ASCENDING;
+        sorter.setSortKeys(Collections.singletonList(
+            new RowSorter.SortKey(currentSortColumn, currentSortOrder)
+        ));
+    }
+    
+    // Update the UI to reflect changes
+    sorter.sort();
+}
+
+public SortOrder getCurrentSortOrder() {
+    return currentSortOrder;
+}
+
+public int getCurrentSortColumn() {
+    return currentSortColumn;
+}
+
+public boolean isSorted() {
+    return isSorted;
+}
 }

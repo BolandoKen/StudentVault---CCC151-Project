@@ -110,17 +110,15 @@ public final class PProgramTablePanel extends JPanel {
         JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         sortPanel.setOpaque(false);
 
-        // Create the sort by combobox
+
         JLabel sortByLabel = new JLabel("Sort by:");
         sortByBox = new JComboBox<>(new String[]{"Program Name", "Program Code", "College Code"});
         
-        // Create the sort button
         sortButton = new JButton(new ImageIcon("Assets/DecendingIcon.png"));
         sortButton.setBorderPainted(false);
         sortButton.setFocusPainted(false);
         sortButton.setContentAreaFilled(false);
 
-        // Add action listener to sort button
         sortButton.addActionListener(e -> {
             System.out.println("Sort button clicked");
             int columnIndex = sortByBox.getSelectedIndex();
@@ -128,7 +126,6 @@ public final class PProgramTablePanel extends JPanel {
             updateSortButtonIcon();
         });
         
-        // Add sort components to panel
         sortPanel.add(sortByLabel);
         sortPanel.add(sortByBox);
         sortPanel.add(sortButton);
@@ -138,7 +135,6 @@ public final class PProgramTablePanel extends JPanel {
         addProgramButton.setFocusPainted(false);
         addProgramButton.setContentAreaFilled(false);
         addProgramButton.setBackground(new Color(0xE7E7E7));
-
         addProgramButton.addActionListener(e -> {
             Dialogs.addProgramDialog(programTable);
         });
@@ -147,7 +143,6 @@ public final class PProgramTablePanel extends JPanel {
         deleteButton.setBorderPainted(false);
         deleteButton.setFocusPainted(false);
         deleteButton.setContentAreaFilled(false);
-
         deleteButton.addActionListener(e -> {
             JTable table = programTable.getTable();
             int selectedRow = table.getSelectedRow();
@@ -196,7 +191,7 @@ public final class PProgramTablePanel extends JPanel {
         leftPanel.add(textContainer, BorderLayout.SOUTH);
 
         JPanel bottomRow = new JPanel(new BorderLayout());
-        bottomRow.setOpaque(false); // Changed from RED to transparent
+        bottomRow.setOpaque(false); 
         gbc.gridy = 2;
         gbc.weighty = 0.9;
         this.add(bottomRow, gbc);
@@ -205,9 +200,6 @@ public final class PProgramTablePanel extends JPanel {
         bottomRow.add(scrollPane, BorderLayout.CENTER);
     }
     
-    /**
-     * Updates the sort button icon based on the current sort state
-     */
     private void updateSortButtonIcon() {
         if (!programTable.isSorted()) {
             sortButton.setIcon(new ImageIcon("Assets/SortDisabledIcon.png"));
