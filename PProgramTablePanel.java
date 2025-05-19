@@ -28,32 +28,44 @@ public final class PProgramTablePanel extends JPanel {
         gbc.weighty = 0.02;
 
         searchPanel = new CSearchPanels.ProgramSearchPanel(searchParams -> {
-        String searchText = searchParams[0].toLowerCase();
-        String columnName = searchParams[1];
+            String searchText = searchParams[0].toLowerCase();
+            String columnName = searchParams[1];
     
-    // Filter the table based on search parameters
-        DefaultTableModel model = (DefaultTableModel) programTable.getTable().getModel();
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
-        programTable.getTable().setRowSorter(sorter);
-    
-        if (searchText.isEmpty()) {
-            sorter.setRowFilter(null);
-        } else {
-            if ("All".equals(columnName)) {
-            sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
+            // Get the existing sorter from CProgramTable instead of creating a new one
+            TableRowSorter<DefaultTableModel> sorter;
+            
+            // If the table is already sorted, use that sorter, otherwise create a temporary one
+            if (programTable.isSorted()) {
+                sorter = (TableRowSorter<DefaultTableModel>) programTable.getTable().getRowSorter();
             } else {
-            // Map column names to column indices
-                int columnIndex = -1;
-                switch (columnName) {
-                case "Program Name": columnIndex = 0; break;
-                case "Program Code": columnIndex = 1; break;
-                case "College Code": columnIndex = 2; break;
-                }
-            if (columnIndex >= 0) {
-                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
-                     }
-                 }
+                // Create a new sorter and apply it
+                DefaultTableModel model = (DefaultTableModel) programTable.getTable().getModel();
+                sorter = new TableRowSorter<>(model);
+                programTable.getTable().setRowSorter(sorter);
             }
+    
+            // Apply the filter to the existing sorter
+            if (searchText.isEmpty()) {
+                sorter.setRowFilter(null);
+            } else {
+                if ("All".equals(columnName)) {
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
+                } else {
+                    // Map column names to column indices
+                    int columnIndex = -1;
+                    switch (columnName) {
+                        case "Program Name": columnIndex = 0; break;
+                        case "Program Code": columnIndex = 1; break;
+                        case "College Code": columnIndex = 2; break;
+                    }
+                    if (columnIndex >= 0) {
+                        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
+                    }
+                }
+            }
+            
+            // Update sort button icon to reflect current state
+            updateSortButtonIcon();
         });
         
         searchPanelContainer.add(searchPanel, BorderLayout.NORTH);
@@ -113,15 +125,7 @@ public final class PProgramTablePanel extends JPanel {
             System.out.println("Sort button clicked");
             int columnIndex = sortByBox.getSelectedIndex();
             programTable.toggleSorting(columnIndex);
-            if (!programTable.isSorted()) {
-                sortButton.setIcon(new ImageIcon("Assets/SortDisabledIcon.png"));
-            } else {
-                sortButton.setIcon(new ImageIcon(
-                    programTable.getCurrentSortOrder() == SortOrder.ASCENDING 
-                    ? "Assets/AscendingIcon.png" 
-                    : "Assets/DecendingIcon.png"
-                ));
-            }
+            updateSortButtonIcon();
         });
         
         // Add sort components to panel
@@ -201,7 +205,22 @@ public final class PProgramTablePanel extends JPanel {
         bottomRow.add(scrollPane, BorderLayout.CENTER);
     }
     
-public CProgramTable getProgramTable() {
-    return programTable;
-}
+    /**
+     * Updates the sort button icon based on the current sort state
+     */
+    private void updateSortButtonIcon() {
+        if (!programTable.isSorted()) {
+            sortButton.setIcon(new ImageIcon("Assets/SortDisabledIcon.png"));
+        } else {
+            sortButton.setIcon(new ImageIcon(
+                programTable.getCurrentSortOrder() == SortOrder.ASCENDING 
+                ? "Assets/AscendingIcon.png" 
+                : "Assets/DecendingIcon.png"
+            ));
+        }
+    }
+    
+    public CProgramTable getProgramTable() {
+        return programTable;
+    }
 }
