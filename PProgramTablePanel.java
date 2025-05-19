@@ -15,6 +15,8 @@ public final class PProgramTablePanel extends JPanel {
     private CSearchPanels.ProgramSearchPanel searchPanel;
 
     public PProgramTablePanel() {
+        programTable = new CProgramTable();
+
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -53,6 +55,7 @@ public final class PProgramTablePanel extends JPanel {
                  }
             }
         });
+        
         searchPanelContainer.add(searchPanel, BorderLayout.NORTH);
         this.add(searchPanelContainer, gbc);
 
@@ -91,6 +94,40 @@ public final class PProgramTablePanel extends JPanel {
         buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 5));
         buttonsPanel.setOpaque(false);
         rightPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
+        JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        sortPanel.setOpaque(false);
+
+        // Create the sort by combobox
+        JLabel sortByLabel = new JLabel("Sort by:");
+        sortByBox = new JComboBox<>(new String[]{"Program Name", "Program Code", "College Code"});
+        
+        // Create the sort button
+        sortButton = new JButton(new ImageIcon("Assets/DecendingIcon.png"));
+        sortButton.setBorderPainted(false);
+        sortButton.setFocusPainted(false);
+        sortButton.setContentAreaFilled(false);
+
+        // Add action listener to sort button
+        sortButton.addActionListener(e -> {
+            System.out.println("Sort button clicked");
+            int columnIndex = sortByBox.getSelectedIndex();
+            programTable.toggleSorting(columnIndex);
+            if (!programTable.isSorted()) {
+                sortButton.setIcon(new ImageIcon("Assets/SortDisabledIcon.png"));
+            } else {
+                sortButton.setIcon(new ImageIcon(
+                    programTable.getCurrentSortOrder() == SortOrder.ASCENDING 
+                    ? "Assets/AscendingIcon.png" 
+                    : "Assets/DecendingIcon.png"
+                ));
+            }
+        });
+        
+        // Add sort components to panel
+        sortPanel.add(sortByLabel);
+        sortPanel.add(sortByBox);
+        sortPanel.add(sortButton);
 
         JButton addProgramButton = new JButton(new ImageIcon("Assets/PlusIcon.png"));
         addProgramButton.setBorderPainted(false);
@@ -145,19 +182,13 @@ public final class PProgramTablePanel extends JPanel {
         buttonsPanel.add(deleteButton);
         buttonsPanel.add(editButton);
 
-        JLabel collegeText = new JLabel("Programs");
-        collegeText.setFont(new Font("Helvetica", Font.BOLD, 32));
+        JLabel programsText = new JLabel("Programs");
+        programsText.setFont(new Font("Helvetica", Font.BOLD, 32));
         JPanel textContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
         textContainer.setOpaque(false);
 
-        sortByBox = new JComboBox<>();
-
-        sortButton = new JButton(new ImageIcon("Assets/DecendingIcon.png"));
-        sortButton.setBorderPainted(false);
-        sortButton.setFocusPainted(false);
-        sortButton.setContentAreaFilled(false);
-
-        textContainer.add(collegeText);
+        textContainer.add(programsText);
+        textContainer.add(sortPanel);
         leftPanel.add(textContainer, BorderLayout.SOUTH);
 
         JPanel bottomRow = new JPanel(new BorderLayout());
@@ -165,8 +196,6 @@ public final class PProgramTablePanel extends JPanel {
         gbc.gridy = 2;
         gbc.weighty = 0.9;
         this.add(bottomRow, gbc);
-
-        programTable = new CProgramTable();
         
         JScrollPane scrollPane = new JScrollPane(programTable);
         bottomRow.add(scrollPane, BorderLayout.CENTER);

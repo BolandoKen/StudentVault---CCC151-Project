@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -9,9 +10,9 @@ public class CProgramTable extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
     private TableRowSorter<DefaultTableModel> sorter;
-    private JComboBox<String> sortByBox;
-    private JButton sortButton;
-    private SortOrder currentSortOrder = SortOrder.DESCENDING;
+    private boolean isSorted = false;
+    private SortOrder currentSortOrder = SortOrder.ASCENDING;
+    private int currentSortColumn = 0; // Default sort column (Program Name)
 
     public CProgramTable() {
         setLayout(new BorderLayout());
@@ -26,9 +27,19 @@ public class CProgramTable extends JPanel {
         };
         
         table = new JTable(tableModel);
+
+        sorter = new TableRowSorter<>(tableModel);
+        sorter.setSortable(0, true);  // Program Name
+        sorter.setSortable(1, true);  // Program Code
+        sorter.setSortable(2, true);  // College Code
+        
         table.setRowHeight(25);
         table.setFont(new Font("Helvetica", Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font("Helvetica", Font.BOLD, 14));
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        add(scrollPane, BorderLayout.CENTER);
+
         loadProgramData();
     }
     
@@ -60,8 +71,31 @@ public class CProgramTable extends JPanel {
         }
     }
     
+    
     public void refreshData() {
+        // Save the current sort state
+        boolean wasSorted = isSorted;
+        int sortColumn = currentSortColumn;
+        SortOrder sortOrder = currentSortOrder;
+        
+        // Clear any filtering/sorting temporarily
+        if (isSorted) {
+            table.setRowSorter(null);
+            isSorted = false;
+        }
+        
+        // Reload data
         loadProgramData();
+        
+        // Restore sorting if it was active
+        if (wasSorted) {
+            table.setRowSorter(sorter);
+            sorter.setSortKeys(Collections.singletonList(
+                new RowSorter.SortKey(sortColumn, sortOrder)
+            ));
+            isSorted = true;
+            sorter.sort();
+        }
     }
     
     public JTable getTable() {
@@ -87,5 +121,53 @@ public class CProgramTable extends JPanel {
             return (String) tableModel.getValueAt(row, 0);
         }
         return null;
+    }
+
+    public void toggleSorting(int columnIndex) {
+        currentSortColumn = columnIndex;
+        
+        if (!isSorted) {
+            // Enable sorting
+            table.setRowSorter(sorter);
+            sorter.setSortKeys(Collections.singletonList(
+                new RowSorter.SortKey(currentSortColumn, currentSortOrder)
+            ));
+            isSorted = true;
+        } else {
+            // Toggle sort direction
+            currentSortOrder = currentSortOrder == SortOrder.ASCENDING 
+                             ? SortOrder.DESCENDING 
+                             : SortOrder.ASCENDING;
+            sorter.setSortKeys(Collections.singletonList(
+                new RowSorter.SortKey(currentSortColumn, currentSortOrder)
+            ));
+        }
+        
+        // Update the UI to reflect changes
+        sorter.sort();
+    }
+    
+    /**
+     * Get the current sort order
+     * @return The current sort order
+     */
+    public SortOrder getCurrentSortOrder() {
+        return currentSortOrder;
+    }
+    
+    /**
+     * Get the current sort column index
+     * @return The current sort column index
+     */
+    public int getCurrentSortColumn() {
+        return currentSortColumn;
+    }
+    
+    /**
+     * Check if the table is currently sorted
+     * @return true if the table is sorted, false otherwise
+     */
+    public boolean isSorted() {
+        return isSorted;
     }
 }
