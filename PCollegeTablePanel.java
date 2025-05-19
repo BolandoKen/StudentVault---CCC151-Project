@@ -4,13 +4,11 @@ import javax.swing.*;
 public final class PCollegeTablePanel extends JPanel {
     private CCollegeTable collegeTable;
     private boolean selectionMode = false;
-    private JButton deleteButton;
-    private JButton cancelButton;
-    private JButton confirmDeleteButton;
-    private JPanel buttonsPanel;
-    private JButton editButton;
+    private final JButton deleteButton;
+    private final JPanel buttonsPanel;    
+    private final JButton editButton;
     private JButton sortButton;
-    private CSearchPanels.CollegeSearchPanel searchPanel;
+    private final CSearchPanels.CollegeSearchPanel searchPanel;
 
     public PCollegeTablePanel() {
         collegeTable = new CCollegeTable();
@@ -129,8 +127,6 @@ public final class PCollegeTablePanel extends JPanel {
                 JOptionPane.showMessageDialog(null, "Please select a college to edit.", "No Selection", JOptionPane.WARNING_MESSAGE);
             }
         });
-        
-        
 
         buttonsPanel.add(addCollegeButton);
         buttonsPanel.add(deleteButton);
@@ -162,10 +158,9 @@ sortButton.addActionListener(e -> {
         ));
     }
 });
-        textContainer.add(sortButton);
+        
         leftPanel.add(textContainer, BorderLayout.SOUTH);
         
-
         JPanel bottomRow = new JPanel(new BorderLayout());
         bottomRow.setOpaque(false); 
         gbc.gridy = 2;
@@ -173,7 +168,6 @@ sortButton.addActionListener(e -> {
         this.add(bottomRow, gbc);
 
        
-    
         JScrollPane scrollPane = new JScrollPane(collegeTable);
         bottomRow.add(scrollPane, BorderLayout.CENTER);
     }

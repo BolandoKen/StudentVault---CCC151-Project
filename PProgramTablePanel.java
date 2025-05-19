@@ -1,14 +1,18 @@
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 public final class PProgramTablePanel extends JPanel {
     private CProgramTable programTable;
     private boolean selectionMode = false;
     private JButton deleteButton;
     private JButton cancelButton;
-    private JButton confirmDeleteButton;
-    private JPanel buttonsPanel;
+    private final JPanel buttonsPanel;
     private JButton editButton;
+    private JButton sortButton;
+    private JComboBox<String> sortByBox;
+    private CSearchPanels.ProgramSearchPanel searchPanel;
 
     public PProgramTablePanel() {
         this.setLayout(new GridBagLayout());
@@ -21,6 +25,35 @@ public final class PProgramTablePanel extends JPanel {
         gbc.gridy = 0;
         gbc.weighty = 0.02;
 
+        searchPanel = new CSearchPanels.ProgramSearchPanel(searchParams -> {
+        String searchText = searchParams[0].toLowerCase();
+        String columnName = searchParams[1];
+    
+    // Filter the table based on search parameters
+        DefaultTableModel model = (DefaultTableModel) programTable.getTable().getModel();
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        programTable.getTable().setRowSorter(sorter);
+    
+        if (searchText.isEmpty()) {
+            sorter.setRowFilter(null);
+        } else {
+            if ("All".equals(columnName)) {
+            sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
+            } else {
+            // Map column names to column indices
+                int columnIndex = -1;
+                switch (columnName) {
+                case "Program Name": columnIndex = 0; break;
+                case "Program Code": columnIndex = 1; break;
+                case "College Code": columnIndex = 2; break;
+                }
+            if (columnIndex >= 0) {
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText, columnIndex));
+                     }
+                 }
+            }
+        });
+        searchPanelContainer.add(searchPanel, BorderLayout.NORTH);
         this.add(searchPanelContainer, gbc);
 
         JPanel topRow = new JPanel(new GridBagLayout());
@@ -93,7 +126,7 @@ public final class PProgramTablePanel extends JPanel {
         editButton.setBorderPainted(false);
         editButton.setFocusPainted(false);
         editButton.setContentAreaFilled(false);
-       editButton.addActionListener(e -> {
+        editButton.addActionListener(e -> {
             JTable table = programTable.getTable();
             int selectedRow = table.getSelectedRow();
         
@@ -117,6 +150,13 @@ public final class PProgramTablePanel extends JPanel {
         JPanel textContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
         textContainer.setOpaque(false);
 
+        sortByBox = new JComboBox<>();
+
+        sortButton = new JButton(new ImageIcon("Assets/DecendingIcon.png"));
+        sortButton.setBorderPainted(false);
+        sortButton.setFocusPainted(false);
+        sortButton.setContentAreaFilled(false);
+
         textContainer.add(collegeText);
         leftPanel.add(textContainer, BorderLayout.SOUTH);
 
@@ -128,16 +168,10 @@ public final class PProgramTablePanel extends JPanel {
 
         programTable = new CProgramTable();
         
-        // Initialize the table with data
-        //CollegeTableUtility.populateCollegeTable(collegeTable);
-
         JScrollPane scrollPane = new JScrollPane(programTable);
         bottomRow.add(scrollPane, BorderLayout.CENTER);
     }
-   /**
- * Returns the CProgramTable associated with this panel
- * @return The CProgramTable instance
- */
+    
 public CProgramTable getProgramTable() {
     return programTable;
 }
