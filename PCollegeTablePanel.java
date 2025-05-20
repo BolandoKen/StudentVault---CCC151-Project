@@ -158,7 +158,7 @@ sortButton.addActionListener(e -> {
         ));
     }
 });
-        
+        textContainer.add(sortButton);
         leftPanel.add(textContainer, BorderLayout.SOUTH);
         
         JPanel bottomRow = new JPanel(new BorderLayout());
