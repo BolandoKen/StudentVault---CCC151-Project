@@ -78,8 +78,7 @@ public class Dialogs {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-    }
-        
+    }  
     public static void editCollegeDialog(String collegeCode, CCollegeTable collegeTable) {
         JDialog dialog = new JDialog();
         dialog.setTitle("Edit College");
@@ -147,8 +146,7 @@ public class Dialogs {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-    }
-            
+    }           
     public static void deleteCollegeDialog(String collegeCode, CCollegeTable collegeTable) {
 
         int confirm = JOptionPane.showConfirmDialog(
@@ -398,11 +396,6 @@ public static void editProgramDialog(String programCode, CProgramTable programTa
     dialog.setVisible(true);
 }
 
-/**
- * Updates all students with the old program code to use the new program code
- * @param oldProgramCode The original program code to find students
- * @param newProgramCode The new program code to update to
- */
 private static void updateStudentsProgramCode(String oldProgramCode, String newProgramCode) {
     // Get all students with the old program code
     List<Student> students = StudentDataManager.getStudentsByProgram(oldProgramCode);
@@ -421,7 +414,6 @@ private static void updateStudentsProgramCode(String oldProgramCode, String newP
     }
 }
 
-// Helper method to update program with college change
     private static boolean updateProgramWithCollege(String oldProgramCode, String newProgramName, String newProgramCode, String newCollegeCode) {
     List<String[]> programs = ProgramDataManager.readCSV();
     boolean updated = false;
@@ -452,7 +444,6 @@ private static void updateStudentsProgramCode(String oldProgramCode, String newP
     
     return false;
 }
-
 public static void deleteProgramDialog(String programCode, CProgramTable programTable) {
     // First check if there are any students in this program
     List<Student> studentsInProgram = StudentDataManager.getStudentsByProgram(programCode);
@@ -503,10 +494,6 @@ public static void deleteProgramDialog(String programCode, CProgramTable program
     }
 }
 
-/**
- * Updates all students in a program to have "N/A" as their program code
- * @param programCode The program code to find students for
- */
 private static void updateStudentsProgramToNA(String programCode) {
     // Get all students with the program code
     List<Student> students = StudentDataManager.getStudentsByProgram(programCode);
@@ -525,7 +512,7 @@ private static void updateStudentsProgramToNA(String programCode) {
     }
 }
 
-    public static void addStudentDialog(CStudentTable studentTable) {
+public static void addStudentDialog(CStudentTable studentTable) {
     JDialog dialog = new JDialog();
     dialog.setTitle("Add New Student");
     dialog.setLayout(new GridLayout(10, 2));
@@ -550,7 +537,7 @@ private static void updateStudentsProgramToNA(String programCode) {
     yearLevelDropdown.addItem("4");
     yearLevelDropdown.addItem("5");
     
-    // College dropdown - added as first step
+    // College dropdown
     JComboBox<String> collegeDropdown = new JComboBox<>();
     collegeDropdown.addItem("-- Select College --");
     Map<String, String> collegeMap = CollegeDataManager.loadCollegeMap();
@@ -561,14 +548,14 @@ private static void updateStudentsProgramToNA(String programCode) {
     // Program dropdown - empty initially
     JComboBox<String> programDropdown = new JComboBox<>();
     programDropdown.addItem("-- Select Program --");
-    programDropdown.setEnabled(false); // Disabled until college is selected
+    programDropdown.setEnabled(false);
     
     // Labels and fields
-    dialog.add(new JLabel("Student ID:"));
+    dialog.add(new JLabel("Student ID (format: 0000-0000):"));
     dialog.add(idNumberField);
-    dialog.add(new JLabel("First Name:"));
+    dialog.add(new JLabel("First Name (letters only):"));
     dialog.add(firstNameField);
-    dialog.add(new JLabel("Last Name:"));
+    dialog.add(new JLabel("Last Name (letters only):"));
     dialog.add(lastNameField);
     dialog.add(new JLabel("Gender:"));
     dialog.add(genderDropdown);
@@ -582,19 +569,15 @@ private static void updateStudentsProgramToNA(String programCode) {
     // Add listener to college dropdown to update program dropdown
     collegeDropdown.addActionListener(e -> {
         int selectedIndex = collegeDropdown.getSelectedIndex();
-        // Clear existing programs
         programDropdown.removeAllItems();
         programDropdown.addItem("-- Select Program --");
         
         if (selectedIndex > 0) {
-            // Get selected college code
             String selectedCollege = (String) collegeDropdown.getSelectedItem();
             String collegeCode = selectedCollege.substring(selectedCollege.lastIndexOf("(") + 1, selectedCollege.lastIndexOf(")"));
             
-            // Get programs for selected college
             Map<String, String> filteredPrograms = ProgramDataManager.loadProgramsByCollege(collegeCode);
             
-            // Add filtered programs to dropdown
             for (Map.Entry<String, String> entry : filteredPrograms.entrySet()) {
                 programDropdown.addItem(entry.getValue() + " (" + entry.getKey() + ")");
             }
@@ -613,12 +596,39 @@ private static void updateStudentsProgramToNA(String programCode) {
         String firstName = firstNameField.getText().trim();
         String lastName = lastNameField.getText().trim();
         
+        // Validate ID number format (0000-0000)
+        if (!idNumber.matches("^\\d{4}-\\d{4}$")) {
+            JOptionPane.showMessageDialog(dialog, 
+                "Student ID must be in the format 0000-0000 (numbers only)", 
+                "Invalid ID Format", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Validate first name (letters only, may include spaces and hyphens)
+        if (!firstName.matches("^[a-zA-Z\\s-]+$")) {
+            JOptionPane.showMessageDialog(dialog, 
+                "First name can only contain letters, spaces, and hyphens", 
+                "Invalid First Name", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Validate last name (letters only, may include spaces and hyphens)
+        if (!lastName.matches("^[a-zA-Z\\s-]+$")) {
+            JOptionPane.showMessageDialog(dialog, 
+                "Last name can only contain letters, spaces, and hyphens", 
+                "Invalid Last Name", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         // Get selected values
         String gender = genderDropdown.getSelectedIndex() > 0 ? 
-                        (String) genderDropdown.getSelectedItem() : "";
+                      (String) genderDropdown.getSelectedItem() : "";
         
         String yearLevel = yearLevelDropdown.getSelectedIndex() > 0 ? 
-                          (String) yearLevelDropdown.getSelectedItem() : "";
+                         (String) yearLevelDropdown.getSelectedItem() : "";
         
         // Validate required fields
         if (idNumber.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
@@ -664,7 +674,7 @@ private static void updateStudentsProgramToNA(String programCode) {
         String programName = selectedProgram.substring(0, selectedProgram.lastIndexOf("(")).trim();
         
         // Add student using the data manager
-        if (StudentDataManager.addStudent(idNumber, firstName, lastName, gender, yearLevel,programCode)) {
+        if (StudentDataManager.addStudent(idNumber, firstName, lastName, gender, yearLevel, programCode)) {
             studentTable.refreshTable();
             dialog.dispose();
             JOptionPane.showMessageDialog(null, 
@@ -688,8 +698,7 @@ private static void updateStudentsProgramToNA(String programCode) {
     dialog.setLocationRelativeTo(null);
     dialog.setVisible(true);
 }
-
-  public static void editStudentDialog(String studentId, CStudentTable studentTable) {
+public static void editStudentDialog(String studentId, CStudentTable studentTable) {
     // First, load the student data
     if (!StudentDataManager.getStudentById(studentId)) {
         JOptionPane.showMessageDialog(null, 
@@ -821,11 +830,11 @@ private static void updateStudentsProgramToNA(String programCode) {
     });
     
     // Labels and fields
-    dialog.add(new JLabel("Student ID:"));
+    dialog.add(new JLabel("Student ID (format: 0000-0000):"));
     dialog.add(idNumberField);
-    dialog.add(new JLabel("First Name:"));
+    dialog.add(new JLabel("First Name (letters only):"));
     dialog.add(firstNameField);
-    dialog.add(new JLabel("Last Name:"));
+    dialog.add(new JLabel("Last Name (letters only):"));
     dialog.add(lastNameField);
     dialog.add(new JLabel("Gender:"));
     dialog.add(genderDropdown);
@@ -844,6 +853,33 @@ private static void updateStudentsProgramToNA(String programCode) {
         String newId = idNumberField.getText().trim();
         String firstName = firstNameField.getText().trim();
         String lastName = lastNameField.getText().trim();
+        
+        // Validate ID number format (0000-0000)
+        if (!newId.matches("^\\d{4}-\\d{4}$")) {
+            JOptionPane.showMessageDialog(dialog, 
+                "Student ID must be in the format 0000-0000 (numbers only)", 
+                "Invalid ID Format", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Validate first name (letters only, may include spaces and hyphens)
+        if (!firstName.matches("^[a-zA-Z\\s-]+$")) {
+            JOptionPane.showMessageDialog(dialog, 
+                "First name can only contain letters, spaces, and hyphens", 
+                "Invalid First Name", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Validate last name (letters only, may include spaces and hyphens)
+        if (!lastName.matches("^[a-zA-Z\\s-]+$")) {
+            JOptionPane.showMessageDialog(dialog, 
+                "Last name can only contain letters, spaces, and hyphens", 
+                "Invalid Last Name", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         
         // Get selected values
         String gender = genderDropdown.getSelectedIndex() > 0 ? 
