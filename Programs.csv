@@ -36,7 +36,7 @@ BSEE,Bachelor of Science in Electrical Engineering,COE
 BSEnET,Bachelor of Science in Environmental Engineering,COE
 BSHM,Bachelor of Science in Hospitality Management,CEBA
 BSIS,Bachelor of Science in Information Systems,CCS
-BSIT,Bachelor of Science in Information Technology,CCS
+BSITS,Bachelor of Science in Information Technology,CCS
 BSMath,Bachelor of Science in Mathematics,CSM
 BSME,Bachelor of Science in Mechanical Engineering,COE
 BSMetE,Bachelor of Science in Metallurgical Engineering,COE
@@ -47,4 +47,3 @@ BTLED-HE,Bachelor of Technology and Livelihood Education (Home Economics),CED
 BTLed-IA,Bachelor of Technology and Livelihood Education (Industrial Arts),CED
 BTVTED-DT,Bachelor of Technical-Vocational Teacher Education (Drafting Technology),CED
 DCET,Diploma in Chemical Engineering Technology,COE
-TP,Test Program,N/A

@@ -1,4 +1,5 @@
 import java.awt.GridLayout;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +112,7 @@ public class Dialogs {
                 return;
             }
             
-            // Confirm code change if different from original
+            // Check if college code is being changed
             if (!newCollegeCode.equals(collegeCode)) {
                 int confirm = JOptionPane.showConfirmDialog(
                     dialog, 
@@ -123,9 +124,43 @@ public class Dialogs {
                 if (confirm != JOptionPane.YES_OPTION) {
                     return;
                 }
+                
+                // Get all programs and update those associated with the college
+                List<String[]> programs = ProgramDataManager.readCSV();
+                List<String[]> updatedPrograms = new ArrayList<>();
+                
+                for (String[] program : programs) {
+                    if (program[2].equals(collegeCode)) {
+                        // Use getProgramByCode to verify the program exists
+                        if (ProgramDataManager.getProgramByCode(program[0])) {
+                            // Update the program with new college code
+                            String updatedProgramCode = program[0]; // Keep same program code
+                            String updatedProgramName = ProgramDataManager.getProgramName();
+                            String updatedCollegeCode = newCollegeCode;
+                            
+                            // Update the program in our list
+                            updatedPrograms.add(new String[] {
+                                updatedProgramCode,
+                                updatedProgramName,
+                                updatedCollegeCode
+                            });
+                        }
+                    } else {
+                        updatedPrograms.add(program);
+                    }
+                }
+                
+                // Write the updated programs back to CSV
+                if (!ProgramDataManager.writeCSV(updatedPrograms)) {
+                    JOptionPane.showMessageDialog(dialog, 
+                        "Failed to update programs with new college code", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
             }
             
-            // Perform the update
+            // Perform the college update
             if (CollegeDataManager.updateCollege(collegeCode, newCollegeName, newCollegeCode)) {
                 // Refresh the table to show updated data
                 collegeTable.refreshTable();
@@ -146,7 +181,7 @@ public class Dialogs {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-    }           
+    }
     public static void deleteCollegeDialog(String collegeCode, CCollegeTable collegeTable) {
 
         int confirm = JOptionPane.showConfirmDialog(
